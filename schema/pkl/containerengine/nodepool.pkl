@@ -1,0 +1,166 @@
+/*
+ * © 2025 Platform Engineering Labs Inc.
+ *
+ * SPDX-License-Identifier: FSL-1.1-ALv2
+ */
+
+module oci.containerengine.nodepool
+
+import "@formae/formae.pkl"
+import "../oci.pkl"
+
+const type = "OCI::ContainerEngine::NodePool"
+
+open class NodePoolResolvable extends formae.Resolvable {
+    hidden type = module.type
+
+    hidden id: NodePoolResolvable = (this) {
+        property = "Id"
+    }
+    hidden compartmentId: NodePoolResolvable = (this) {
+        property = "CompartmentId"
+    }
+    hidden clusterId: NodePoolResolvable = (this) {
+        property = "ClusterId"
+    }
+}
+
+/// Node shape configuration for flexible shapes
+class NodeShapeConfig {
+    /// The number of OCPUs for the node
+    ocpus: Float?
+
+    /// The amount of memory in GBs for the node
+    memoryInGBs: Float?
+}
+
+/// Placement configuration for nodes in a node pool
+class NodePoolPlacementConfig {
+    /// The availability domain for the nodes
+    availabilityDomain: String?
+
+    /// The OCID of the subnet for the nodes
+    subnetId: String|formae.Resolvable?
+
+    /// Optional capacity reservation ID
+    capacityReservationId: String?
+
+    /// Fault domains for the nodes
+    faultDomains: Listing<String>?
+}
+
+/// Node configuration details
+class NodeConfigDetails {
+    /// The number of nodes in the node pool
+    size: Int?
+
+    /// Placement configurations - where to place the nodes
+    placementConfigs: Listing<NodePoolPlacementConfig>?
+
+    /// NSG OCIDs for the nodes
+    nsgIds: Listing<String|formae.Resolvable>?
+
+    /// Whether PV encryption in transit is enabled
+    isPvEncryptionInTransitEnabled: Boolean?
+
+    /// FreeformTags for nodes
+    freeformTags: Mapping<String, String>?
+
+    /// DefinedTags for nodes
+    definedTags: Mapping<String, Mapping<String, Any>>?
+}
+
+/// Node source details - specifies the image for nodes
+class NodeSourceViaImageDetails {
+    /// Source type - IMAGE
+    hidden sourceType: String = "IMAGE"
+
+    /// The OCID of the image to use
+    imageId: String?
+
+    /// Size of the boot volume in GBs
+    bootVolumeSizeInGBs: Int?
+}
+
+/// Initial node labels
+class NodeLabel {
+    /// The key of the label
+    key: String?
+
+    /// The value of the label
+    value: String?
+}
+
+@oci.ResourceHint {
+    type = module.type
+    identifier = "Id"
+    discoverable = true
+    extractable = true
+    parent = "OCI::ContainerEngine::Cluster"
+    listParam = new formae.ListProperty {
+        parentProperty = "Id"
+        listParameter = "ClusterId"
+    }
+}
+open class NodePool extends formae.Resource {
+
+    /// The OCID of the compartment in which the node pool exists
+    @oci.FieldHint{required = true}
+    compartmentId: String|formae.Resolvable
+
+    /// The OCID of the cluster to which this node pool is attached
+    @oci.FieldHint{required = true}
+    clusterId: String|formae.Resolvable
+
+    /// The name of the node pool
+    @oci.FieldHint{required = true}
+    name: String
+
+    /// The version of Kubernetes to install on nodes in the node pool
+    @oci.FieldHint
+    kubernetesVersion: String?
+
+    /// The name of the node shape for the nodes in the node pool
+    /// Examples: VM.Standard.E4.Flex, VM.Standard.A1.Flex
+    @oci.FieldHint{required = true}
+    nodeShape: String
+
+    /// Configuration for flexible node shapes (OCPUs and memory)
+    @oci.FieldHint
+    nodeShapeConfig: NodeShapeConfig?
+
+    /// The configuration of nodes in the node pool
+    @oci.FieldHint{required = true}
+    nodeConfigDetails: NodeConfigDetails
+
+    /// Details of the node source (image)
+    @oci.FieldHint
+    nodeSourceDetails: NodeSourceViaImageDetails?
+
+    /// The SSH public key to install on all nodes
+    @oci.FieldHint
+    sshPublicKey: String?
+
+    /// Initial labels for nodes
+    @oci.FieldHint
+    initialNodeLabels: Listing<NodeLabel>?
+
+    /// FreeformTags - converted from formae.Tag format via tags property
+    @oci.FieldHint {
+        outputTransformation = oci.transform.tagsToFreeformTags
+        outputField = "FreeformTags"
+    }
+    tags: Listing<formae.Tag>?
+
+    @oci.FieldHint
+    definedTags: Mapping<String, Mapping<String, Any>>?
+
+    local parent = this
+
+    hidden res: NodePoolResolvable = new {
+        label = parent.label
+        stack = parent.stack?.label
+    }
+}
+
+

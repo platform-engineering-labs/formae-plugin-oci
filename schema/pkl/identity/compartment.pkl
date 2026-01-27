@@ -1,0 +1,58 @@
+/*
+ * © 2025 Platform Engineering Labs Inc.
+ *
+ * SPDX-License-Identifier: FSL-1.1-ALv2
+ */
+
+module oci.identity.compartment
+
+import "@formae/formae.pkl"
+import "../oci.pkl"
+
+const type = "OCI::Identity::Compartment"
+
+open class CompartmentResolvable extends formae.Resolvable {
+    hidden type = module.type
+
+    hidden id: CompartmentResolvable = (this) {
+        property = "Id"
+    }
+    hidden name: CompartmentResolvable = (this) {
+        property = "Name"
+    }
+}
+
+@oci.ResourceHint {
+    type = module.type
+    identifier = "Id"
+    discoverable = true
+    extractable = true
+    // Compartments are root-level resources - discovery will traverse naturally
+}
+open class Compartment extends formae.Resource {
+
+    @oci.FieldHint{required = true createOnly = true}
+    compartmentId: String|formae.Resolvable
+
+    @oci.FieldHint{required = true}
+    name: String
+
+    @oci.FieldHint{required = true}
+    description: String
+
+    @oci.FieldHint {
+        outputTransformation = oci.transform.tagsToFreeformTags
+        outputField = "FreeformTags"
+    }
+    tags: Listing<formae.Tag>?
+
+    @oci.FieldHint
+    definedTags: Mapping<String, Mapping<String, Any>>?
+
+    local parent = this
+
+    hidden res: CompartmentResolvable = new {
+        label = parent.label
+        stack = parent.stack?.label
+    }
+}

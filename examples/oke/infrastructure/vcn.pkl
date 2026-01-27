@@ -1,0 +1,32 @@
+/*
+ * © 2025 Platform Engineering Labs Inc.
+ *
+ * SPDX-License-Identifier: FSL-1.1-ALv2
+ */
+
+import "@formae/formae.pkl"
+import "@oci/core/vcn.pkl"
+
+import "../vars.pkl"
+
+class VcnResources {
+    compartmentId: String
+    projectName: String
+    vcnCidr: String
+
+    vcn: vcn.VCN = new vcn.VCN {
+        label = "oke-vcn"
+        compartmentId = outer.compartmentId
+        cidrBlock = vcnCidr
+        displayName = projectName + "-vcn"
+        dnsLabel = "okecluster"
+        tags {
+            new { key = "Name"; value = projectName + "-vcn" }
+            new { key = "Project"; value = projectName }
+        }
+    }
+
+    hidden resources: Listing<formae.Resource> = new {
+        vcn
+    }
+}

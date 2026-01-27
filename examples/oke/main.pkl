@@ -1,0 +1,79 @@
+/*
+ * © 2025 Platform Engineering Labs Inc.
+ *
+ * SPDX-License-Identifier: FSL-1.1-ALv2
+ */
+
+amends "@formae/forma.pkl"
+
+import "./vars.pkl"
+import "./infrastructure/vcn.pkl"
+import "./infrastructure/security.pkl"
+import "./infrastructure/network.pkl"
+import "./infrastructure/oke.pkl"
+
+local _vcn = new vcn.VcnResources {
+    compartmentId = vars.props.compartmentId.value
+    projectName = vars.projectName
+    vcnCidr = vars.vcnCidr
+}
+
+local _security = new security.SecurityResources {
+    compartmentId = vars.props.compartmentId.value
+    projectName = vars.projectName
+    serviceLbSubnetCidr = vars.serviceLbSubnetCidr
+    workerNodeSubnetCidr = vars.workerNodeSubnetCidr
+    vcn = _vcn.vcn
+}
+
+local _network = new network.NetworkResources {
+    compartmentId = vars.props.compartmentId.value
+    projectName = vars.projectName
+    serviceLbSubnetCidr = vars.serviceLbSubnetCidr
+    workerNodeSubnetCidr = vars.workerNodeSubnetCidr
+    serviceGatewayServiceId = vars.props.serviceGatewayServiceId.value
+    vcn = _vcn.vcn
+    securityList = _security.securityList
+}
+
+local _oke = new oke.OkeResources {
+    compartmentId = vars.props.compartmentId.value
+    projectName = vars.projectName
+    k8sVersion = vars.k8sVersion
+    vmShape = vars.vmShape
+    nodeOcpus = vars.nodeOcpus
+    nodeMemoryGBs = vars.nodeMemoryGBs
+    nodePoolSize = vars.nodePoolSize
+    availabilityDomain = vars.props.availabilityDomain.value
+    nodeImageId = vars.props.nodeImageId.value
+    vcn = _vcn.vcn
+    svcLbSubnet = _network.svcLbSubnet
+    workerSubnet = _network.workerSubnet
+}
+
+description {
+    text = """
+    OKE Example - Oracle Kubernetes Engine Cluster
+
+    This example creates:
+    - VCN with public (service LB) and private (worker nodes) subnets
+    - Internet Gateway for public subnets
+    - NAT Gateway and Service Gateway for private subnet access
+    - Public and Private Route Tables
+    - OKE Cluster with public API endpoint
+    - Node Pool with flexible VM shapes (E4.Flex)
+
+    The worker nodes use a private subnet with NAT Gateway for internet access.
+    """
+    confirm = true
+}
+
+forma {
+    vars.stack
+    vars.target
+
+    ..._vcn.resources
+    ..._security.resources
+    ..._network.resources
+    ..._oke.resources
+}

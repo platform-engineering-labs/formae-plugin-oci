@@ -1,0 +1,163 @@
+/*
+ * © 2025 Platform Engineering Labs Inc.
+ *
+ * SPDX-License-Identifier: FSL-1.1-ALv2
+ */
+
+module oci.core.securitylist
+
+import "@formae/formae.pkl"
+import "../oci.pkl"
+
+const type = "OCI::Core::SecurityList"
+
+open class SecurityListResolvable extends formae.Resolvable {
+    hidden type = module.type
+
+    hidden id: SecurityListResolvable = (this) {
+        property = "Id"
+    }
+}
+
+/// Port range for TCP/UDP options
+class PortRange {
+    /// The minimum port number
+    min: Int
+
+    /// The maximum port number
+    max: Int
+}
+
+/// TCP options for security rules
+class TcpOptions {
+    /// Destination port range
+    destinationPortRange: PortRange?
+
+    /// Source port range
+    sourcePortRange: PortRange?
+}
+
+/// UDP options for security rules
+class UdpOptions {
+    /// Destination port range
+    destinationPortRange: PortRange?
+
+    /// Source port range
+    sourcePortRange: PortRange?
+}
+
+/// ICMP options for security rules
+class IcmpOptions {
+    /// The ICMP type (required)
+    type: Int
+
+    /// The ICMP code (optional)
+    code: Int?
+}
+
+/// Ingress (inbound) security rule
+class IngressSecurityRule {
+    /// The transport protocol. Use "all" or an IPv4 protocol number:
+    /// "1" (ICMP), "6" (TCP), "17" (UDP), "58" (ICMPv6)
+    protocol: String?
+
+    /// Source CIDR block or service CIDR block
+    source: String?
+
+    /// Type of source: "CIDR_BLOCK" or "SERVICE_CIDR_BLOCK"
+    sourceType: String?
+
+    /// Whether the rule is stateless (default: false = stateful)
+    isStateless: Boolean?
+
+    /// TCP options (for protocol "6")
+    tcpOptions: TcpOptions?
+
+    /// UDP options (for protocol "17")
+    udpOptions: UdpOptions?
+
+    /// ICMP options (for protocol "1" or "58")
+    icmpOptions: IcmpOptions?
+
+    /// Description of the rule
+    description: String?
+}
+
+/// Egress (outbound) security rule
+class EgressSecurityRule {
+    /// The transport protocol. Use "all" or an IPv4 protocol number:
+    /// "1" (ICMP), "6" (TCP), "17" (UDP), "58" (ICMPv6)
+    protocol: String?
+
+    /// Destination CIDR block or service CIDR block
+    destination: String?
+
+    /// Type of destination: "CIDR_BLOCK" or "SERVICE_CIDR_BLOCK"
+    destinationType: String?
+
+    /// Whether the rule is stateless (default: false = stateful)
+    isStateless: Boolean?
+
+    /// TCP options (for protocol "6")
+    tcpOptions: TcpOptions?
+
+    /// UDP options (for protocol "17")
+    udpOptions: UdpOptions?
+
+    /// ICMP options (for protocol "1" or "58")
+    icmpOptions: IcmpOptions?
+
+    /// Description of the rule
+    description: String?
+}
+
+@oci.ResourceHint {
+    type = module.type
+    identifier = "Id"
+    discoverable = true
+    extractable = true
+    parent = "OCI::Core::VCN"
+    listParam = List(
+        new formae.ListProperty { parentProperty = "Id" listParameter = "VcnId" },
+        new formae.ListProperty { parentProperty = "CompartmentId" listParameter = "CompartmentId" }
+    )
+}
+open class SecurityList extends formae.Resource {
+
+    /// The OCID of the compartment containing the security list
+    @oci.FieldHint{required = true createOnly = true}
+    compartmentId: String|formae.Resolvable
+
+    /// The OCID of the VCN the security list belongs to
+    @oci.FieldHint{required = true createOnly = true}
+    vcnId: String|formae.Resolvable
+
+    /// A user-friendly name for the security list
+    @oci.FieldHint
+    displayName: String?
+
+    /// Rules for allowing ingress (inbound) IP packets
+    @oci.FieldHint
+    ingressSecurityRules: Listing<IngressSecurityRule>?
+
+    /// Rules for allowing egress (outbound) IP packets
+    @oci.FieldHint
+    egressSecurityRules: Listing<EgressSecurityRule>?
+
+    /// FreeformTags - converted from formae.Tag format via tags property
+    @oci.FieldHint {
+        outputTransformation = oci.transform.tagsToFreeformTags
+        outputField = "FreeformTags"
+    }
+    tags: Listing<formae.Tag>?
+
+    @oci.FieldHint
+    definedTags: Mapping<String, Mapping<String, Any>>?
+
+    local parent = this
+
+    hidden res: SecurityListResolvable = new {
+        label = parent.label
+        stack = parent.stack?.label
+    }
+}

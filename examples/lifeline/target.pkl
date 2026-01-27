@@ -1,0 +1,21 @@
+/*
+ * © 2025 Platform Engineering Labs Inc.
+ *
+ * SPDX-License-Identifier: FSL-1.1-ALv2
+ */
+
+amends "@formae/forma.pkl"
+import "@formae/formae.pkl"
+import "@oci/oci.pkl"
+
+
+forma {
+   new formae.Target {
+        label = "oci-disco-target"
+        discoverable = true
+        config = new oci.Config {
+            region = "us-chicago-1"
+            profile = "PEL"
+        }
+    }
+}

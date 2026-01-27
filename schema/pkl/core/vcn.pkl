@@ -1,0 +1,86 @@
+/*
+ * © 2025 Platform Engineering Labs Inc.
+ *
+ * SPDX-License-Identifier: FSL-1.1-ALv2
+ */
+
+module oci.core.vcn
+
+import "@formae/formae.pkl"
+import "../oci.pkl"
+
+const type = "OCI::Core::VCN"
+
+open class VcnResolvable extends formae.Resolvable {
+    hidden type = module.type
+
+    hidden id: VcnResolvable = (this) {
+        property = "Id"
+    }
+    hidden CompartmentId: VcnResolvable = (this) {
+        property = "CompartmentId"
+    }
+    hidden cidrBlock: VcnResolvable = (this) {
+        property = "CidrBlock"
+    }
+    hidden defaultDhcpOptionsId: VcnResolvable = (this) {
+        property = "DefaultDhcpOptionsId"
+    }
+    hidden defaultRouteTableId: VcnResolvable = (this) {
+        property = "DefaultRouteTableId"
+    }
+    hidden defaultSecurityListId: VcnResolvable = (this) {
+        property = "DefaultSecurityListId"
+    }
+}
+
+@oci.ResourceHint {
+    type = module.type
+    identifier = "Id"
+    discoverable = true
+    extractable = true
+    parent = "OCI::Identity::Compartment"
+    listParam = new formae.ListProperty {
+        parentProperty = "Id"
+        listParameter = "CompartmentId"
+    }
+}
+open class VCN extends formae.Resource {
+
+    @oci.FieldHint{required = true}
+    compartmentId: String|formae.Resolvable
+
+    @oci.FieldHint
+    cidrBlock: String?
+
+    @oci.FieldHint
+    cidrBlocks: Listing<String>?
+
+    @oci.FieldHint
+    displayName: String?
+
+    @oci.FieldHint
+    dnsLabel: String?
+
+    @oci.FieldHint
+    isIpv6Enabled: Boolean?
+
+    /// FreeformTags - converted from formae.Tag format via tags property
+    /// Use the inherited `tags` property to set tags in standard formae format.
+    /// They will be automatically converted to OCI FreeformTags format.
+    @oci.FieldHint {
+        outputTransformation = oci.transform.tagsToFreeformTags
+        outputField = "FreeformTags"
+    }
+    tags: Listing<formae.Tag>?
+
+    @oci.FieldHint
+    definedTags: Mapping<String, Mapping<String, Any>>?
+
+    local parent = this
+
+    hidden res: VcnResolvable = new {
+        label = parent.label
+        stack = parent.stack?.label
+    }
+}

@@ -1,0 +1,134 @@
+/*
+ * © 2025 Platform Engineering Labs Inc.
+ *
+ * SPDX-License-Identifier: FSL-1.1-ALv2
+ */
+
+module oci.containerengine.virtualnodepool
+
+import "@formae/formae.pkl"
+import "../oci.pkl"
+
+const type = "OCI::ContainerEngine::VirtualNodePool"
+
+open class VirtualNodePoolResolvable extends formae.Resolvable {
+    hidden type = module.type
+
+    hidden id: VirtualNodePoolResolvable = (this) {
+        property = "Id"
+    }
+    hidden compartmentId: VirtualNodePoolResolvable = (this) {
+        property = "CompartmentId"
+    }
+    hidden clusterId: VirtualNodePoolResolvable = (this) {
+        property = "ClusterId"
+    }
+}
+
+/// Taint effect for virtual nodes
+typealias TaintEffect = "NoSchedule" | "PreferNoSchedule" | "NoExecute"
+
+/// Placement configuration for virtual nodes
+class PlacementConfiguration {
+    /// The availability domain for the virtual nodes
+    availabilityDomain: String
+
+    /// The OCID of the subnet for the virtual nodes
+    subnetId: String|formae.Resolvable
+
+    /// Fault domains for the virtual nodes
+    faultDomains: Listing<String>?
+}
+
+/// Pod configuration for virtual nodes
+class PodConfiguration {
+    /// The OCID of the subnet for pods
+    subnetId: String|formae.Resolvable
+
+    /// NSG OCIDs for pods
+    nsgIds: Listing<String|formae.Resolvable>?
+
+    /// Pod shape (e.g., "Pod.Standard.E4.Flex")
+    shape: String
+}
+
+/// Taints for virtual nodes
+class Taint {
+    /// The key of the taint
+    key: String?
+
+    /// The value of the taint
+    value: String?
+
+    /// The effect of the taint
+    effect: TaintEffect?
+}
+
+@oci.ResourceHint {
+    type = module.type
+    identifier = "Id"
+    discoverable = true
+    extractable = true
+    parent = "OCI::ContainerEngine::Cluster"
+    listParam = new formae.ListProperty {
+        parentProperty = "Id"
+        listParameter = "ClusterId"
+    }
+}
+open class VirtualNodePool extends formae.Resource {
+
+    /// The OCID of the compartment
+    @oci.FieldHint{required = true}
+    compartmentId: String|formae.Resolvable
+
+    /// The OCID of the cluster
+    @oci.FieldHint{required = true}
+    clusterId: String|formae.Resolvable
+
+    /// The display name of the virtual node pool
+    @oci.FieldHint{required = true}
+    displayName: String
+
+    /// Placement configurations for virtual nodes
+    @oci.FieldHint{required = true}
+    placementConfigurations: Listing<PlacementConfiguration>
+
+    /// Pod configuration - defines subnet and shape for pods
+    @oci.FieldHint{required = true}
+    podConfiguration: PodConfiguration
+
+    /// The number of virtual nodes (size)
+    @oci.FieldHint
+    size: Int?
+
+    /// NSG OCIDs for virtual nodes
+    @oci.FieldHint
+    nsgIds: Listing<String|formae.Resolvable>?
+
+    /// Initial labels for virtual nodes (using formae.Tag for key/value pairs)
+    @oci.FieldHint
+    initialVirtualNodeLabels: Listing<formae.Tag>?
+
+    /// Taints for virtual nodes
+    @oci.FieldHint
+    taints: Listing<Taint>?
+
+    /// FreeformTags - converted from formae.Tag format via tags property
+    @oci.FieldHint {
+        outputTransformation = oci.transform.tagsToFreeformTags
+        outputField = "FreeformTags"
+    }
+    tags: Listing<formae.Tag>?
+
+    @oci.FieldHint
+    definedTags: Mapping<String, Mapping<String, Any>>?
+
+    local parent = this
+
+    hidden res: VirtualNodePoolResolvable = new {
+        label = parent.label
+        stack = parent.stack?.label
+    }
+}
+
+

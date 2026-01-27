@@ -1,0 +1,56 @@
+/*
+ * © 2025 Platform Engineering Labs Inc.
+ *
+ * SPDX-License-Identifier: FSL-1.1-ALv2
+ */
+
+amends "@formae/forma.pkl"
+import "@formae/formae.pkl"
+import "@oci/oci.pkl"
+import "@oci/objectstorage/bucket.pkl"
+import "./vars.pkl"
+
+description {
+    text = """
+    This forma is supposed to be used in patch mode and demonstrate how to make minimal changes
+    to the infrastructure with minimal blast radius. This is an example of how less experienced
+    platform engineers and developer teams can make changes to the infrastructure without seeing
+    or touching everything else. Another use case is to make urgent changes, for example at night,
+    without having to deal with all details. And yet another use case would be developers changing
+    some parameters in their deployments, such as memory and CPU requirements.
+
+    Apply this forma in patch mode to create a new OCI bucket.
+
+    Destroy all resources referenced by this forma using the destroy command.
+    """
+    confirm = true
+}
+
+properties {
+    namespace = new formae.Prop {
+        flag = "namespace"
+        default = "axzylw3yomfa"
+    }
+}
+
+forma {
+    vars.stack
+    vars.target
+
+    new bucket.Bucket {
+        label = "lifeline-bucket"
+        compartmentId = vars.compartmentId.value
+        name = "lifeline-app-data-1"
+        namespace = properties.namespace.value
+        publicAccessType = "NoPublicAccess"
+        storageTier = "Standard"
+        versioning = "Enabled"
+        tags {
+            new { key = "Environment"; value = "production" }
+            new { key = "Project"; value = "lifeline" }
+            new { key = "ManagedBy"; value = "formae" }
+            new { key = "Purpose"; value = "application-data" }
+        }
+    }
+}
+

@@ -1,0 +1,448 @@
+amends "@formae/forma.pkl"
+import "@formae/formae.pkl"
+
+// Resource imports
+import "@oci/core/internetgateway.pkl"
+import "@oci/core/networksecuritygroup.pkl"
+import "@oci/core/networksecuritygroupsecurityrule.pkl"
+import "@oci/core/routetable.pkl"
+import "@oci/core/subnet.pkl"
+import "@oci/core/vcn.pkl"
+import "@oci/identity/compartment.pkl"
+
+forma {
+
+  local myStack = new formae.Stack {
+    // Please provide a stack to bring the resources in this Forma under management
+    label = "oci-lifeline"
+    description = "This was generated"
+  }
+  myStack
+
+
+  local ociDiscoTarget = new formae.Target {
+    label = "oci-disco-target"
+    namespace = "OCI"
+    discoverable = true
+    config {
+      Type = "OCI"
+      Profile = "PEL"
+      Region = "us-chicago-1"
+    }
+  }
+  ociDiscoTarget
+
+  new internetgateway.InternetGateway {
+    label = "ocid1.internetgateway.oc1.us-chicago-1.aaaaaaaa2ehl6zwawyjc2wcb24drzvwou6t2hrfnbd3gyznk42tswkdhxetq"
+    tags = new Listing<formae.Tag> {}
+    compartmentId = new vcn.VcnResolvable {
+      // RealValue: ocid1.tenancy.oc1..aaaaaaaakxm3lo5ntsbsmx3n6epvrntxsmjg6eypafyi2ldngr6bsclpcdta
+      stack = myStack.res.label
+      label = "ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa2t464ubehlyce6iope75otzcw4pvcziie2fnxjnenh2a"
+    }.CompartmentId
+    vcnId = new vcn.VcnResolvable {
+      // RealValue: ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa2t464ubehlyce6iope75otzcw4pvcziie2fnxjnenh2a
+      stack = myStack.res.label
+      label = "ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa2t464ubehlyce6iope75otzcw4pvcziie2fnxjnenh2a"
+    }.id
+    isEnabled = true
+    displayName = "lifeline-internet-gateway"
+    definedTags = new Mapping {
+      ["Oracle-Tags"] = new Mapping {
+        ["CreatedBy"] = "default/nicholas.browdues@platform.engineering"
+        ["CreatedOn"] = "2025-12-05T05:31:24.693Z"
+      }
+    }
+    target = ociDiscoTarget.res
+    stack = myStack.res
+  }
+
+  new internetgateway.InternetGateway {
+    label = "ocid1.internetgateway.oc1.us-chicago-1.aaaaaaaa6dlfnlifaieoppn56on7kv7mrdfh2ow4okiq2buseu3iryazuzea"
+    tags = new Listing<formae.Tag> {}
+    compartmentId = new vcn.VcnResolvable {
+      // RealValue: ocid1.tenancy.oc1..aaaaaaaakxm3lo5ntsbsmx3n6epvrntxsmjg6eypafyi2ldngr6bsclpcdta
+      stack = myStack.res.label
+      label = "ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa36hroncls7latvtth47hx4l3i5vgnazxylehd6ymzmra"
+    }.CompartmentId
+    vcnId = new vcn.VcnResolvable {
+      // RealValue: ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa36hroncls7latvtth47hx4l3i5vgnazxylehd6ymzmra
+      stack = myStack.res.label
+      label = "ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa36hroncls7latvtth47hx4l3i5vgnazxylehd6ymzmra"
+    }.id
+    isEnabled = true
+    displayName = "oke-example-igw"
+    definedTags = new Mapping {
+      ["Oracle-Tags"] = new Mapping {
+        ["CreatedBy"] = "default/nicholas.browdues@platform.engineering"
+        ["CreatedOn"] = "2025-12-05T06:20:47.815Z"
+      }
+    }
+    target = ociDiscoTarget.res
+    stack = myStack.res
+  }
+
+  new networksecuritygroup.NetworkSecurityGroup {
+    label = "ocid1.networksecuritygroup.oc1.us-chicago-1.aaaaaaaa7qleca5u3c3dxmzbwtthuff4pqle6jj2mfrcf5xbvwssxn4s2o5q"
+    tags = new Listing<formae.Tag> {}
+    compartmentId = new vcn.VcnResolvable {
+      // RealValue: ocid1.tenancy.oc1..aaaaaaaakxm3lo5ntsbsmx3n6epvrntxsmjg6eypafyi2ldngr6bsclpcdta
+      stack = myStack.res.label
+      label = "ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa2t464ubehlyce6iope75otzcw4pvcziie2fnxjnenh2a"
+    }.CompartmentId
+    vcnId = new vcn.VcnResolvable {
+      // RealValue: ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa2t464ubehlyce6iope75otzcw4pvcziie2fnxjnenh2a
+      stack = myStack.res.label
+      label = "ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa2t464ubehlyce6iope75otzcw4pvcziie2fnxjnenh2a"
+    }.id
+    displayName = "lifeline-web-nsg"
+    definedTags = new Mapping {
+      ["Oracle-Tags"] = new Mapping {
+        ["CreatedBy"] = "default/nicholas.browdues@platform.engineering"
+        ["CreatedOn"] = "2025-12-05T05:31:25.084Z"
+      }
+    }
+    target = ociDiscoTarget.res
+    stack = myStack.res
+  }
+
+  new networksecuritygroup.NetworkSecurityGroup {
+    label = "ocid1.networksecuritygroup.oc1.us-chicago-1.aaaaaaaai3b6epncqqmxo4mmjqcq6upbr3wpeit3gcnadoxm5x26rndr6epa"
+    tags = new Listing<formae.Tag> {}
+    compartmentId = new vcn.VcnResolvable {
+      // RealValue: ocid1.tenancy.oc1..aaaaaaaakxm3lo5ntsbsmx3n6epvrntxsmjg6eypafyi2ldngr6bsclpcdta
+      stack = myStack.res.label
+      label = "ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa2t464ubehlyce6iope75otzcw4pvcziie2fnxjnenh2a"
+    }.CompartmentId
+    vcnId = new vcn.VcnResolvable {
+      // RealValue: ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa2t464ubehlyce6iope75otzcw4pvcziie2fnxjnenh2a
+      stack = myStack.res.label
+      label = "ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa2t464ubehlyce6iope75otzcw4pvcziie2fnxjnenh2a"
+    }.id
+    displayName = "lifeline-database-nsg"
+    definedTags = new Mapping {
+      ["Oracle-Tags"] = new Mapping {
+        ["CreatedBy"] = "default/nicholas.browdues@platform.engineering"
+        ["CreatedOn"] = "2025-12-05T05:31:28.205Z"
+      }
+    }
+    target = ociDiscoTarget.res
+    stack = myStack.res
+  }
+
+  new networksecuritygroupsecurityrule.NetworkSecurityGroupSecurityRule {
+    label = "07A372"
+    networkSecurityGroupId = new networksecuritygroup.NetworkSecurityGroupResolvable {
+      // RealValue: ocid1.networksecuritygroup.oc1.us-chicago-1.aaaaaaaa7qleca5u3c3dxmzbwtthuff4pqle6jj2mfrcf5xbvwssxn4s2o5q
+      stack = myStack.res.label
+      label = "ocid1.networksecuritygroup.oc1.us-chicago-1.aaaaaaaa7qleca5u3c3dxmzbwtthuff4pqle6jj2mfrcf5xbvwssxn4s2o5q"
+    }.id
+    direction = "INGRESS"
+    protocol = "6"
+    description = "Allow HTTPS traffic from internet"
+    source = "0.0.0.0/0"
+    sourceType = "CIDR_BLOCK"
+    isStateless = false
+    target = ociDiscoTarget.res
+    stack = myStack.res
+  }
+
+  new networksecuritygroupsecurityrule.NetworkSecurityGroupSecurityRule {
+    label = "3A012B"
+    networkSecurityGroupId = new networksecuritygroup.NetworkSecurityGroupResolvable {
+      // RealValue: ocid1.networksecuritygroup.oc1.us-chicago-1.aaaaaaaa7qleca5u3c3dxmzbwtthuff4pqle6jj2mfrcf5xbvwssxn4s2o5q
+      stack = myStack.res.label
+      label = "ocid1.networksecuritygroup.oc1.us-chicago-1.aaaaaaaa7qleca5u3c3dxmzbwtthuff4pqle6jj2mfrcf5xbvwssxn4s2o5q"
+    }.id
+    direction = "INGRESS"
+    protocol = "6"
+    description = "Allow HTTP traffic from internet"
+    source = "0.0.0.0/0"
+    sourceType = "CIDR_BLOCK"
+    isStateless = false
+    target = ociDiscoTarget.res
+    stack = myStack.res
+  }
+
+  new networksecuritygroupsecurityrule.NetworkSecurityGroupSecurityRule {
+    label = "75D457"
+    networkSecurityGroupId = new networksecuritygroup.NetworkSecurityGroupResolvable {
+      // RealValue: ocid1.networksecuritygroup.oc1.us-chicago-1.aaaaaaaai3b6epncqqmxo4mmjqcq6upbr3wpeit3gcnadoxm5x26rndr6epa
+      stack = myStack.res.label
+      label = "ocid1.networksecuritygroup.oc1.us-chicago-1.aaaaaaaai3b6epncqqmxo4mmjqcq6upbr3wpeit3gcnadoxm5x26rndr6epa"
+    }.id
+    direction = "INGRESS"
+    protocol = "6"
+    description = "Allow SSH from web tier for management"
+    source = "10.0.1.0/24"
+    sourceType = "CIDR_BLOCK"
+    isStateless = false
+    target = ociDiscoTarget.res
+    stack = myStack.res
+  }
+
+  new networksecuritygroupsecurityrule.NetworkSecurityGroupSecurityRule {
+    label = "9C6D3B"
+    networkSecurityGroupId = new networksecuritygroup.NetworkSecurityGroupResolvable {
+      // RealValue: ocid1.networksecuritygroup.oc1.us-chicago-1.aaaaaaaai3b6epncqqmxo4mmjqcq6upbr3wpeit3gcnadoxm5x26rndr6epa
+      stack = myStack.res.label
+      label = "ocid1.networksecuritygroup.oc1.us-chicago-1.aaaaaaaai3b6epncqqmxo4mmjqcq6upbr3wpeit3gcnadoxm5x26rndr6epa"
+    }.id
+    direction = "INGRESS"
+    protocol = "6"
+    description = "Allow PostgreSQL from web tier"
+    source = "10.0.1.0/24"
+    sourceType = "CIDR_BLOCK"
+    isStateless = false
+    target = ociDiscoTarget.res
+    stack = myStack.res
+  }
+
+  new routetable.RouteTable {
+    label = "ocid1.routetable.oc1.us-chicago-1.aaaaaaaa6rtze5ti7uwx4yxqzqdhacqmak4vbczfnalrd2kjropyrov6xbdq"
+    tags = new Listing<formae.Tag> {}
+    compartmentId = new vcn.VcnResolvable {
+      // RealValue: ocid1.tenancy.oc1..aaaaaaaakxm3lo5ntsbsmx3n6epvrntxsmjg6eypafyi2ldngr6bsclpcdta
+      stack = myStack.res.label
+      label = "ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa2t464ubehlyce6iope75otzcw4pvcziie2fnxjnenh2a"
+    }.CompartmentId
+    vcnId = new vcn.VcnResolvable {
+      // RealValue: ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa2t464ubehlyce6iope75otzcw4pvcziie2fnxjnenh2a
+      stack = myStack.res.label
+      label = "ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa2t464ubehlyce6iope75otzcw4pvcziie2fnxjnenh2a"
+    }.id
+    displayName = "lifeline-public-route-table"
+    routeRules = new Listing { new routetable.RouteRule {
+
+      } }
+    definedTags = new Mapping {
+      ["Oracle-Tags"] = new Mapping {
+        ["CreatedBy"] = "default/nicholas.browdues@platform.engineering"
+        ["CreatedOn"] = "2025-12-05T05:31:28.561Z"
+      }
+    }
+    target = ociDiscoTarget.res
+    stack = myStack.res
+  }
+
+  new routetable.RouteTable {
+    label = "ocid1.routetable.oc1.us-chicago-1.aaaaaaaaprzcw2qwij5jl4xwx5rwmdsiwmgpal7f3iqyeavfzrgwx3ekocqq"
+    tags = new Listing<formae.Tag> {}
+    compartmentId = new vcn.VcnResolvable {
+      // RealValue: ocid1.tenancy.oc1..aaaaaaaakxm3lo5ntsbsmx3n6epvrntxsmjg6eypafyi2ldngr6bsclpcdta
+      stack = myStack.res.label
+      label = "ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa36hroncls7latvtth47hx4l3i5vgnazxylehd6ymzmra"
+    }.CompartmentId
+    vcnId = new vcn.VcnResolvable {
+      // RealValue: ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa36hroncls7latvtth47hx4l3i5vgnazxylehd6ymzmra
+      stack = myStack.res.label
+      label = "ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa36hroncls7latvtth47hx4l3i5vgnazxylehd6ymzmra"
+    }.id
+    displayName = "Default Route Table for oke-example-vcn"
+    routeRules = new Listing {  }
+    definedTags = new Mapping {
+      ["Oracle-Tags"] = new Mapping {
+        ["CreatedBy"] = "default/nicholas.browdues@platform.engineering"
+        ["CreatedOn"] = "2025-12-05T06:20:47.040Z"
+      }
+    }
+    target = ociDiscoTarget.res
+    stack = myStack.res
+  }
+
+  new routetable.RouteTable {
+    label = "ocid1.routetable.oc1.us-chicago-1.aaaaaaaarcbqs5igxmrguxgyb7z52fe5ichfdc5x4v4aagwsnojxw3nlhnpa"
+    tags = new Listing<formae.Tag> {}
+    compartmentId = new vcn.VcnResolvable {
+      // RealValue: ocid1.tenancy.oc1..aaaaaaaakxm3lo5ntsbsmx3n6epvrntxsmjg6eypafyi2ldngr6bsclpcdta
+      stack = myStack.res.label
+      label = "ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa2t464ubehlyce6iope75otzcw4pvcziie2fnxjnenh2a"
+    }.CompartmentId
+    vcnId = new vcn.VcnResolvable {
+      // RealValue: ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa2t464ubehlyce6iope75otzcw4pvcziie2fnxjnenh2a
+      stack = myStack.res.label
+      label = "ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa2t464ubehlyce6iope75otzcw4pvcziie2fnxjnenh2a"
+    }.id
+    displayName = "Default Route Table for lifeline-vcn"
+    routeRules = new Listing {  }
+    definedTags = new Mapping {
+      ["Oracle-Tags"] = new Mapping {
+        ["CreatedBy"] = "default/nicholas.browdues@platform.engineering"
+        ["CreatedOn"] = "2025-12-05T05:31:22.842Z"
+      }
+    }
+    target = ociDiscoTarget.res
+    stack = myStack.res
+  }
+
+  new routetable.RouteTable {
+    label = "ocid1.routetable.oc1.us-chicago-1.aaaaaaaarurx5eayle4tqt52hnklxlwozqyx4djmztqwllonq5nzeyhujxya"
+    tags = new Listing<formae.Tag> {}
+    compartmentId = new vcn.VcnResolvable {
+      // RealValue: ocid1.tenancy.oc1..aaaaaaaakxm3lo5ntsbsmx3n6epvrntxsmjg6eypafyi2ldngr6bsclpcdta
+      stack = myStack.res.label
+      label = "ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa36hroncls7latvtth47hx4l3i5vgnazxylehd6ymzmra"
+    }.CompartmentId
+    vcnId = new vcn.VcnResolvable {
+      // RealValue: ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa36hroncls7latvtth47hx4l3i5vgnazxylehd6ymzmra
+      stack = myStack.res.label
+      label = "ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa36hroncls7latvtth47hx4l3i5vgnazxylehd6ymzmra"
+    }.id
+    displayName = "oke-example-public-rt"
+    routeRules = new Listing { new routetable.RouteRule {
+
+      } }
+    definedTags = new Mapping {
+      ["Oracle-Tags"] = new Mapping {
+        ["CreatedBy"] = "default/nicholas.browdues@platform.engineering"
+        ["CreatedOn"] = "2025-12-05T06:20:48.501Z"
+      }
+    }
+    target = ociDiscoTarget.res
+    stack = myStack.res
+  }
+
+  new subnet.Subnet {
+    label = "ocid1.subnet.oc1.us-chicago-1.aaaaaaaajp2ynakeaqhg6cueixkosh2t3gtpdwmyf6lwwvf74bmda3ki5dea"
+    tags = new Listing<formae.Tag> {}
+    compartmentId = new vcn.VcnResolvable {
+      // RealValue: ocid1.tenancy.oc1..aaaaaaaakxm3lo5ntsbsmx3n6epvrntxsmjg6eypafyi2ldngr6bsclpcdta
+      stack = myStack.res.label
+      label = "ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa2t464ubehlyce6iope75otzcw4pvcziie2fnxjnenh2a"
+    }.CompartmentId
+    vcnId = new vcn.VcnResolvable {
+      // RealValue: ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa2t464ubehlyce6iope75otzcw4pvcziie2fnxjnenh2a
+      stack = myStack.res.label
+      label = "ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa2t464ubehlyce6iope75otzcw4pvcziie2fnxjnenh2a"
+    }.id
+    cidrBlock = "10.0.1.0/24"
+    displayName = "lifeline-public-subnet"
+    dnsLabel = "public"
+    prohibitPublicIpOnVnic = false
+    prohibitInternetIngress = false
+    routeTableId = "ocid1.routetable.oc1.us-chicago-1.aaaaaaaa6rtze5ti7uwx4yxqzqdhacqmak4vbczfnalrd2kjropyrov6xbdq"
+    definedTags = new Mapping {
+      ["Oracle-Tags"] = new Mapping {
+        ["CreatedBy"] = "default/nicholas.browdues@platform.engineering"
+        ["CreatedOn"] = "2025-12-05T05:31:30.421Z"
+      }
+    }
+    target = ociDiscoTarget.res
+    stack = myStack.res
+  }
+
+  new subnet.Subnet {
+    label = "ocid1.subnet.oc1.us-chicago-1.aaaaaaaakrvwfnkytavdgr53iytnhoudpzpjypwendo5r5zsdj5rigixcvbq"
+    tags = new Listing<formae.Tag> {}
+    compartmentId = new vcn.VcnResolvable {
+      // RealValue: ocid1.tenancy.oc1..aaaaaaaakxm3lo5ntsbsmx3n6epvrntxsmjg6eypafyi2ldngr6bsclpcdta
+      stack = myStack.res.label
+      label = "ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa36hroncls7latvtth47hx4l3i5vgnazxylehd6ymzmra"
+    }.CompartmentId
+    vcnId = new vcn.VcnResolvable {
+      // RealValue: ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa36hroncls7latvtth47hx4l3i5vgnazxylehd6ymzmra
+      stack = myStack.res.label
+      label = "ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa36hroncls7latvtth47hx4l3i5vgnazxylehd6ymzmra"
+    }.id
+    cidrBlock = "10.0.1.0/24"
+    displayName = "oke-example-public-subnet"
+    dnsLabel = "okepublic"
+    prohibitPublicIpOnVnic = false
+    prohibitInternetIngress = false
+    routeTableId = "ocid1.routetable.oc1.us-chicago-1.aaaaaaaarurx5eayle4tqt52hnklxlwozqyx4djmztqwllonq5nzeyhujxya"
+    definedTags = new Mapping {
+      ["Oracle-Tags"] = new Mapping {
+        ["CreatedBy"] = "default/nicholas.browdues@platform.engineering"
+        ["CreatedOn"] = "2025-12-05T06:20:49.099Z"
+      }
+    }
+    target = ociDiscoTarget.res
+    stack = myStack.res
+  }
+
+  new subnet.Subnet {
+    label = "ocid1.subnet.oc1.us-chicago-1.aaaaaaaapbshjlsiwaao2c5dtxsgtljj6x3mjnfbiybmlhycsjqygqcry2ya"
+    tags = new Listing<formae.Tag> {}
+    compartmentId = new vcn.VcnResolvable {
+      // RealValue: ocid1.tenancy.oc1..aaaaaaaakxm3lo5ntsbsmx3n6epvrntxsmjg6eypafyi2ldngr6bsclpcdta
+      stack = myStack.res.label
+      label = "ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa2t464ubehlyce6iope75otzcw4pvcziie2fnxjnenh2a"
+    }.CompartmentId
+    vcnId = new vcn.VcnResolvable {
+      // RealValue: ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa2t464ubehlyce6iope75otzcw4pvcziie2fnxjnenh2a
+      stack = myStack.res.label
+      label = "ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa2t464ubehlyce6iope75otzcw4pvcziie2fnxjnenh2a"
+    }.id
+    cidrBlock = "10.0.2.0/24"
+    displayName = "lifeline-private-subnet"
+    dnsLabel = "private"
+    prohibitPublicIpOnVnic = true
+    prohibitInternetIngress = true
+    routeTableId = "ocid1.routetable.oc1.us-chicago-1.aaaaaaaarcbqs5igxmrguxgyb7z52fe5ichfdc5x4v4aagwsnojxw3nlhnpa"
+    definedTags = new Mapping {
+      ["Oracle-Tags"] = new Mapping {
+        ["CreatedBy"] = "default/nicholas.browdues@platform.engineering"
+        ["CreatedOn"] = "2025-12-05T05:31:25.101Z"
+      }
+    }
+    target = ociDiscoTarget.res
+    stack = myStack.res
+  }
+
+  new vcn.VCN {
+    label = "ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa2t464ubehlyce6iope75otzcw4pvcziie2fnxjnenh2a"
+    tags = new Listing<formae.Tag> {}
+    compartmentId = new compartment.CompartmentResolvable {
+      // RealValue: ocid1.tenancy.oc1..aaaaaaaakxm3lo5ntsbsmx3n6epvrntxsmjg6eypafyi2ldngr6bsclpcdta
+      stack = myStack.res.label
+      label = "ocid1.tenancy.oc1..aaaaaaaakxm3lo5ntsbsmx3n6epvrntxsmjg6eypafyi2ldngr6bsclpcdta"
+    }.id
+    cidrBlock = "10.0.0.0/16"
+    cidrBlocks = new Listing { "10.0.0.0/16" }
+    displayName = "lifeline-vcn"
+    dnsLabel = "lifeline"
+    definedTags = new Mapping {
+      ["Oracle-Tags"] = new Mapping {
+        ["CreatedBy"] = "default/nicholas.browdues@platform.engineering"
+        ["CreatedOn"] = "2025-12-05T05:31:22.842Z"
+      }
+    }
+    target = ociDiscoTarget.res
+    stack = myStack.res
+  }
+
+  new vcn.VCN {
+    label = "ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qa36hroncls7latvtth47hx4l3i5vgnazxylehd6ymzmra"
+    tags = new Listing<formae.Tag> {}
+    compartmentId = new compartment.CompartmentResolvable {
+      // RealValue: ocid1.tenancy.oc1..aaaaaaaakxm3lo5ntsbsmx3n6epvrntxsmjg6eypafyi2ldngr6bsclpcdta
+      stack = myStack.res.label
+      label = "ocid1.tenancy.oc1..aaaaaaaakxm3lo5ntsbsmx3n6epvrntxsmjg6eypafyi2ldngr6bsclpcdta"
+    }.id
+    cidrBlock = "10.0.0.0/16"
+    cidrBlocks = new Listing { "10.0.0.0/16" }
+    displayName = "oke-example-vcn"
+    dnsLabel = "okecluster"
+    definedTags = new Mapping {
+      ["Oracle-Tags"] = new Mapping {
+        ["CreatedBy"] = "default/nicholas.browdues@platform.engineering"
+        ["CreatedOn"] = "2025-12-05T06:20:47.040Z"
+      }
+    }
+    target = ociDiscoTarget.res
+    stack = myStack.res
+  }
+
+  new compartment.Compartment {
+    label = "ocid1.tenancy.oc1..aaaaaaaakxm3lo5ntsbsmx3n6epvrntxsmjg6eypafyi2ldngr6bsclpcdta"
+    tags = new Listing<formae.Tag> {}
+    compartmentId = "ocid1.tenancy.oc1..aaaaaaaakxm3lo5ntsbsmx3n6epvrntxsmjg6eypafyi2ldngr6bsclpcdta"
+    name = "platform-engineering-labs"
+    description = "platform-engineering-labs"
+    definedTags = new Mapping {
+
+    }
+    target = ociDiscoTarget.res
+    stack = myStack.res
+  }
+}

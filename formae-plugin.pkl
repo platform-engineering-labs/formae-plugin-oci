@@ -1,0 +1,21 @@
+/*
+ * Formae Plugin Manifest
+ *
+ * This file defines metadata for your Formae plugin.
+ */
+
+name = "oci"
+
+version = "0.1.0"
+
+namespace = "OCI"
+
+description = "Oracle Cloud Infrastructure resource plugin for Formae"
+
+license = "FSL-1.1-ALv2"
+
+minFormaeVersion = "0.77.0"
+
+output {
+  renderer = new JsonRenderer {}
+}
