@@ -1,0 +1,58 @@
+/*
+ * © 2025 Platform Engineering Labs Inc.
+ *
+ * SPDX-License-Identifier: FSL-1.1-ALv2
+ */
+
+amends "@formae/forma.pkl"
+import "@formae/formae.pkl"
+import "@oci/oci.pkl"
+
+import "./vars.pkl"
+import "./network_resources.pkl" as nw
+import "./security_group_resources.pkl" as sg
+
+description {
+    text = """
+        OCI Lifeline Example
+        """
+    confirm = true
+}
+
+properties {
+    vcnCidr = new formae.Prop {
+        flag = "vcnCidr"
+        default = "10.0.0.0/16"
+    }
+
+    publicSubnetCidr = new formae.Prop {
+        flag = "publicSubnetCidr"
+        default = "10.0.1.0/24"
+    }
+
+    privateSubnetCidr = new formae.Prop {
+        flag = "privateSubnetCidr"
+        default = "10.0.2.0/24"
+    }
+}
+
+local network = new nw.NetworkResources {
+    compartmentId = vars.compartmentId.value
+    vcnCidr = properties.vcnCidr.value
+    publicSubnetCidr = properties.publicSubnetCidr.value
+    privateSubnetCidr = properties.privateSubnetCidr.value
+}
+
+local securityGroups = new sg.SecurityGroupResources {
+    compartmentId = vars.compartmentId.value
+    vcn = network.vcn
+    publicSubnetCidr = properties.publicSubnetCidr.value
+}
+
+forma {
+    vars.stack
+    vars.target
+
+    ...network.resources
+    ...securityGroups.resources
+}

@@ -1,0 +1,95 @@
+/*
+ * © 2025 Platform Engineering Labs Inc.
+ *
+ * SPDX-License-Identifier: FSL-1.1-ALv2
+ */
+
+module oci.core.subnet
+
+import "@formae/formae.pkl"
+import "../oci.pkl"
+
+const type = "OCI::Core::Subnet"
+
+open class SubnetResolvable extends formae.Resolvable {
+    hidden type = module.type
+
+    hidden id: SubnetResolvable = (this) {
+        property = "Id"
+    }
+    hidden cidrBlock: SubnetResolvable = (this) {
+        property = "CidrBlock"
+    }
+    hidden virtualRouterIp: SubnetResolvable = (this) {
+        property = "VirtualRouterIp"
+    }
+    hidden virtualRouterMac: SubnetResolvable = (this) {
+        property = "VirtualRouterMac"
+    }
+}
+
+@oci.ResourceHint {
+    type = module.type
+    identifier = "Id"
+    discoverable = true
+    extractable = true
+    parent = "OCI::Core::VCN"
+    listParam = List(
+        new formae.ListProperty { parentProperty = "Id" listParameter = "VcnId" },
+        new formae.ListProperty { parentProperty = "CompartmentId" listParameter = "CompartmentId" }
+    )
+}
+open class Subnet extends formae.Resource {
+
+    @oci.FieldHint{required = true createOnly = true}
+    compartmentId: String|formae.Resolvable
+
+    @oci.FieldHint{required = true createOnly = true}
+    vcnId: String|formae.Resolvable
+
+    @oci.FieldHint{required = true}
+    cidrBlock: String
+
+    @oci.FieldHint
+    availabilityDomain: String?
+
+    @oci.FieldHint
+    displayName: String?
+
+    @oci.FieldHint
+    dnsLabel: String?
+
+    @oci.FieldHint
+    prohibitPublicIpOnVnic: Boolean?
+
+    @oci.FieldHint
+    prohibitInternetIngress: Boolean?
+
+    @oci.FieldHint
+    routeTableId: (String|formae.Resolvable)?
+
+    @oci.FieldHint
+    securityListIds: Listing<String|formae.Resolvable>?
+
+    @oci.FieldHint
+    ipv6CidrBlock: String?
+
+    @oci.FieldHint
+    ipv6CidrBlocks: Listing<String>?
+
+    @oci.FieldHint {
+        outputTransformation = oci.transform.tagsToFreeformTags
+        outputField = "FreeformTags"
+    }
+    tags: Listing<formae.Tag>?
+
+    @oci.FieldHint
+    definedTags: Mapping<String, Mapping<String, Any>>?
+
+    local parent = this
+
+    hidden res: SubnetResolvable = new {
+        label = parent.label
+        stack = parent.stack?.label
+    }
+}

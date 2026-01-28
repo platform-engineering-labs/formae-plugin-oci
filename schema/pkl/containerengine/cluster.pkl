@@ -1,0 +1,159 @@
+/*
+ * © 2025 Platform Engineering Labs Inc.
+ *
+ * SPDX-License-Identifier: FSL-1.1-ALv2
+ */
+
+module oci.containerengine.cluster
+
+import "@formae/formae.pkl"
+import "../oci.pkl"
+
+const type = "OCI::ContainerEngine::Cluster"
+
+open class ClusterResolvable extends formae.Resolvable {
+    hidden type = module.type
+
+    hidden id: ClusterResolvable = (this) {
+        property = "Id"
+    }
+    hidden compartmentId: ClusterResolvable = (this) {
+        property = "CompartmentId"
+    }
+    hidden kubernetesVersion: ClusterResolvable = (this) {
+        property = "KubernetesVersion"
+    }
+    hidden vcnId: ClusterResolvable = (this) {
+        property = "VcnId"
+    }
+}
+
+/// Cluster type - BASIC_CLUSTER or ENHANCED_CLUSTER
+typealias ClusterType = "BASIC_CLUSTER" | "ENHANCED_CLUSTER"
+
+/// CNI type for pod networking
+typealias CniType = "FLANNEL_OVERLAY" | "OCI_VCN_IP_NATIVE"
+
+/// Endpoint configuration for the Kubernetes API server
+class ClusterEndpointConfig {
+    /// The OCID of the subnet for the Kubernetes API endpoint
+    subnetId: String|formae.Resolvable
+
+    /// Whether the cluster API endpoint should have a public IP address
+    isPublicIpEnabled: Boolean?
+
+    /// List of NSG OCIDs for the API endpoint
+    nsgIds: Listing<String|formae.Resolvable>?
+}
+
+/// Kubernetes network configuration
+class KubernetesNetworkConfig {
+    /// CIDR block for Kubernetes pods
+    podsCidr: String?
+
+    /// CIDR block for Kubernetes services
+    servicesCidr: String?
+}
+
+/// Add-on options for the cluster
+class AddOnOptions {
+    /// Whether the Kubernetes Dashboard is enabled
+    isKubernetesDashboardEnabled: Boolean?
+
+    /// Whether Tiller (Helm v2) is enabled
+    isTillerEnabled: Boolean?
+}
+
+/// Admission controller options
+class AdmissionControllerOptions {
+    /// Whether the PodSecurityPolicy admission controller is enabled
+    isPodSecurityPolicyEnabled: Boolean?
+}
+
+/// Cluster create options
+class ClusterCreateOptions {
+    /// OCIDs of subnets for Kubernetes service load balancers
+    serviceLbSubnetIds: Listing<String|formae.Resolvable>?
+
+    /// Kubernetes network configuration
+    kubernetesNetworkConfig: KubernetesNetworkConfig?
+
+    /// Add-on options
+    addOns: AddOnOptions?
+
+    /// Admission controller options
+    admissionControllerOptions: AdmissionControllerOptions?
+}
+
+/// Pod network option details for OCI VCN-Native CNI
+class OciVcnIpNativePodNetworkOptionDetails {
+    /// CNI type - must be OCI_VCN_IP_NATIVE
+    hidden cniType: CniType = "OCI_VCN_IP_NATIVE"
+}
+
+/// Pod network option details for Flannel CNI
+class FlannelOverlayPodNetworkOptionDetails {
+    /// CNI type - must be FLANNEL_OVERLAY
+    hidden cniType: CniType = "FLANNEL_OVERLAY"
+}
+
+@oci.ResourceHint {
+    type = module.type
+    identifier = "Id"
+    discoverable = true
+    extractable = true
+    parent = "OCI::Identity::Compartment"
+    listParam = new formae.ListProperty {
+        parentProperty = "Id"
+        listParameter = "CompartmentId"
+    }
+}
+open class Cluster extends formae.Resource {
+
+    /// The OCID of the compartment in which to create the cluster
+    @oci.FieldHint{required = true}
+    compartmentId: String|formae.Resolvable
+
+    /// The OCID of the VCN to use for the cluster
+    @oci.FieldHint{required = true}
+    vcnId: String|formae.Resolvable
+
+    /// The version of Kubernetes to install into the cluster masters
+    @oci.FieldHint{required = true}
+    kubernetesVersion: String
+
+    /// The name of the cluster
+    @oci.FieldHint
+    name: String?
+
+    /// The type of cluster - BASIC_CLUSTER or ENHANCED_CLUSTER
+    @oci.FieldHint
+    clusterType: ClusterType?
+
+    /// The network configuration for the Kubernetes API endpoint
+    @oci.FieldHint
+    endpointConfig: ClusterEndpointConfig?
+
+    /// Optional cluster creation options
+    @oci.FieldHint
+    options: ClusterCreateOptions?
+
+    /// FreeformTags - converted from formae.Tag format via tags property
+    @oci.FieldHint {
+        outputTransformation = oci.transform.tagsToFreeformTags
+        outputField = "FreeformTags"
+    }
+    tags: Listing<formae.Tag>?
+
+    @oci.FieldHint
+    definedTags: Mapping<String, Mapping<String, Any>>?
+
+    local parent = this
+
+    hidden res: ClusterResolvable = new {
+        label = parent.label
+        stack = parent.stack?.label
+    }
+}
+
+

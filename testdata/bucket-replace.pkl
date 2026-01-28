@@ -1,0 +1,44 @@
+/*
+ * © 2025 Platform Engineering Labs Inc.
+ *
+ * SPDX-License-Identifier: FSL-1.1-ALv2
+ */
+
+amends "@formae/forma.pkl"
+import "@formae/formae.pkl"
+
+import "@oci/oci.pkl"
+import "@oci/objectstorage/bucket.pkl"
+
+// These values need to be set for your OCI tenancy
+local testCompartmentId = read("env:OCI_COMPARTMENT_ID")
+local testNamespace = read("env:OCI_NAMESPACE")
+local testProfile = read?("env:OCI_PROFILE") ?? "DEFAULT"
+local testRunID = read("env:FORMAE_TEST_RUN_ID")
+
+local stackName = "plugin-sdk-test-stack"
+
+forma {
+  new formae.Stack {
+    label = stackName
+    description = "Plugin SDK test for OCI Bucket"
+  }
+
+  new formae.Target {
+    label = "oci-target"
+    config = new oci.Config {
+      profile = testProfile
+      region = "us-chicago-1"
+    }
+  }
+
+  new bucket.Bucket {
+    label = "plugin-sdk-test-bucket"
+    compartmentId = testCompartmentId
+    // Changed bucket name - this requires replacement (bucket names are immutable)
+    name = "formae-plugin-sdk-test-\(testRunID)-replaced"
+    namespace = testNamespace
+    storageTier = "Standard"
+    publicAccessType = "NoPublicAccess"
+  }
+}

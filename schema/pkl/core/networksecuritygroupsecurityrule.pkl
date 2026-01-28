@@ -1,0 +1,106 @@
+/*
+ * © 2025 Platform Engineering Labs Inc.
+ *
+ * SPDX-License-Identifier: FSL-1.1-ALv2
+ */
+
+module oci.core.networksecuritygroupsecurityrule
+
+import "@formae/formae.pkl"
+import "../oci.pkl"
+
+const type = "OCI::Core::NetworkSecurityGroupSecurityRule"
+
+open class TcpOptions {
+    @oci.SubResourceHint
+    destinationPortRange: PortRange?
+
+    @oci.SubResourceHint
+    sourcePortRange: PortRange?
+}
+
+open class UdpOptions {
+    @oci.SubResourceHint
+    destinationPortRange: PortRange?
+
+    @oci.SubResourceHint
+    sourcePortRange: PortRange?
+}
+
+open class IcmpOptions {
+    @oci.FieldHint{required = true}
+    type: Int
+
+    @oci.FieldHint
+    code: Int?
+}
+
+open class PortRange {
+    @oci.FieldHint{required = true}
+    min: Int
+
+    @oci.FieldHint{required = true}
+    max: Int
+}
+
+open class NetworkSecurityGroupSecurityRuleResolvable extends formae.Resolvable {
+    hidden type = module.type
+
+    hidden id: NetworkSecurityGroupSecurityRuleResolvable = (this) {
+        property = "Id"
+    }
+}
+
+@oci.ResourceHint {
+    type = module.type
+    identifier = "Id"
+    discoverable = true
+    extractable = true
+    parent = "OCI::Core::NetworkSecurityGroup"
+    listParam = new formae.ListProperty { parentProperty = "Id" listParameter = "NetworkSecurityGroupId" }
+}
+open class NetworkSecurityGroupSecurityRule extends formae.Resource {
+
+    @oci.FieldHint{required = true createOnly = true}
+    networkSecurityGroupId: String|formae.Resolvable
+
+    @oci.FieldHint{required = true}
+    direction: String
+
+    @oci.FieldHint{required = true}
+    protocol: String
+
+    @oci.FieldHint
+    description: String?
+
+    @oci.FieldHint
+    destination: String?
+
+    @oci.FieldHint
+    destinationType: String?
+
+    @oci.FieldHint
+    source: String?
+
+    @oci.FieldHint
+    sourceType: String?
+
+    @oci.FieldHint
+    icmpOptions: IcmpOptions?
+
+    @oci.FieldHint
+    isStateless: Boolean?
+
+    @oci.FieldHint
+    tcpOptions: TcpOptions?
+
+    @oci.FieldHint
+    udpOptions: UdpOptions?
+
+    local parent = this
+
+    hidden res: NetworkSecurityGroupSecurityRuleResolvable = new {
+        label = parent.label
+        stack = parent.stack?.label
+    }
+}

@@ -1,0 +1,68 @@
+/*
+ * © 2025 Platform Engineering Labs Inc.
+ *
+ * SPDX-License-Identifier: FSL-1.1-ALv2
+ */
+
+module oci.core.servicegateway
+
+import "@formae/formae.pkl"
+import "../oci.pkl"
+
+const type = "OCI::Core::ServiceGateway"
+
+open class ServiceGatewayService {
+    @oci.FieldHint{required = true}
+    serviceId: String?
+}
+
+open class ServiceGatewayResolvable extends formae.Resolvable {
+    hidden type = module.type
+
+    hidden id: ServiceGatewayResolvable = (this) {
+        property = "Id"
+    }
+}
+
+@oci.ResourceHint {
+    type = module.type
+    identifier = "Id"
+    discoverable = true
+    extractable = true
+    parent = "OCI::Core::VCN"
+    listParam = List(
+        new formae.ListProperty { parentProperty = "Id" listParameter = "VcnId" },
+        new formae.ListProperty { parentProperty = "CompartmentId" listParameter = "CompartmentId" }
+    )
+}
+open class ServiceGateway extends formae.Resource {
+
+    @oci.FieldHint{required = true createOnly = true}
+    compartmentId: String|formae.Resolvable
+
+    @oci.FieldHint{required = true createOnly = true}
+    vcnId: String|formae.Resolvable
+
+    @oci.FieldHint{required = true}
+    services: Listing<ServiceGatewayService>
+
+    @oci.FieldHint
+    displayName: String?
+
+    @oci.FieldHint {
+        outputTransformation = oci.transform.tagsToFreeformTags
+        outputField = "FreeformTags"
+    }
+    tags: Listing<formae.Tag>?
+
+    @oci.FieldHint
+    definedTags: Mapping<String, Mapping<String, Any>>?
+
+    local parent = this
+
+    hidden res: ServiceGatewayResolvable = new {
+        label = parent.label
+        stack = parent.stack?.label
+    }
+}
+

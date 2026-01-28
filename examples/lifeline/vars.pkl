@@ -1,0 +1,30 @@
+/*
+ * © 2025 Platform Engineering Labs Inc.
+ *
+ * SPDX-License-Identifier: FSL-1.1-ALv2
+ */
+
+import "@formae/formae.pkl"
+import "@oci/oci.pkl"
+
+stackName = "oci-lifeline"
+region = "us-chicago-1"
+compartmentIdDefault = "ocid1.tenancy.oc1..aaaaaaaakxm3lo5ntsbsmx3n6epvrntxsmjg6eypafyi2ldngr6bsclpcdta"
+
+compartmentId: formae.Prop = new formae.Prop {
+    flag = "compartmentId"
+    default = compartmentIdDefault
+}
+
+stack: formae.Stack = new {
+    label = stackName
+    description = "OCI Lifeline Infrastructure Stack"
+}
+
+target: formae.Target = new formae.Target {
+    label = "oci-target"
+    config = new oci.Config {
+        region = module.region
+    }
+}
+

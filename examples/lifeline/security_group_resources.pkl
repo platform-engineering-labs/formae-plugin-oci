@@ -1,0 +1,116 @@
+/*
+ * © 2025 Platform Engineering Labs Inc.
+ *
+ * SPDX-License-Identifier: FSL-1.1-ALv2
+ */
+
+import "@formae/formae.pkl"
+import "@oci/core/vcn.pkl"
+import "@oci/core/networksecuritygroup.pkl"
+import "@oci/core/networksecuritygroupsecurityrule.pkl"
+
+class SecurityGroupResources {
+    compartmentId: String
+    vcn: vcn.VCN
+    publicSubnetCidr: String
+
+    hidden webNsg: networksecuritygroup.NetworkSecurityGroup = new {
+        label = "lifeline-web-nsg"
+        compartmentId = outer.compartmentId
+        vcnId = vcn.res.id
+        displayName = "lifeline-web-nsg"
+        tags {
+            new { key = "Environment"; value = "production" }
+            new { key = "Project"; value = "lifeline" }
+            new { key = "ManagedBy"; value = "formae" }
+            new { key = "Tier"; value = "web" }
+        }
+    }
+
+    hidden dbNsg: networksecuritygroup.NetworkSecurityGroup = new {
+        label = "lifeline-db-nsg"
+        compartmentId = outer.compartmentId
+        vcnId = vcn.res.id
+        displayName = "lifeline-database-nsg"
+        tags {
+            new { key = "Environment"; value = "production" }
+            new { key = "Project"; value = "lifeline" }
+            new { key = "ManagedBy"; value = "formae" }
+            new { key = "Tier"; value = "database" }
+        }
+    }
+
+    hidden webHttpRule: networksecuritygroupsecurityrule.NetworkSecurityGroupSecurityRule = new {
+        label = "web-allow-http"
+        networkSecurityGroupId = webNsg.res.id
+        direction = "INGRESS"
+        protocol = "6"  // TCP
+        description = "Allow HTTP traffic from internet"
+        source = "0.0.0.0/0"
+        sourceType = "CIDR_BLOCK"
+        tcpOptions = new networksecuritygroupsecurityrule.TcpOptions {
+            destinationPortRange = new networksecuritygroupsecurityrule.PortRange {
+                min = 80
+                max = 80
+            }
+        }
+    }
+
+    hidden webHttpsRule: networksecuritygroupsecurityrule.NetworkSecurityGroupSecurityRule = new {
+        label = "web-allow-https"
+        networkSecurityGroupId = webNsg.res.id
+        direction = "INGRESS"
+        protocol = "6"  // TCP
+        description = "Allow HTTPS traffic from internet"
+        source = "0.0.0.0/0"
+        sourceType = "CIDR_BLOCK"
+        tcpOptions = new networksecuritygroupsecurityrule.TcpOptions {
+            destinationPortRange = new networksecuritygroupsecurityrule.PortRange {
+                min = 443
+                max = 443
+            }
+        }
+    }
+
+    hidden dbPostgresRule: networksecuritygroupsecurityrule.NetworkSecurityGroupSecurityRule = new {
+        label = "db-allow-postgres-from-web"
+        networkSecurityGroupId = dbNsg.res.id
+        direction = "INGRESS"
+        protocol = "6"  // TCP
+        description = "Allow PostgreSQL from web tier"
+        source = publicSubnetCidr
+        sourceType = "CIDR_BLOCK"
+        tcpOptions = new networksecuritygroupsecurityrule.TcpOptions {
+            destinationPortRange = new networksecuritygroupsecurityrule.PortRange {
+                min = 5432
+                max = 5432
+            }
+        }
+    }
+
+    hidden dbSshRule: networksecuritygroupsecurityrule.NetworkSecurityGroupSecurityRule = new {
+        label = "db-allow-ssh-from-web"
+        networkSecurityGroupId = dbNsg.res.id
+        direction = "INGRESS"
+        protocol = "6"  // TCP
+        description = "Allow SSH from web tier for management"
+        source = publicSubnetCidr
+        sourceType = "CIDR_BLOCK"
+        tcpOptions = new networksecuritygroupsecurityrule.TcpOptions {
+            destinationPortRange = new networksecuritygroupsecurityrule.PortRange {
+                min = 22
+                max = 22
+            }
+        }
+    }
+
+    hidden resources: Listing<formae.Resource> = new {
+        webNsg
+        dbNsg
+        webHttpRule
+        webHttpsRule
+        dbPostgresRule
+        dbSshRule
+    }
+}
+

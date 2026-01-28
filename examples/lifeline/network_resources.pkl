@@ -1,0 +1,109 @@
+/*
+ * © 2025 Platform Engineering Labs Inc.
+ *
+ * SPDX-License-Identifier: FSL-1.1-ALv2
+ */
+
+import "@formae/formae.pkl"
+import "@oci/core/vcn.pkl"
+import "@oci/core/internetgateway.pkl"
+import "@oci/core/routetable.pkl"
+import "@oci/core/subnet.pkl"
+
+class NetworkResources {
+    compartmentId: String
+    vcnCidr: String
+    publicSubnetCidr: String
+    privateSubnetCidr: String
+
+    vcn: vcn.VCN = new {
+        label = "lifeline-vcn"
+        compartmentId = outer.compartmentId
+        cidrBlock = vcnCidr
+        displayName = "lifeline-vcn"
+        dnsLabel = "lifeline"
+        tags {
+            new { key = "Environment"; value = "production" }
+            new { key = "Project"; value = "lifeline" }
+            new { key = "ManagedBy"; value = "formae" }
+            new { key = "Tier"; value = "network" }
+        }
+    }
+
+    hidden igw: internetgateway.InternetGateway = new {
+        label = "lifeline-igw"
+        compartmentId = outer.compartmentId
+        vcnId = vcn.res.id
+        isEnabled = true
+        displayName = "lifeline-internet-gateway"
+        tags {
+            new { key = "Environment"; value = "production" }
+            new { key = "Project"; value = "lifeline" }
+            new { key = "ManagedBy"; value = "formae" }
+        }
+    }
+
+    hidden routeTable: routetable.RouteTable = new {
+        label = "lifeline-public-rt"
+        compartmentId = outer.compartmentId
+        vcnId = vcn.res.id
+        displayName = "lifeline-public-route-table"
+        routeRules = new {
+            new routetable.RouteRule {
+                networkEntityId = igw.res.id
+                destination = "0.0.0.0/0"
+                destinationType = "CIDR_BLOCK"
+                description = "Route to Internet Gateway"
+            }
+        }
+        tags {
+            new { key = "Environment"; value = "production" }
+            new { key = "Project"; value = "lifeline" }
+            new { key = "ManagedBy"; value = "formae" }
+            new { key = "Purpose"; value = "public-routing" }
+        }
+    }
+
+    hidden publicSubnet: subnet.Subnet = new {
+        label = "lifeline-public-subnet"
+        compartmentId = outer.compartmentId
+        vcnId = vcn.res.id
+        cidrBlock = publicSubnetCidr
+        displayName = "lifeline-public-subnet"
+        dnsLabel = "public"
+        prohibitPublicIpOnVnic = false
+        routeTableId = routeTable.res.id
+        tags {
+            new { key = "Environment"; value = "production" }
+            new { key = "Project"; value = "lifeline" }
+            new { key = "ManagedBy"; value = "formae" }
+            new { key = "Tier"; value = "public" }
+        }
+    }
+
+    hidden privateSubnet: subnet.Subnet = new {
+        label = "lifeline-private-subnet"
+        compartmentId = outer.compartmentId
+        vcnId = vcn.res.id
+        cidrBlock = privateSubnetCidr
+        displayName = "lifeline-private-subnet"
+        dnsLabel = "private"
+        prohibitPublicIpOnVnic = true
+        prohibitInternetIngress = true
+        tags {
+            new { key = "Environment"; value = "production" }
+            new { key = "Project"; value = "lifeline" }
+            new { key = "ManagedBy"; value = "formae" }
+            new { key = "Tier"; value = "private" }
+        }
+    }
+
+    hidden resources: Listing<formae.Resource> = new {
+        vcn
+        igw
+        routeTable
+        publicSubnet
+        privateSubnet
+    }
+}
+

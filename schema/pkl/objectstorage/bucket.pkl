@@ -1,0 +1,74 @@
+/*
+ * © 2025 Platform Engineering Labs Inc.
+ *
+ * SPDX-License-Identifier: FSL-1.1-ALv2
+ */
+
+module oci.objectstorage.bucket
+
+import "@formae/formae.pkl"
+import "../oci.pkl"
+
+const type = "OCI::ObjectStorage::Bucket"
+
+open class BucketResolvable extends formae.Resolvable {
+    hidden type = module.type
+
+    hidden name: BucketResolvable = (this) {
+        property = "Name"
+    }
+    hidden namespace: BucketResolvable = (this) {
+        property = "Namespace"
+    }
+}
+
+@oci.ResourceHint {
+    type = module.type
+    identifier = "Name"
+    discoverable = true
+    extractable = true
+    parent = "OCI::Identity::Compartment"
+    listParam = new formae.ListProperty {
+        parentProperty = "Id"
+        listParameter = "CompartmentId"
+    }
+}
+open class Bucket extends formae.Resource {
+
+    @oci.FieldHint{required = true createOnly = true}
+    compartmentId: String|formae.Resolvable
+
+    @oci.FieldHint{required = true createOnly = true}
+    name: String
+
+    @oci.FieldHint{required = true createOnly = true}
+    namespace: String
+
+    @oci.FieldHint
+    publicAccessType: String?
+
+    @oci.FieldHint
+    storageTier: String?
+
+    @oci.FieldHint
+    objectEventsEnabled: Boolean?
+
+    @oci.FieldHint
+    versioning: String?
+
+    @oci.FieldHint {
+        outputTransformation = oci.transform.tagsToFreeformTags
+        outputField = "FreeformTags"
+    }
+    tags: Listing<formae.Tag>?
+
+    @oci.FieldHint
+    definedTags: Mapping<String, Mapping<String, Any>>?
+
+    local parent = this
+
+    hidden res: BucketResolvable = new {
+        label = parent.label
+        stack = parent.stack?.label
+    }
+}
