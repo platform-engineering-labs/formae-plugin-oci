@@ -5,6 +5,7 @@
  */
 
 import "@formae/formae.pkl"
+import "@oci/oci.pkl"
 import "@oci/core/vcn.pkl"
 import "@oci/core/internetgateway.pkl"
 import "@oci/core/routetable.pkl"
@@ -22,11 +23,11 @@ class NetworkResources {
         cidrBlock = vcnCidr
         displayName = "lifeline-vcn"
         dnsLabel = "lifeline"
-        tags {
-            new { key = "Environment"; value = "production" }
-            new { key = "Project"; value = "lifeline" }
-            new { key = "ManagedBy"; value = "formae" }
-            new { key = "Tier"; value = "network" }
+        freeformTags {
+            new oci.FreeformTag { key = "Environment"; value = "production" }
+            new oci.FreeformTag { key = "Project"; value = "lifeline" }
+            new oci.FreeformTag { key = "ManagedBy"; value = "formae" }
+            new oci.FreeformTag { key = "Tier"; value = "network" }
         }
     }
 
@@ -36,10 +37,10 @@ class NetworkResources {
         vcnId = vcn.res.id
         isEnabled = true
         displayName = "lifeline-internet-gateway"
-        tags {
-            new { key = "Environment"; value = "production" }
-            new { key = "Project"; value = "lifeline" }
-            new { key = "ManagedBy"; value = "formae" }
+        freeformTags {
+            new oci.FreeformTag { key = "Environment"; value = "production" }
+            new oci.FreeformTag { key = "Project"; value = "lifeline" }
+            new oci.FreeformTag { key = "ManagedBy"; value = "formae" }
         }
     }
 
@@ -56,11 +57,11 @@ class NetworkResources {
                 description = "Route to Internet Gateway"
             }
         }
-        tags {
-            new { key = "Environment"; value = "production" }
-            new { key = "Project"; value = "lifeline" }
-            new { key = "ManagedBy"; value = "formae" }
-            new { key = "Purpose"; value = "public-routing" }
+        freeformTags {
+            new oci.FreeformTag { key = "Environment"; value = "production" }
+            new oci.FreeformTag { key = "Project"; value = "lifeline" }
+            new oci.FreeformTag { key = "ManagedBy"; value = "formae" }
+            new oci.FreeformTag { key = "Purpose"; value = "public-routing" }
         }
     }
 
@@ -73,11 +74,11 @@ class NetworkResources {
         dnsLabel = "public"
         prohibitPublicIpOnVnic = false
         routeTableId = routeTable.res.id
-        tags {
-            new { key = "Environment"; value = "production" }
-            new { key = "Project"; value = "lifeline" }
-            new { key = "ManagedBy"; value = "formae" }
-            new { key = "Tier"; value = "public" }
+        freeformTags {
+            new oci.FreeformTag { key = "Environment"; value = "production" }
+            new oci.FreeformTag { key = "Project"; value = "lifeline" }
+            new oci.FreeformTag { key = "ManagedBy"; value = "formae" }
+            new oci.FreeformTag { key = "Tier"; value = "public" }
         }
     }
 
@@ -90,11 +91,11 @@ class NetworkResources {
         dnsLabel = "private"
         prohibitPublicIpOnVnic = true
         prohibitInternetIngress = true
-        tags {
-            new { key = "Environment"; value = "production" }
-            new { key = "Project"; value = "lifeline" }
-            new { key = "ManagedBy"; value = "formae" }
-            new { key = "Tier"; value = "private" }
+        freeformTags {
+            new oci.FreeformTag { key = "Environment"; value = "production" }
+            new oci.FreeformTag { key = "Project"; value = "lifeline" }
+            new oci.FreeformTag { key = "ManagedBy"; value = "formae" }
+            new oci.FreeformTag { key = "Tier"; value = "private" }
         }
     }
 

@@ -100,10 +100,10 @@ func (p *NodePoolProvisioner) Create(ctx context.Context, request *resource.Crea
 		if isPvEncryptionInTransitEnabled, ok := util.ExtractBool(nodeConfigDetails, "isPvEncryptionInTransitEnabled"); ok {
 			config.IsPvEncryptionInTransitEnabled = common.Bool(isPvEncryptionInTransitEnabled)
 		}
-		if freeformTags, ok := util.ExtractTag(nodeConfigDetails, "freeformTags"); ok {
+		if freeformTags, ok := util.ExtractFreeformTags(nodeConfigDetails, "freeformTags"); ok {
 			config.FreeformTags = freeformTags
 		}
-		if definedTags, ok := util.ExtractNestedTag(nodeConfigDetails, "definedTags"); ok {
+		if definedTags, ok := util.ExtractDefinedTags(nodeConfigDetails, "definedTags"); ok {
 			config.DefinedTags = definedTags
 		}
 
@@ -151,10 +151,10 @@ func (p *NodePoolProvisioner) Create(ctx context.Context, request *resource.Crea
 		createDetails.InitialNodeLabels = labels
 	}
 
-	if freeformTags, ok := util.ExtractTag(props, "FreeformTags"); ok {
+	if freeformTags, ok := util.ExtractFreeformTags(props, "FreeformTags"); ok {
 		createDetails.FreeformTags = freeformTags
 	}
-	if definedTags, ok := util.ExtractNestedTag(props, "DefinedTags"); ok {
+	if definedTags, ok := util.ExtractDefinedTags(props, "DefinedTags"); ok {
 		createDetails.DefinedTags = definedTags
 	}
 
@@ -258,10 +258,10 @@ func (p *NodePoolProvisioner) Update(ctx context.Context, request *resource.Upda
 		updateDetails.InitialNodeLabels = labels
 	}
 
-	if freeformTags, ok := util.ExtractTag(props, "FreeformTags"); ok {
+	if freeformTags, ok := util.ExtractFreeformTags(props, "FreeformTags"); ok {
 		updateDetails.FreeformTags = freeformTags
 	}
-	if definedTags, ok := util.ExtractNestedTag(props, "DefinedTags"); ok {
+	if definedTags, ok := util.ExtractDefinedTags(props, "DefinedTags"); ok {
 		updateDetails.DefinedTags = definedTags
 	}
 
@@ -449,10 +449,10 @@ func (p *NodePoolProvisioner) Read(ctx context.Context, request *resource.ReadRe
 		props["SshPublicKey"] = *resp.SshPublicKey
 	}
 	if resp.FreeformTags != nil {
-		props["FreeformTags"] = resp.FreeformTags
+		props["FreeformTags"] = util.FreeformTagsToList(resp.FreeformTags)
 	}
 	if resp.DefinedTags != nil {
-		props["DefinedTags"] = resp.DefinedTags
+		props["DefinedTags"] = util.DefinedTagsToList(resp.DefinedTags)
 	}
 
 	propBytes, err := json.Marshal(props)

@@ -96,24 +96,24 @@ class SubResourceHint extends formae.SubResourceHint {
   hidden outputKeyTransformation: (String) -> String = (it) -> it.capitalize()
 }
 
-/// Converts Listing<formae.Tag> to OCI FreeformTags format (Mapping<String, String>)
-/// In:  [{key: "Env", value: "prod"}, {key: "Team", value: "platform"}]
-/// Out: {"Env": "prod", "Team": "platform"}
-class Transform {
+/// OCI FreeformTag - simple key/value string pairs
+/// Example: new FreeformTag { key = "Environment"; value = "production" }
+class FreeformTag {
+  hidden key: String
+  hidden value: String
 
-  tagsToFreeformTags: (Any) -> Mapping<String, String> = (tags) ->
-    if (tags == null)
-      new Mapping<String, String> {}
-    else
-      tags.toList().fold(new Mapping<String, String> {}, (acc, tag) ->
-        let (tagMap = tag.toMap())
-        let (key = tagMap.getOrNull("key") ?? tagMap.getOrNull("Key"))
-        let (value = tagMap.getOrNull("value") ?? tagMap.getOrNull("Value"))
-          if (key != null && value != null)
-            (acc) { [key.toString()] = value.toString() }
-          else
-            acc
-      )
+  fixed Key: String = key
+  fixed Value: String = value
 }
 
-const transform: Transform = new Transform {}
+/// OCI DefinedTag - namespaced tags with namespace/key/value structure
+/// Example: new DefinedTag { namespace = "Operations"; key = "CostCenter"; value = "42" }
+class DefinedTag {
+  hidden namespace: String
+  hidden key: String
+  hidden value: Any
+
+  fixed Namespace: String = namespace
+  fixed Key: String = key
+  fixed Value: Any = value
+}

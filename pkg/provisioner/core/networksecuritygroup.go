@@ -50,10 +50,10 @@ func (p *NetworkSecurityGroupProvisioner) Create(ctx context.Context, request *r
 	if displayName, ok := util.ExtractString(props, "DisplayName"); ok {
 		createDetails.DisplayName = common.String(displayName)
 	}
-	if freeformTags, ok := util.ExtractTag(props, "FreeformTags"); ok {
+	if freeformTags, ok := util.ExtractFreeformTags(props, "FreeformTags"); ok {
 		createDetails.FreeformTags = freeformTags
 	}
-	if definedTags, ok := util.ExtractNestedTag(props, "DefinedTags"); ok {
+	if definedTags, ok := util.ExtractDefinedTags(props, "DefinedTags"); ok {
 		createDetails.DefinedTags = definedTags
 	}
 
@@ -77,10 +77,10 @@ func (p *NetworkSecurityGroupProvisioner) Create(ctx context.Context, request *r
 		properties["DisplayName"] = *resp.DisplayName
 	}
 	if resp.FreeformTags != nil {
-		properties["FreeformTags"] = resp.FreeformTags
+		properties["FreeformTags"] = util.FreeformTagsToList(resp.FreeformTags)
 	}
 	if resp.DefinedTags != nil {
-		properties["DefinedTags"] = resp.DefinedTags
+		properties["DefinedTags"] = util.DefinedTagsToList(resp.DefinedTags)
 	}
 
 	propertiesBytes, err := json.Marshal(properties)
@@ -115,11 +115,11 @@ func (p *NetworkSecurityGroupProvisioner) Update(ctx context.Context, request *r
 		updateDetails.DisplayName = common.String(displayName)
 	}
 
-	if freeformTags, ok := util.ExtractTag(props, "FreeformTags"); ok {
+	if freeformTags, ok := util.ExtractFreeformTags(props, "FreeformTags"); ok {
 		updateDetails.FreeformTags = freeformTags
 	}
 
-	if definedTags, ok := util.ExtractNestedTag(props, "DefinedTags"); ok {
+	if definedTags, ok := util.ExtractDefinedTags(props, "DefinedTags"); ok {
 		updateDetails.DefinedTags = definedTags
 	}
 
@@ -224,10 +224,10 @@ func (p *NetworkSecurityGroupProvisioner) Read(ctx context.Context, request *res
 		props["DisplayName"] = *resp.DisplayName
 	}
 	if resp.FreeformTags != nil {
-		props["FreeformTags"] = resp.FreeformTags
+		props["FreeformTags"] = util.FreeformTagsToList(resp.FreeformTags)
 	}
 	if resp.DefinedTags != nil {
-		props["DefinedTags"] = resp.DefinedTags
+		props["DefinedTags"] = util.DefinedTagsToList(resp.DefinedTags)
 	}
 
 	propBytes, err := json.Marshal(props)

@@ -5,6 +5,7 @@
  */
 
 import "@formae/formae.pkl"
+import "@oci/oci.pkl"
 import "@oci/core/vcn.pkl"
 import "@oci/core/networksecuritygroup.pkl"
 import "@oci/core/networksecuritygroupsecurityrule.pkl"
@@ -19,11 +20,11 @@ class SecurityGroupResources {
         compartmentId = outer.compartmentId
         vcnId = vcn.res.id
         displayName = "lifeline-web-nsg"
-        tags {
-            new { key = "Environment"; value = "production" }
-            new { key = "Project"; value = "lifeline" }
-            new { key = "ManagedBy"; value = "formae" }
-            new { key = "Tier"; value = "web" }
+        freeformTags {
+            new oci.FreeformTag { key = "Environment"; value = "production" }
+            new oci.FreeformTag { key = "Project"; value = "lifeline" }
+            new oci.FreeformTag { key = "ManagedBy"; value = "formae" }
+            new oci.FreeformTag { key = "Tier"; value = "web" }
         }
     }
 
@@ -32,11 +33,11 @@ class SecurityGroupResources {
         compartmentId = outer.compartmentId
         vcnId = vcn.res.id
         displayName = "lifeline-database-nsg"
-        tags {
-            new { key = "Environment"; value = "production" }
-            new { key = "Project"; value = "lifeline" }
-            new { key = "ManagedBy"; value = "formae" }
-            new { key = "Tier"; value = "database" }
+        freeformTags {
+            new oci.FreeformTag { key = "Environment"; value = "production" }
+            new oci.FreeformTag { key = "Project"; value = "lifeline" }
+            new oci.FreeformTag { key = "ManagedBy"; value = "formae" }
+            new oci.FreeformTag { key = "Tier"; value = "database" }
         }
     }
 

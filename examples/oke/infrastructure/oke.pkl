@@ -5,6 +5,7 @@
  */
 
 import "@formae/formae.pkl"
+import "@oci/oci.pkl"
 import "@oci/core/vcn.pkl"
 import "@oci/core/subnet.pkl"
 import "@oci/containerengine/cluster.pkl"
@@ -50,9 +51,9 @@ class OkeResources {
             }
         }
 
-        tags {
-            new { key = "Name"; value = projectName }
-            new { key = "Project"; value = projectName }
+        freeformTags {
+            new oci.FreeformTag { key = "Name"; value = projectName }
+            new oci.FreeformTag { key = "Project"; value = projectName }
         }
     }
 
@@ -100,9 +101,9 @@ class OkeResources {
             }
         }
 
-        tags {
-            new { key = "Name"; value = projectName + "-nodepool" }
-            new { key = "Project"; value = projectName }
+        freeformTags {
+            new oci.FreeformTag { key = "Name"; value = projectName + "-nodepool" }
+            new oci.FreeformTag { key = "Project"; value = projectName }
         }
     }
 

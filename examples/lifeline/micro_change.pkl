@@ -37,11 +37,11 @@ forma {
         publicAccessType = "NoPublicAccess"
         storageTier = "Standard"
         versioning = "Enabled"
-        tags {
-            new { key = "Environment"; value = "production" }
-            new { key = "Project"; value = "lifeline" }
-            new { key = "ManagedBy"; value = "formae" }
-            new { key = "Purpose"; value = "application-data" }
+        freeformTags {
+            new oci.FreeformTag { key = "Environment"; value = "production" }
+            new oci.FreeformTag { key = "Project"; value = "lifeline" }
+            new oci.FreeformTag { key = "ManagedBy"; value = "formae" }
+            new oci.FreeformTag { key = "Purpose"; value = "application-data" }
         }
     }
 }

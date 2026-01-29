@@ -1,0 +1,162 @@
+amends "@formae/forma.pkl"
+import "@formae/formae.pkl"
+
+// Resource imports
+import "@oci/core/internetgateway.pkl"
+import "@oci/core/routetable.pkl"
+import "@oci/core/securitylist.pkl"
+import "@oci/core/vcn.pkl"
+import "@oci/identity/compartment.pkl"
+import "@oci/oci.pkl"
+
+forma {
+
+  local myStack = new formae.Stack {
+    label = "extracted-cleanup"
+    description = "This was generated"
+  }
+  myStack
+
+
+  local ociTarget = new formae.Target {
+    label = "oci-target"
+    namespace = "OCI"
+    discoverable = true
+    config {
+      Type = "OCI"
+      Region = "us-chicago-1"
+    }
+  }
+  ociTarget
+
+  new internetgateway.InternetGateway {
+    label = "ocid1.internetgateway.oc1.us-chicago-1.aaaaaaaaplu72klzju7ugqeqgtriotkyppcp32ceals2n6jr6l4vqmi2nklq"
+    compartmentId = "ocid1.tenancy.oc1..aaaaaaaakxm3lo5ntsbsmx3n6epvrntxsmjg6eypafyi2ldngr6bsclpcdta" // The target resource with the label = "ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qatfhbiw2637zayjgo3h3piitc2ezemp75objsrb5s4kgq" of type = "OCI::Core::VCN" is not managed yet. Bring it under management first to convert this into a Resolvable.
+    vcnId = "ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qatfhbiw2637zayjgo3h3piitc2ezemp75objsrb5s4kgq" // The target resource with the label = "ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qatfhbiw2637zayjgo3h3piitc2ezemp75objsrb5s4kgq" of type = "OCI::Core::VCN" is not managed yet. Bring it under management first to convert this into a Resolvable.
+    isEnabled = true
+    displayName = "ociiii"
+    freeformTags = new Listing { new oci.FreeformTag {
+        key = "foo"
+        value = "bar"
+      } }
+    definedTags = new Listing { new oci.DefinedTag {
+        namespace = "Oracle-Tags"
+        key = "CreatedOn"
+        value = "2026-01-28T09:03:01.874Z"
+      }; new oci.DefinedTag {
+        namespace = "Oracle-Tags"
+        key = "CreatedBy"
+        value = "default/pb@platform.engineering"
+      } }
+    target = ociTarget.res
+    stack = myStack.res
+  }
+
+  new routetable.RouteTable {
+    label = "ocid1.routetable.oc1.us-chicago-1.aaaaaaaasbzdabmimakrv4lbljx5uiyqpqxd75qafsfz43d7ubnsswzuovea"
+    compartmentId = "ocid1.tenancy.oc1..aaaaaaaakxm3lo5ntsbsmx3n6epvrntxsmjg6eypafyi2ldngr6bsclpcdta" // The target resource with the label = "ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qatfhbiw2637zayjgo3h3piitc2ezemp75objsrb5s4kgq" of type = "OCI::Core::VCN" is not managed yet. Bring it under management first to convert this into a Resolvable.
+    vcnId = "ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qatfhbiw2637zayjgo3h3piitc2ezemp75objsrb5s4kgq" // The target resource with the label = "ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qatfhbiw2637zayjgo3h3piitc2ezemp75objsrb5s4kgq" of type = "OCI::Core::VCN" is not managed yet. Bring it under management first to convert this into a Resolvable.
+    displayName = "Default Route Table for ociish"
+    routeRules = new Listing {  }
+    definedTags = new Listing { new oci.DefinedTag {
+        namespace = "Oracle-Tags"
+        key = "CreatedBy"
+        value = "default/pb@platform.engineering"
+      }; new oci.DefinedTag {
+        namespace = "Oracle-Tags"
+        key = "CreatedOn"
+        value = "2026-01-28T09:02:46.716Z"
+      } }
+    target = ociTarget.res
+    stack = myStack.res
+  }
+
+  new securitylist.SecurityList {
+    label = "ocid1.securitylist.oc1.us-chicago-1.aaaaaaaamo5xztvsc4vamwolqxvt7w6a4djw5yl5j5wtskrjs76wac7eh25a"
+    compartmentId = "ocid1.tenancy.oc1..aaaaaaaakxm3lo5ntsbsmx3n6epvrntxsmjg6eypafyi2ldngr6bsclpcdta" // The target resource with the label = "ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qatfhbiw2637zayjgo3h3piitc2ezemp75objsrb5s4kgq" of type = "OCI::Core::VCN" is not managed yet. Bring it under management first to convert this into a Resolvable.
+    vcnId = "ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qatfhbiw2637zayjgo3h3piitc2ezemp75objsrb5s4kgq" // The target resource with the label = "ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qatfhbiw2637zayjgo3h3piitc2ezemp75objsrb5s4kgq" of type = "OCI::Core::VCN" is not managed yet. Bring it under management first to convert this into a Resolvable.
+    displayName = "Default Security List for ociish"
+    ingressSecurityRules = new Listing { new securitylist.IngressSecurityRule {
+        protocol = "6"
+        source = "0.0.0.0/0"
+        sourceType = "CIDR_BLOCK"
+        isStateless = false
+        tcpOptions = new securitylist.TcpOptions {
+          destinationPortRange = new securitylist.PortRange {
+            min = 22
+            max = 22
+          }
+        }
+      }; new securitylist.IngressSecurityRule {
+        protocol = "1"
+        source = "0.0.0.0/0"
+        sourceType = "CIDR_BLOCK"
+        isStateless = false
+        icmpOptions = new securitylist.IcmpOptions {
+          type = 3
+          code = 4
+        }
+      }; new securitylist.IngressSecurityRule {
+        protocol = "1"
+        source = "10.0.0.0/16"
+        sourceType = "CIDR_BLOCK"
+        isStateless = false
+        icmpOptions = new securitylist.IcmpOptions {
+          type = 3
+        }
+      } }
+    egressSecurityRules = new Listing { new securitylist.EgressSecurityRule {
+        protocol = "all"
+        destination = "0.0.0.0/0"
+        destinationType = "CIDR_BLOCK"
+        isStateless = false
+      } }
+    definedTags = new Listing { new oci.DefinedTag {
+        namespace = "Oracle-Tags"
+        key = "CreatedBy"
+        value = "default/pb@platform.engineering"
+      }; new oci.DefinedTag {
+        namespace = "Oracle-Tags"
+        key = "CreatedOn"
+        value = "2026-01-28T09:02:46.716Z"
+      } }
+    target = ociTarget.res
+    stack = myStack.res
+  }
+
+  new vcn.VCN {
+    label = "ocid1.vcn.oc1.us-chicago-1.amaaaaaawu4ry7qatfhbiw2637zayjgo3h3piitc2ezemp75objsrb5s4kgq"
+    compartmentId = "ocid1.tenancy.oc1..aaaaaaaakxm3lo5ntsbsmx3n6epvrntxsmjg6eypafyi2ldngr6bsclpcdta" // The target resource with the label = "ocid1.tenancy.oc1..aaaaaaaakxm3lo5ntsbsmx3n6epvrntxsmjg6eypafyi2ldngr6bsclpcdta" of type = "OCI::Identity::Compartment" is not managed yet. Bring it under management first to convert this into a Resolvable.
+    cidrBlock = "10.0.0.0/16"
+    cidrBlocks = new Listing { "10.0.0.0/16" }
+    displayName = "ociish"
+    dnsLabel = "ociish"
+    definedTags = new Listing { new oci.DefinedTag {
+        namespace = "Oracle-Tags"
+        key = "CreatedBy"
+        value = "default/pb@platform.engineering"
+      }; new oci.DefinedTag {
+        namespace = "Oracle-Tags"
+        key = "CreatedOn"
+        value = "2026-01-28T09:02:46.716Z"
+      } }
+    target = ociTarget.res
+    stack = myStack.res
+  }
+
+  new compartment.Compartment {
+    label = "ocid1.tenancy.oc1..aaaaaaaakxm3lo5ntsbsmx3n6epvrntxsmjg6eypafyi2ldngr6bsclpcdta"
+    compartmentId = "ocid1.tenancy.oc1..aaaaaaaakxm3lo5ntsbsmx3n6epvrntxsmjg6eypafyi2ldngr6bsclpcdta"
+    name = "platform-engineering-labs"
+    description = "platform-engineering-labs"
+    freeformTags = new Listing { new oci.FreeformTag {
+        key = "FormaeResourceLabel"
+        value = "ocid1.tenancy.oc1..aaaaaaaakxm3lo5ntsbsmx3n6epvrntxsmjg6eypafyi2ldngr6bsclpcdta"
+      }; new oci.FreeformTag {
+        key = "FormaeStackLabel"
+        value = "oke-example-stack"
+      } }
+    target = ociTarget.res
+    stack = myStack.res
+  }
+}

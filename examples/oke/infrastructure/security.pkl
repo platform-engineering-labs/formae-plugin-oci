@@ -5,6 +5,7 @@
  */
 
 import "@formae/formae.pkl"
+import "@oci/oci.pkl"
 import "@oci/core/vcn.pkl"
 import "@oci/core/securitylist.pkl"
 
@@ -152,9 +153,9 @@ class SecurityResources {
             }
         }
 
-        tags {
-            new { key = "Name"; value = projectName + "-security-list" }
-            new { key = "Project"; value = projectName }
+        freeformTags {
+            new oci.FreeformTag { key = "Name"; value = projectName + "-security-list" }
+            new oci.FreeformTag { key = "Project"; value = projectName }
         }
     }
 

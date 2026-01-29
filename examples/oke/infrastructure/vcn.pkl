@@ -5,6 +5,7 @@
  */
 
 import "@formae/formae.pkl"
+import "@oci/oci.pkl"
 import "@oci/core/vcn.pkl"
 
 import "../vars.pkl"
@@ -20,9 +21,9 @@ class VcnResources {
         cidrBlock = vcnCidr
         displayName = projectName + "-vcn"
         dnsLabel = "okecluster"
-        tags {
-            new { key = "Name"; value = projectName + "-vcn" }
-            new { key = "Project"; value = projectName }
+        freeformTags {
+            new oci.FreeformTag { key = "Name"; value = projectName + "-vcn" }
+            new oci.FreeformTag { key = "Project"; value = projectName }
         }
     }
 

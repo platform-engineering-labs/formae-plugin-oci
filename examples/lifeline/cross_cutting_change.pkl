@@ -56,21 +56,21 @@ forma {
         compartmentId = vars.compartmentId.value
         vcnId = lifelineVcn.id
         isEnabled = true
-        tags { new { key = properties.crossCuttingTag.value; value = properties.crossCuttingTagValue.value } }
+        freeformTags { new oci.FreeformTag { key = properties.crossCuttingTag.value; value = properties.crossCuttingTagValue.value } }
     }
 
     new networksecuritygroup.NetworkSecurityGroup {
         label = "lifeline-web-nsg"
         compartmentId = vars.compartmentId.value
         vcnId = lifelineVcn.id
-        tags { new { key = properties.crossCuttingTag.value; value = properties.crossCuttingTagValue.value } }
+        freeformTags { new oci.FreeformTag { key = properties.crossCuttingTag.value; value = properties.crossCuttingTagValue.value } }
     }
 
     new networksecuritygroup.NetworkSecurityGroup {
         label = "lifeline-db-nsg"
         compartmentId = vars.compartmentId.value
         vcnId = lifelineVcn.id
-        tags { new { key = properties.crossCuttingTag.value; value = properties.crossCuttingTagValue.value } }
+        freeformTags { new oci.FreeformTag { key = properties.crossCuttingTag.value; value = properties.crossCuttingTagValue.value } }
     }
 }
 

@@ -144,15 +144,11 @@ open class SecurityList extends formae.Resource {
     @oci.FieldHint
     egressSecurityRules: Listing<EgressSecurityRule>?
 
-    /// FreeformTags - converted from formae.Tag format via tags property
-    @oci.FieldHint {
-        outputTransformation = oci.transform.tagsToFreeformTags
-        outputField = "FreeformTags"
-    }
-    tags: Listing<formae.Tag>?
+    @oci.FieldHint
+    freeformTags: Listing<oci.FreeformTag>?
 
     @oci.FieldHint
-    definedTags: Mapping<String, Mapping<String, Any>>?
+    definedTags: Listing<oci.DefinedTag>?
 
     local parent = this
 

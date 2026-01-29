@@ -4,34 +4,78 @@
 
 package util
 
-import "fmt"
-
-// ExtractTag converts a map[string]any to map[string]string for OCI FreeformTags
-func ExtractTag(props map[string]any, key string) (map[string]string, bool) {
-	if tags, ok := props[key].(map[string]any); ok && len(tags) > 0 {
-		result := make(map[string]string, len(tags))
-		for k, v := range tags {
-			result[k] = fmt.Sprintf("%v", v)
+// ExtractFreeformTags converts Listing<oci.FreeformTag> ([{Key, Value}]) to map[string]string for OCI API
+func ExtractFreeformTags(props map[string]any, key string) (map[string]string, bool) {
+	slice, ok := props[key].([]any)
+	if !ok || len(slice) == 0 {
+		return nil, false
+	}
+	result := make(map[string]string, len(slice))
+	for _, item := range slice {
+		if tag, ok := item.(map[string]any); ok {
+			k, _ := tag["Key"].(string)
+			v, _ := tag["Value"].(string)
+			if k != "" {
+				result[k] = v
+			}
 		}
+	}
+	if len(result) > 0 {
 		return result, true
 	}
 	return nil, false
 }
 
-// ExtractNestedTag converts a map[string]any to map[string]map[string]any for OCI DefinedTags
-func ExtractNestedTag(props map[string]any, key string) (map[string]map[string]any, bool) {
-	if tags, ok := props[key].(map[string]any); ok && len(tags) > 0 {
-		result := make(map[string]map[string]any, len(tags))
-		for k, v := range tags {
-			if m, ok := v.(map[string]any); ok {
-				result[k] = m
+// ExtractDefinedTags converts Listing<oci.DefinedTag> ([{Namespace, Key, Value}]) to map[string]map[string]any for OCI API
+func ExtractDefinedTags(props map[string]any, key string) (map[string]map[string]any, bool) {
+	slice, ok := props[key].([]any)
+	if !ok || len(slice) == 0 {
+		return nil, false
+	}
+	result := make(map[string]map[string]any)
+	for _, item := range slice {
+		if tag, ok := item.(map[string]any); ok {
+			ns, _ := tag["Namespace"].(string)
+			k, _ := tag["Key"].(string)
+			v := tag["Value"]
+			if ns != "" && k != "" {
+				if result[ns] == nil {
+					result[ns] = make(map[string]any)
+				}
+				result[ns][k] = v
 			}
 		}
-		if len(result) > 0 {
-			return result, true
-		}
+	}
+	if len(result) > 0 {
+		return result, true
 	}
 	return nil, false
+}
+
+// FreeformTagsToList converts OCI's map[string]string to Listing<oci.FreeformTag> format for responses
+func FreeformTagsToList(tags map[string]string) []map[string]string {
+	if len(tags) == 0 {
+		return nil
+	}
+	result := make([]map[string]string, 0, len(tags))
+	for k, v := range tags {
+		result = append(result, map[string]string{"Key": k, "Value": v})
+	}
+	return result
+}
+
+// DefinedTagsToList converts OCI's map[string]map[string]any to Listing<oci.DefinedTag> format for responses
+func DefinedTagsToList(tags map[string]map[string]any) []map[string]any {
+	if len(tags) == 0 {
+		return nil
+	}
+	result := make([]map[string]any, 0)
+	for ns, kvs := range tags {
+		for k, v := range kvs {
+			result = append(result, map[string]any{"Namespace": ns, "Key": k, "Value": v})
+		}
+	}
+	return result
 }
 
 // validateString checks if a value is a non-empty string or a resolved reference

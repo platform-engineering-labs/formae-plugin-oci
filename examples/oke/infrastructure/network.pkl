@@ -5,6 +5,7 @@
  */
 
 import "@formae/formae.pkl"
+import "@oci/oci.pkl"
 import "@oci/core/vcn.pkl"
 import "@oci/core/subnet.pkl"
 import "@oci/core/internetgateway.pkl"
@@ -31,8 +32,8 @@ class NetworkResources {
         vcnId = vcn.res.id
         isEnabled = true
         displayName = projectName + "-igw"
-        tags {
-            new { key = "Name"; value = projectName + "-igw" }
+        freeformTags {
+            new oci.FreeformTag { key = "Name"; value = projectName + "-igw" }
         }
     }
 
@@ -43,8 +44,8 @@ class NetworkResources {
         vcnId = vcn.res.id
         displayName = projectName + "-nat-gw"
         blockTraffic = false
-        tags {
-            new { key = "Name"; value = projectName + "-nat-gw" }
+        freeformTags {
+            new oci.FreeformTag { key = "Name"; value = projectName + "-nat-gw" }
         }
     }
 
@@ -59,8 +60,8 @@ class NetworkResources {
                 serviceId = serviceGatewayServiceId
             }
         }
-        tags {
-            new { key = "Name"; value = projectName + "-svc-gw" }
+        freeformTags {
+            new oci.FreeformTag { key = "Name"; value = projectName + "-svc-gw" }
         }
     }
 
@@ -78,8 +79,8 @@ class NetworkResources {
                 networkEntityId = internetGateway.res.id
             }
         }
-        tags {
-            new { key = "Name"; value = projectName + "-public-rt" }
+        freeformTags {
+            new oci.FreeformTag { key = "Name"; value = projectName + "-public-rt" }
         }
     }
 
@@ -103,8 +104,8 @@ class NetworkResources {
                 networkEntityId = serviceGateway.res.id
             }
         }
-        tags {
-            new { key = "Name"; value = projectName + "-private-rt" }
+        freeformTags {
+            new oci.FreeformTag { key = "Name"; value = projectName + "-private-rt" }
         }
     }
 
@@ -122,9 +123,9 @@ class NetworkResources {
         securityListIds {
             securityList.res.id
         }
-        tags {
-            new { key = "Name"; value = projectName + "-svclb-subnet" }
-            new { key = "OKECluster"; value = projectName }
+        freeformTags {
+            new oci.FreeformTag { key = "Name"; value = projectName + "-svclb-subnet" }
+            new oci.FreeformTag { key = "OKECluster"; value = projectName }
         }
     }
 
@@ -142,9 +143,9 @@ class NetworkResources {
         securityListIds {
             securityList.res.id
         }
-        tags {
-            new { key = "Name"; value = projectName + "-worker-subnet" }
-            new { key = "OKECluster"; value = projectName }
+        freeformTags {
+            new oci.FreeformTag { key = "Name"; value = projectName + "-worker-subnet" }
+            new oci.FreeformTag { key = "OKECluster"; value = projectName }
         }
     }
 

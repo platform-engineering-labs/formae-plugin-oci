@@ -56,14 +56,11 @@ open class Bucket extends formae.Resource {
     @oci.FieldHint
     versioning: String?
 
-    @oci.FieldHint {
-        outputTransformation = oci.transform.tagsToFreeformTags
-        outputField = "FreeformTags"
-    }
-    tags: Listing<formae.Tag>?
+    @oci.FieldHint
+    freeformTags: Listing<oci.FreeformTag>?
 
     @oci.FieldHint
-    definedTags: Mapping<String, Mapping<String, Any>>?
+    definedTags: Listing<oci.DefinedTag>?
 
     local parent = this
 
