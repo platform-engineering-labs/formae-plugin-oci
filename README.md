@@ -1,5 +1,8 @@
 # OCI Plugin for Formae
 
+[![CI](https://github.com/platform-engineering-labs/formae-plugin-oci/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/platform-engineering-labs/formae-plugin-oci/actions/workflows/ci.yml)
+[![Nightly](https://github.com/platform-engineering-labs/formae-plugin-oci/actions/workflows/nightly.yml/badge.svg?branch=main)](https://github.com/platform-engineering-labs/formae-plugin-oci/actions/workflows/nightly.yml)
+
 Formae plugin for managing Oracle Cloud Infrastructure resources.
 
 ## Supported Resources
