@@ -26,7 +26,7 @@ open class BucketResolvable extends formae.Resolvable {
     type = module.type
     identifier = "Name"
     discoverable = true
-    extractable = true
+    extractable = false  // TODO: re-enable once formae extract uses oci.DefinedTag
     parent = "OCI::Identity::Compartment"
     listParam = new formae.ListProperty {
         parentProperty = "Id"
@@ -41,8 +41,8 @@ open class Bucket extends formae.Resource {
     @oci.FieldHint{required = true createOnly = true}
     name: String
 
-    @oci.FieldHint{required = true createOnly = true}
-    namespace: String
+    @oci.FieldHint{createOnly = true}
+    namespace: String?
 
     @oci.FieldHint
     publicAccessType: String?
