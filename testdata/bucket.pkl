@@ -12,7 +12,6 @@ import "@oci/objectstorage/bucket.pkl"
 
 // These values need to be set for your OCI tenancy
 local testCompartmentId = read("env:OCI_COMPARTMENT_ID")
-local testNamespace = read("env:OCI_NAMESPACE")
 local testProfile = read?("env:OCI_PROFILE") ?? "DEFAULT"
 local testRunID = read("env:FORMAE_TEST_RUN_ID")
 
@@ -36,7 +35,6 @@ forma {
     label = "plugin-sdk-test-bucket"
     compartmentId = testCompartmentId
     name = "formae-plugin-sdk-test-\(testRunID)"
-    namespace = testNamespace
     storageTier = "Standard"
     publicAccessType = "NoPublicAccess"
   }
