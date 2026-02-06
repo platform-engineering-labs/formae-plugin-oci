@@ -7,7 +7,7 @@ require (
 	github.com/evanphx/json-patch/v5 v5.9.11
 	github.com/oracle/oci-go-sdk/v65 v65.81.0
 	github.com/platform-engineering-labs/formae/pkg/model v0.1.4
-	github.com/platform-engineering-labs/formae/pkg/plugin v0.1.11
+	github.com/platform-engineering-labs/formae/pkg/plugin v0.1.12
 	github.com/platform-engineering-labs/formae/pkg/plugin-conformance-tests v0.1.18
 )
 
