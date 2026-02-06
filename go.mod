@@ -5,7 +5,7 @@ go 1.25
 require (
 	github.com/apple/pkl-go v0.12.0
 	github.com/evanphx/json-patch/v5 v5.9.11
-	github.com/oracle/oci-go-sdk/v65 v65.81.0
+	github.com/oracle/oci-go-sdk/v65 v65.108.0
 	github.com/platform-engineering-labs/formae/pkg/model v0.1.4
 	github.com/platform-engineering-labs/formae/pkg/plugin v0.1.11
 	github.com/platform-engineering-labs/formae/pkg/plugin-conformance-tests v0.1.18
@@ -20,7 +20,7 @@ require (
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
-	github.com/gofrs/flock v0.8.1 // indirect
+	github.com/gofrs/flock v0.10.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.7 // indirect
 	github.com/lufia/plan9stats v0.0.0-20251013123823-9fd1530e3ec3 // indirect
@@ -38,6 +38,7 @@ require (
 	github.com/tklauser/numcpus v0.11.0 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
+	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/instrumentation/host v0.65.0 // indirect
@@ -50,6 +51,7 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v1.40.0 // indirect
 	go.opentelemetry.io/otel/trace v1.40.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.9.0 // indirect
+	golang.org/x/crypto v0.47.0 // indirect
 	golang.org/x/net v0.49.0 // indirect
 	golang.org/x/sys v0.40.0 // indirect
 	golang.org/x/text v0.33.0 // indirect
