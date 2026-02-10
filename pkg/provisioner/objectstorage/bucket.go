@@ -94,43 +94,11 @@ func (p *BucketProvisioner) Create(ctx context.Context, request *resource.Create
 		return nil, fmt.Errorf("failed to create Bucket: %w", err)
 	}
 
-	// Build properties from Create response
-	properties := map[string]any{
-		"CompartmentId": *resp.CompartmentId,
-		"Name":          *resp.Name,
-		"Namespace":     *resp.Namespace,
-	}
-
-	if resp.PublicAccessType != "" {
-		properties["PublicAccessType"] = string(resp.PublicAccessType)
-	}
-	if resp.StorageTier != "" {
-		properties["StorageTier"] = string(resp.StorageTier)
-	}
-	if resp.ObjectEventsEnabled != nil {
-		properties["ObjectEventsEnabled"] = *resp.ObjectEventsEnabled
-	}
-	if resp.Versioning != "" {
-		properties["Versioning"] = string(resp.Versioning)
-	}
-	if resp.FreeformTags != nil {
-		properties["FreeformTags"] = util.FreeformTagsToList(resp.FreeformTags)
-	}
-	if resp.DefinedTags != nil {
-		properties["DefinedTags"] = util.DefinedTagsToList(resp.DefinedTags)
-	}
-
-	propertiesBytes, err := json.Marshal(properties)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal properties: %w", err)
-	}
-
 	return &resource.CreateResult{
 		ProgressResult: &resource.ProgressResult{
-			Operation:          resource.OperationCreate,
-			OperationStatus:    resource.OperationStatusSuccess,
-			NativeID:           *resp.Name,
-			ResourceProperties: json.RawMessage(propertiesBytes),
+			Operation:       resource.OperationCreate,
+			OperationStatus: resource.OperationStatusSuccess,
+			NativeID:        *resp.Name,
 		},
 	}, nil
 }
@@ -188,44 +156,11 @@ func (p *BucketProvisioner) Update(ctx context.Context, request *resource.Update
 		return nil, fmt.Errorf("failed to update Bucket: %w", err)
 	}
 
-	// Build properties from Update response (same as Create and Read)
-	// This ensures formae stores the complete state, preventing drift detection issues
-	properties := map[string]any{
-		"CompartmentId": *resp.CompartmentId,
-		"Name":          *resp.Name,
-		"Namespace":     *resp.Namespace,
-	}
-
-	if resp.PublicAccessType != "" {
-		properties["PublicAccessType"] = string(resp.PublicAccessType)
-	}
-	if resp.StorageTier != "" {
-		properties["StorageTier"] = string(resp.StorageTier)
-	}
-	if resp.ObjectEventsEnabled != nil {
-		properties["ObjectEventsEnabled"] = *resp.ObjectEventsEnabled
-	}
-	if resp.Versioning != "" {
-		properties["Versioning"] = string(resp.Versioning)
-	}
-	if resp.FreeformTags != nil {
-		properties["FreeformTags"] = util.FreeformTagsToList(resp.FreeformTags)
-	}
-	if resp.DefinedTags != nil {
-		properties["DefinedTags"] = util.DefinedTagsToList(resp.DefinedTags)
-	}
-
-	propertiesBytes, err := json.Marshal(properties)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal Bucket properties: %w", err)
-	}
-
 	return &resource.UpdateResult{
 		ProgressResult: &resource.ProgressResult{
-			Operation:          resource.OperationUpdate,
-			OperationStatus:    resource.OperationStatusSuccess,
-			NativeID:           *resp.Name,
-			ResourceProperties: json.RawMessage(propertiesBytes),
+			Operation:       resource.OperationUpdate,
+			OperationStatus: resource.OperationStatusSuccess,
+			NativeID:        *resp.Name,
 		},
 	}, nil
 }

@@ -178,90 +178,11 @@ func (p *NetworkSecurityGroupSecurityRuleProvisioner) Create(ctx context.Context
 		return nil, fmt.Errorf("created rule validation failed: %w", err)
 	}
 
-	// Build properties from the Create response to avoid eventual consistency issues with List
-	properties := map[string]any{
-		"Id":                     ruleID,
-		"NetworkSecurityGroupId": nsgId,
-		"Direction":              string(rule.Direction),
-		"Protocol":               *rule.Protocol,
-	}
-
-	if rule.Description != nil {
-		properties["Description"] = *rule.Description
-	}
-	if rule.Destination != nil {
-		properties["Destination"] = *rule.Destination
-	}
-	if rule.DestinationType != "" {
-		properties["DestinationType"] = string(rule.DestinationType)
-	}
-	if rule.Source != nil {
-		properties["Source"] = *rule.Source
-	}
-	if rule.SourceType != "" {
-		properties["SourceType"] = string(rule.SourceType)
-	}
-	if rule.IsStateless != nil {
-		properties["IsStateless"] = *rule.IsStateless
-	}
-	// Use camelCase for nested objects to match Pkl schema (outputKeyTransformation doesn't apply to nested objects)
-	if rule.TcpOptions != nil {
-		tcpOpts := make(map[string]any)
-		if rule.TcpOptions.DestinationPortRange != nil {
-			tcpOpts["destinationPortRange"] = map[string]any{
-				"min": *rule.TcpOptions.DestinationPortRange.Min,
-				"max": *rule.TcpOptions.DestinationPortRange.Max,
-			}
-		}
-		if rule.TcpOptions.SourcePortRange != nil {
-			tcpOpts["sourcePortRange"] = map[string]any{
-				"min": *rule.TcpOptions.SourcePortRange.Min,
-				"max": *rule.TcpOptions.SourcePortRange.Max,
-			}
-		}
-		if len(tcpOpts) > 0 {
-			properties["TcpOptions"] = tcpOpts
-		}
-	}
-	if rule.UdpOptions != nil {
-		udpOpts := make(map[string]any)
-		if rule.UdpOptions.DestinationPortRange != nil {
-			udpOpts["destinationPortRange"] = map[string]any{
-				"min": *rule.UdpOptions.DestinationPortRange.Min,
-				"max": *rule.UdpOptions.DestinationPortRange.Max,
-			}
-		}
-		if rule.UdpOptions.SourcePortRange != nil {
-			udpOpts["sourcePortRange"] = map[string]any{
-				"min": *rule.UdpOptions.SourcePortRange.Min,
-				"max": *rule.UdpOptions.SourcePortRange.Max,
-			}
-		}
-		if len(udpOpts) > 0 {
-			properties["UdpOptions"] = udpOpts
-		}
-	}
-	if rule.IcmpOptions != nil {
-		icmpOpts := map[string]any{
-			"type": *rule.IcmpOptions.Type,
-		}
-		if rule.IcmpOptions.Code != nil {
-			icmpOpts["code"] = *rule.IcmpOptions.Code
-		}
-		properties["IcmpOptions"] = icmpOpts
-	}
-
-	propertiesBytes, err := json.Marshal(properties)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal properties: %w", err)
-	}
-
 	return &resource.CreateResult{
 		ProgressResult: &resource.ProgressResult{
-			Operation:          resource.OperationCreate,
-			OperationStatus:    resource.OperationStatusSuccess,
-			NativeID:           nativeID,
-			ResourceProperties: json.RawMessage(propertiesBytes),
+			Operation:       resource.OperationCreate,
+			OperationStatus: resource.OperationStatusSuccess,
+			NativeID:        nativeID,
 		},
 	}, nil
 }

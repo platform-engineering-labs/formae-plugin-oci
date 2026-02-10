@@ -1,0 +1,131 @@
+/*
+ * © 2025 Platform Engineering Labs Inc.
+ *
+ * SPDX-License-Identifier: FSL-1.1-ALv2
+ */
+
+module oci.core.instance
+
+import "@formae/formae.pkl"
+import "../oci.pkl"
+
+const type = "OCI::Core::Instance"
+
+open class InstanceResolvable extends formae.Resolvable {
+    hidden type = module.type
+
+    hidden id: InstanceResolvable = (this) {
+        property = "Id"
+    }
+}
+
+/// Source details for launching an instance (image or boot volume)
+class SourceDetails {
+    /// "image" or "bootVolume"
+    sourceType: String
+
+    /// Image OCID (when sourceType is "image")
+    imageId: (String|formae.Resolvable)?
+
+    /// Boot volume OCID (when sourceType is "bootVolume")
+    bootVolumeId: (String|formae.Resolvable)?
+
+    /// Boot volume size in GBs (when sourceType is "image")
+    bootVolumeSizeInGBs: Int?
+}
+
+/// VNIC details for creating an instance's primary network interface
+class CreateVnicDetails {
+    /// Subnet OCID for the VNIC
+    subnetId: (String|formae.Resolvable)?
+
+    /// Display name for the VNIC
+    displayName: String?
+
+    /// Whether to assign a public IP
+    assignPublicIp: Boolean?
+
+    /// Whether to assign a private DNS record
+    assignPrivateDnsRecord: Boolean?
+
+    /// Hostname label for DNS
+    hostnameLabel: String?
+
+    /// List of NSG OCIDs
+    nsgIds: Listing<String|formae.Resolvable>?
+
+    /// Private IP address
+    privateIp: String?
+
+    /// Skip source/dest check
+    skipSourceDestCheck: Boolean?
+
+    /// Freeform tags for the VNIC
+    freeformTags: Listing<oci.FreeformTag>?
+
+    /// Defined tags for the VNIC
+    definedTags: Listing<oci.DefinedTag>?
+}
+
+/// Shape configuration for flexible shapes
+class ShapeConfig {
+    /// Number of OCPUs
+    ocpus: Float?
+
+    /// Memory in GBs
+    memoryInGBs: Float?
+
+    /// Baseline OCPU utilization (for burstable instances)
+    baselineOcpuUtilization: String?
+}
+
+@oci.ResourceHint {
+    type = module.type
+    identifier = "Id"
+    discoverable = true
+    extractable = true
+    parent = "OCI::Identity::Compartment"
+    listParam = new formae.ListProperty {
+        parentProperty = "Id"
+        listParameter = "CompartmentId"
+    }
+}
+open class Instance extends formae.Resource {
+
+    @oci.FieldHint{required = true createOnly = true}
+    compartmentId: String|formae.Resolvable
+
+    @oci.FieldHint{required = true createOnly = true}
+    availabilityDomain: String
+
+    @oci.FieldHint{required = true}
+    shape: String
+
+    @oci.FieldHint
+    displayName: String?
+
+    @oci.FieldHint{createOnly = true}
+    sourceDetails: SourceDetails?
+
+    @oci.FieldHint{createOnly = true}
+    createVnicDetails: CreateVnicDetails?
+
+    @oci.FieldHint
+    shapeConfig: ShapeConfig?
+
+    @oci.FieldHint
+    metadata: Mapping<String, String>?
+
+    @oci.FieldHint
+    freeformTags: Listing<oci.FreeformTag>?
+
+    @oci.FieldHint
+    definedTags: Listing<oci.DefinedTag>?
+
+    local parent = this
+
+    hidden res: InstanceResolvable = new {
+        label = parent.label
+        stack = parent.stack?.label
+    }
+}

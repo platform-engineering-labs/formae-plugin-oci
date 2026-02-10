@@ -19,6 +19,10 @@ Formae plugin for managing Oracle Cloud Infrastructure resources.
 | `OCI::Core::SecurityList` | Security lists |
 | `OCI::Core::NetworkSecurityGroup` | Network security groups |
 | `OCI::Core::NetworkSecurityGroupSecurityRule` | NSG security rules |
+| `OCI::Core::DhcpOptions` | DHCP options |
+| `OCI::Core::Instance` | Compute instances |
+| `OCI::Core::Volume` | Block volumes |
+| `OCI::Identity::Policy` | IAM policies |
 | `OCI::ContainerEngine::Cluster` | OKE clusters |
 | `OCI::ContainerEngine::NodePool` | OKE node pools |
 | `OCI::ContainerEngine::VirtualNodePool` | OKE virtual node pools |

@@ -77,51 +77,11 @@ func (p *VCNProvisioner) Create(ctx context.Context, request *resource.CreateReq
 		return nil, fmt.Errorf("failed to create VCN: %w", err)
 	}
 
-	// Build properties from Create response
-	properties := map[string]any{
-		"CompartmentId": *resp.CompartmentId,
-		"Id":            *resp.Id,
-	}
-
-	if resp.CidrBlock != nil {
-		properties["CidrBlock"] = *resp.CidrBlock
-	}
-	if resp.CidrBlocks != nil {
-		properties["CidrBlocks"] = resp.CidrBlocks
-	}
-	if resp.DisplayName != nil {
-		properties["DisplayName"] = *resp.DisplayName
-	}
-	if resp.DnsLabel != nil {
-		properties["DnsLabel"] = *resp.DnsLabel
-	}
-	if resp.DefaultDhcpOptionsId != nil {
-		properties["DefaultDhcpOptionsId"] = *resp.DefaultDhcpOptionsId
-	}
-	if resp.DefaultRouteTableId != nil {
-		properties["DefaultRouteTableId"] = *resp.DefaultRouteTableId
-	}
-	if resp.DefaultSecurityListId != nil {
-		properties["DefaultSecurityListId"] = *resp.DefaultSecurityListId
-	}
-	if resp.FreeformTags != nil {
-		properties["FreeformTags"] = util.FreeformTagsToList(resp.FreeformTags)
-	}
-	if resp.DefinedTags != nil {
-		properties["DefinedTags"] = util.DefinedTagsToList(resp.DefinedTags)
-	}
-
-	propertiesBytes, err := json.Marshal(properties)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal properties: %w", err)
-	}
-
 	return &resource.CreateResult{
 		ProgressResult: &resource.ProgressResult{
-			Operation:          resource.OperationCreate,
-			OperationStatus:    resource.OperationStatusSuccess,
-			NativeID:           *resp.Id,
-			ResourceProperties: json.RawMessage(propertiesBytes),
+			Operation:       resource.OperationCreate,
+			OperationStatus: resource.OperationStatusSuccess,
+			NativeID:        *resp.Id,
 		},
 	}, nil
 }

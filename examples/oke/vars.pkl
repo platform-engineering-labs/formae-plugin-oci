@@ -59,6 +59,5 @@ target: formae.Target = new formae.Target {
     label = "oci-target"
     config = new oci.Config {
         region = module.ociRegion
-        profile = "DEFAULT"
     }
 }

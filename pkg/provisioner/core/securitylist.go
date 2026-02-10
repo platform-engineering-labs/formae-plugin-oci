@@ -448,35 +448,11 @@ func (p *SecurityListProvisioner) Create(ctx context.Context, request *resource.
 		return nil, fmt.Errorf("failed to create SecurityList: %w", err)
 	}
 
-	properties := map[string]any{
-		"CompartmentId":        *resp.CompartmentId,
-		"VcnId":                *resp.VcnId,
-		"Id":                   *resp.Id,
-		"IngressSecurityRules": serializeIngressRules(resp.IngressSecurityRules),
-		"EgressSecurityRules":  serializeEgressRules(resp.EgressSecurityRules),
-	}
-
-	if resp.DisplayName != nil {
-		properties["DisplayName"] = *resp.DisplayName
-	}
-	if resp.FreeformTags != nil {
-		properties["FreeformTags"] = util.FreeformTagsToList(resp.FreeformTags)
-	}
-	if resp.DefinedTags != nil {
-		properties["DefinedTags"] = util.DefinedTagsToList(resp.DefinedTags)
-	}
-
-	propertiesBytes, err := json.Marshal(properties)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal properties: %w", err)
-	}
-
 	return &resource.CreateResult{
 		ProgressResult: &resource.ProgressResult{
-			Operation:          resource.OperationCreate,
-			OperationStatus:    resource.OperationStatusSuccess,
-			NativeID:           *resp.Id,
-			ResourceProperties: json.RawMessage(propertiesBytes),
+			Operation:       resource.OperationCreate,
+			OperationStatus: resource.OperationStatusSuccess,
+			NativeID:        *resp.Id,
 		},
 	}, nil
 }
@@ -532,25 +508,11 @@ func (p *SecurityListProvisioner) Update(ctx context.Context, request *resource.
 		return nil, fmt.Errorf("failed to update SecurityList: %w", err)
 	}
 
-	readReq := &resource.ReadRequest{
-		NativeID: *resp.Id,
-	}
-	readRes, err := p.Read(ctx, readReq)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read SecurityList after update: %w", err)
-	}
-
-	var propertiesBytes json.RawMessage
-	if readRes.Properties != "" {
-		propertiesBytes = json.RawMessage(readRes.Properties)
-	}
-
 	return &resource.UpdateResult{
 		ProgressResult: &resource.ProgressResult{
-			Operation:          resource.OperationUpdate,
-			OperationStatus:    resource.OperationStatusSuccess,
-			NativeID:           *resp.Id,
-			ResourceProperties: propertiesBytes,
+			Operation:       resource.OperationUpdate,
+			OperationStatus: resource.OperationStatusSuccess,
+			NativeID:        *resp.Id,
 		},
 	}, nil
 }

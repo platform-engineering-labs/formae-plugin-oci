@@ -22,6 +22,8 @@ type Clients struct {
 
 	mu              sync.Mutex
 	virtualNetwork  *core.VirtualNetworkClient
+	blockstorage    *core.BlockstorageClient
+	compute         *core.ComputeClient
 	objectStorage   *objectstorage.ObjectStorageClient
 	identity        *identity.IdentityClient
 	containerEngine *containerengine.ContainerEngineClient
@@ -50,6 +52,36 @@ func (c *Clients) GetVirtualNetworkClient() (*core.VirtualNetworkClient, error) 
 		c.virtualNetwork = &client
 	}
 	return c.virtualNetwork, nil
+}
+
+// GetBlockstorageClient returns a cached or newly created BlockstorageClient
+func (c *Clients) GetBlockstorageClient() (*core.BlockstorageClient, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if c.blockstorage == nil {
+		client, err := core.NewBlockstorageClientWithConfigurationProvider(c.provider)
+		if err != nil {
+			return nil, err
+		}
+		c.blockstorage = &client
+	}
+	return c.blockstorage, nil
+}
+
+// GetComputeClient returns a cached or newly created ComputeClient
+func (c *Clients) GetComputeClient() (*core.ComputeClient, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if c.compute == nil {
+		client, err := core.NewComputeClientWithConfigurationProvider(c.provider)
+		if err != nil {
+			return nil, err
+		}
+		c.compute = &client
+	}
+	return c.compute, nil
 }
 
 // GetObjectStorageClient returns a cached or newly created ObjectStorageClient
