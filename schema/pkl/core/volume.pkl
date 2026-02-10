@@ -1,0 +1,68 @@
+/*
+ * © 2025 Platform Engineering Labs Inc.
+ *
+ * SPDX-License-Identifier: FSL-1.1-ALv2
+ */
+
+module oci.core.volume
+
+import "@formae/formae.pkl"
+import "../oci.pkl"
+
+const type = "OCI::Core::Volume"
+
+open class VolumeResolvable extends formae.Resolvable {
+    hidden type = module.type
+
+    hidden id: VolumeResolvable = (this) {
+        property = "Id"
+    }
+}
+
+@oci.ResourceHint {
+    type = module.type
+    identifier = "Id"
+    discoverable = true
+    extractable = true
+    parent = "OCI::Identity::Compartment"
+    listParam = new formae.ListProperty {
+        parentProperty = "Id"
+        listParameter = "CompartmentId"
+    }
+}
+open class Volume extends formae.Resource {
+
+    @oci.FieldHint{required = true createOnly = true}
+    compartmentId: String|formae.Resolvable
+
+    @oci.FieldHint{required = true createOnly = true}
+    availabilityDomain: String
+
+    @oci.FieldHint
+    displayName: String?
+
+    @oci.FieldHint
+    sizeInGBs: Int?
+
+    @oci.FieldHint
+    vpusPerGB: Int?
+
+    @oci.FieldHint
+    isAutoTuneEnabled: Boolean?
+
+    @oci.FieldHint{createOnly = true}
+    kmsKeyId: String?
+
+    @oci.FieldHint
+    freeformTags: Listing<oci.FreeformTag>?
+
+    @oci.FieldHint
+    definedTags: Listing<oci.DefinedTag>?
+
+    local parent = this
+
+    hidden res: VolumeResolvable = new {
+        label = parent.label
+        stack = parent.stack?.label
+    }
+}

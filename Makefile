@@ -84,8 +84,7 @@ install-dev: build
 ## gen-pkl: Resolve PKL dependencies
 gen-pkl:
 	pkl project resolve schema/pkl
-	pkl project resolve examples/lifeline
-	pkl project resolve examples/oke
+	pkl project resolve examples
 	pkl project resolve testdata
 
 ## help: Show this help message

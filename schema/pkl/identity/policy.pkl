@@ -1,0 +1,62 @@
+/*
+ * © 2025 Platform Engineering Labs Inc.
+ *
+ * SPDX-License-Identifier: FSL-1.1-ALv2
+ */
+
+module oci.identity.policy
+
+import "@formae/formae.pkl"
+import "../oci.pkl"
+
+const type = "OCI::Identity::Policy"
+
+open class PolicyResolvable extends formae.Resolvable {
+    hidden type = module.type
+
+    hidden id: PolicyResolvable = (this) {
+        property = "Id"
+    }
+}
+
+@oci.ResourceHint {
+    type = module.type
+    identifier = "Id"
+    discoverable = true
+    extractable = true
+    parent = "OCI::Identity::Compartment"
+    listParam = new formae.ListProperty {
+        parentProperty = "Id"
+        listParameter = "CompartmentId"
+    }
+}
+open class Policy extends formae.Resource {
+
+    @oci.FieldHint{required = true createOnly = true}
+    compartmentId: String|formae.Resolvable
+
+    @oci.FieldHint{required = true createOnly = true}
+    name: String
+
+    @oci.FieldHint{required = true}
+    description: String
+
+    @oci.FieldHint{required = true}
+    statements: Listing<String>
+
+    @oci.FieldHint
+    versionDate: String?
+
+    @oci.FieldHint
+    freeformTags: Listing<oci.FreeformTag>?
+
+    @oci.FieldHint
+    definedTags: Listing<oci.DefinedTag>?
+
+    local parent = this
+
+    hidden res: PolicyResolvable = new {
+        label = parent.label
+        stack = parent.stack?.label
+    }
+}

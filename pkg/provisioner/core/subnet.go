@@ -91,65 +91,11 @@ func (p *SubnetProvisioner) Create(ctx context.Context, request *resource.Create
 		return nil, fmt.Errorf("failed to create Subnet: %w", err)
 	}
 
-	// Build properties from Create response
-	properties := map[string]any{
-		"CompartmentId": *resp.CompartmentId,
-		"VcnId":         *resp.VcnId,
-		"Id":            *resp.Id,
-		"CidrBlock":     *resp.CidrBlock,
-	}
-
-	if resp.AvailabilityDomain != nil {
-		properties["AvailabilityDomain"] = *resp.AvailabilityDomain
-	}
-	if resp.DisplayName != nil {
-		properties["DisplayName"] = *resp.DisplayName
-	}
-	if resp.DnsLabel != nil {
-		properties["DnsLabel"] = *resp.DnsLabel
-	}
-	if resp.ProhibitPublicIpOnVnic != nil {
-		properties["ProhibitPublicIpOnVnic"] = *resp.ProhibitPublicIpOnVnic
-	}
-	if resp.ProhibitInternetIngress != nil {
-		properties["ProhibitInternetIngress"] = *resp.ProhibitInternetIngress
-	}
-	if resp.RouteTableId != nil {
-		properties["RouteTableId"] = *resp.RouteTableId
-	}
-	if resp.SecurityListIds != nil {
-		properties["SecurityListIds"] = resp.SecurityListIds
-	}
-	if resp.VirtualRouterIp != nil {
-		properties["VirtualRouterIp"] = *resp.VirtualRouterIp
-	}
-	if resp.VirtualRouterMac != nil {
-		properties["VirtualRouterMac"] = *resp.VirtualRouterMac
-	}
-	if resp.Ipv6CidrBlock != nil {
-		properties["Ipv6CidrBlock"] = *resp.Ipv6CidrBlock
-	}
-	if resp.Ipv6CidrBlocks != nil {
-		properties["Ipv6CidrBlocks"] = resp.Ipv6CidrBlocks
-	}
-	if resp.FreeformTags != nil {
-		properties["FreeformTags"] = util.FreeformTagsToList(resp.FreeformTags)
-	}
-	if resp.DefinedTags != nil {
-		properties["DefinedTags"] = util.DefinedTagsToList(resp.DefinedTags)
-	}
-
-	propertiesBytes, err := json.Marshal(properties)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal properties: %w", err)
-	}
-
 	return &resource.CreateResult{
 		ProgressResult: &resource.ProgressResult{
-			Operation:          resource.OperationCreate,
-			OperationStatus:    resource.OperationStatusSuccess,
-			NativeID:           *resp.Id,
-			ResourceProperties: json.RawMessage(propertiesBytes),
+			Operation:       resource.OperationCreate,
+			OperationStatus: resource.OperationStatusSuccess,
+			NativeID:        *resp.Id,
 		},
 	}, nil
 }

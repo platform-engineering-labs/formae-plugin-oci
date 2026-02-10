@@ -9,6 +9,7 @@ require (
 	github.com/platform-engineering-labs/formae/pkg/model v0.1.4
 	github.com/platform-engineering-labs/formae/pkg/plugin v0.1.11
 	github.com/platform-engineering-labs/formae/pkg/plugin-conformance-tests v0.1.18
+	github.com/stretchr/testify v1.11.1
 )
 
 require (
@@ -16,6 +17,7 @@ require (
 	ergo.services/ergo v1.999.310 // indirect
 	github.com/cenkalti/backoff/v5 v5.0.3 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/ebitengine/purego v0.9.1 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
@@ -26,6 +28,7 @@ require (
 	github.com/lufia/plan9stats v0.0.0-20251013123823-9fd1530e3ec3 // indirect
 	github.com/masterminds/semver v1.5.0 // indirect
 	github.com/platform-engineering-labs/formae/pkg/api/model v0.1.1 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
 	github.com/shirou/gopsutil/v4 v4.26.1 // indirect
 	github.com/sony/gobreaker v0.5.0 // indirect
@@ -57,4 +60,5 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260128011058-8636f8732409 // indirect
 	google.golang.org/grpc v1.78.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

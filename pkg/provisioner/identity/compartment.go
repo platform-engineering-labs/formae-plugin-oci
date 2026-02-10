@@ -64,43 +64,11 @@ func (p *CompartmentProvisioner) Create(ctx context.Context, request *resource.C
 		return nil, fmt.Errorf("failed to create Compartment: %w", err)
 	}
 
-	// Build properties from Create response
-	properties := map[string]any{
-		"Id": *resp.Id,
-	}
-
-	// CompartmentId for root compartment may be nil, use Id as fallback
-	if resp.CompartmentId != nil {
-		properties["CompartmentId"] = *resp.CompartmentId
-	} else {
-		fmt.Printf("DEBUG: CompartmentId is nil for compartment %s, using Id as fallback\n", *resp.Id)
-		properties["CompartmentId"] = *resp.Id
-	}
-
-	if resp.Name != nil {
-		properties["Name"] = *resp.Name
-	}
-	if resp.Description != nil {
-		properties["Description"] = *resp.Description
-	}
-	if resp.FreeformTags != nil {
-		properties["FreeformTags"] = util.FreeformTagsToList(resp.FreeformTags)
-	}
-	if resp.DefinedTags != nil {
-		properties["DefinedTags"] = util.DefinedTagsToList(resp.DefinedTags)
-	}
-
-	propertiesBytes, err := json.Marshal(properties)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal properties: %w", err)
-	}
-
 	return &resource.CreateResult{
 		ProgressResult: &resource.ProgressResult{
-			Operation:          resource.OperationCreate,
-			OperationStatus:    resource.OperationStatusSuccess,
-			NativeID:           *resp.Id,
-			ResourceProperties: json.RawMessage(propertiesBytes),
+			Operation:       resource.OperationCreate,
+			OperationStatus: resource.OperationStatusSuccess,
+			NativeID:        *resp.Id,
 		},
 	}, nil
 }
@@ -199,42 +167,11 @@ func (p *CompartmentProvisioner) Update(ctx context.Context, request *resource.U
 		return nil, fmt.Errorf("failed to update Compartment: %w", err)
 	}
 
-	properties := map[string]any{
-		"Id": *resp.Id,
-	}
-
-	// CompartmentId for root compartment may be nil, use Id as fallback
-	if resp.CompartmentId != nil {
-		properties["CompartmentId"] = *resp.CompartmentId
-	} else {
-		fmt.Printf("DEBUG: CompartmentId is nil for compartment %s, using Id as fallback\n", *resp.Id)
-		properties["CompartmentId"] = *resp.Id
-	}
-
-	if resp.Name != nil {
-		properties["Name"] = *resp.Name
-	}
-	if resp.Description != nil {
-		properties["Description"] = *resp.Description
-	}
-	if resp.FreeformTags != nil {
-		properties["FreeformTags"] = util.FreeformTagsToList(resp.FreeformTags)
-	}
-	if resp.DefinedTags != nil {
-		properties["DefinedTags"] = util.DefinedTagsToList(resp.DefinedTags)
-	}
-
-	propertiesBytes, err := json.Marshal(properties)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal properties: %w", err)
-	}
-
 	return &resource.UpdateResult{
 		ProgressResult: &resource.ProgressResult{
-			Operation:          resource.OperationUpdate,
-			OperationStatus:    resource.OperationStatusSuccess,
-			NativeID:           *resp.Id,
-			ResourceProperties: json.RawMessage(propertiesBytes),
+			Operation:       resource.OperationUpdate,
+			OperationStatus: resource.OperationStatusSuccess,
+			NativeID:        *resp.Id,
 		},
 	}, nil
 }

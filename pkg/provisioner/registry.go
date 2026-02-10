@@ -28,7 +28,7 @@ func Get(resourceType string, clients *client.Clients) Provisioner {
 	if !ok {
 		return nil
 	}
-	return factory(clients)
+	return &readAfterWrite{inner: factory(clients)}
 }
 
 // GetFactory returns the factory function for a resource type (for testing)

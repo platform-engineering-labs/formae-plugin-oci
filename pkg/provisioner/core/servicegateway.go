@@ -96,43 +96,11 @@ func (p *ServiceGatewayProvisioner) Create(ctx context.Context, request *resourc
 		return nil, fmt.Errorf("failed to create ServiceGateway: %w", err)
 	}
 
-	// Build properties from Create response
-	properties := map[string]any{
-		"CompartmentId": *resp.CompartmentId,
-		"VcnId":         *resp.VcnId,
-		"Id":            *resp.Id,
-	}
-
-	// Convert services to array of maps
-	servicesArray := make([]map[string]string, 0, len(resp.Services))
-	for _, svc := range resp.Services {
-		servicesArray = append(servicesArray, map[string]string{
-			"serviceId": *svc.ServiceId,
-		})
-	}
-	properties["Services"] = servicesArray
-
-	if resp.DisplayName != nil {
-		properties["DisplayName"] = *resp.DisplayName
-	}
-	if resp.FreeformTags != nil {
-		properties["FreeformTags"] = util.FreeformTagsToList(resp.FreeformTags)
-	}
-	if resp.DefinedTags != nil {
-		properties["DefinedTags"] = util.DefinedTagsToList(resp.DefinedTags)
-	}
-
-	propertiesBytes, err := json.Marshal(properties)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal properties: %w", err)
-	}
-
 	return &resource.CreateResult{
 		ProgressResult: &resource.ProgressResult{
-			Operation:          resource.OperationCreate,
-			OperationStatus:    resource.OperationStatusSuccess,
-			NativeID:           *resp.Id,
-			ResourceProperties: json.RawMessage(propertiesBytes),
+			Operation:       resource.OperationCreate,
+			OperationStatus: resource.OperationStatusSuccess,
+			NativeID:        *resp.Id,
 		},
 	}, nil
 }

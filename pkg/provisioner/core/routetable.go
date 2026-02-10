@@ -127,55 +127,11 @@ func (p *RouteTableProvisioner) Create(ctx context.Context, request *resource.Cr
 		return nil, fmt.Errorf("failed to create RouteTable: %w", err)
 	}
 
-	// Build properties from Create response
-	properties := map[string]any{
-		"CompartmentId": *resp.CompartmentId,
-		"VcnId":         *resp.VcnId,
-		"Id":            *resp.Id,
-	}
-
-	if resp.DisplayName != nil {
-		properties["DisplayName"] = *resp.DisplayName
-	}
-
-	// Always include RouteRules, even if empty
-	// Use camelCase to match Pkl schema (nested objects don't get outputKeyTransformation)
-	rules := make([]map[string]any, len(resp.RouteRules))
-	for i, rule := range resp.RouteRules {
-		ruleMap := map[string]any{
-			"networkEntityId": *rule.NetworkEntityId,
-		}
-		if rule.Destination != nil {
-			ruleMap["destination"] = *rule.Destination
-		}
-		if rule.DestinationType != "" {
-			ruleMap["destinationType"] = string(rule.DestinationType)
-		}
-		if rule.Description != nil {
-			ruleMap["description"] = *rule.Description
-		}
-		rules[i] = ruleMap
-	}
-	properties["RouteRules"] = rules
-
-	if resp.FreeformTags != nil {
-		properties["FreeformTags"] = util.FreeformTagsToList(resp.FreeformTags)
-	}
-	if resp.DefinedTags != nil {
-		properties["DefinedTags"] = util.DefinedTagsToList(resp.DefinedTags)
-	}
-
-	propertiesBytes, err := json.Marshal(properties)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal properties: %w", err)
-	}
-
 	return &resource.CreateResult{
 		ProgressResult: &resource.ProgressResult{
-			Operation:          resource.OperationCreate,
-			OperationStatus:    resource.OperationStatusSuccess,
-			NativeID:           *resp.Id,
-			ResourceProperties: json.RawMessage(propertiesBytes),
+			Operation:       resource.OperationCreate,
+			OperationStatus: resource.OperationStatusSuccess,
+			NativeID:        *resp.Id,
 		},
 	}, nil
 }
@@ -223,26 +179,11 @@ func (p *RouteTableProvisioner) Update(ctx context.Context, request *resource.Up
 		return nil, fmt.Errorf("failed to update RouteTable: %w", err)
 	}
 
-	// Read the updated resource to get full state including Id
-	readReq := &resource.ReadRequest{
-		NativeID: *resp.Id,
-	}
-	readRes, err := p.Read(ctx, readReq)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read RouteTable after update: %w", err)
-	}
-
-	var propertiesBytes json.RawMessage
-	if readRes.Properties != "" {
-		propertiesBytes = json.RawMessage(readRes.Properties)
-	}
-
 	return &resource.UpdateResult{
 		ProgressResult: &resource.ProgressResult{
-			Operation:          resource.OperationUpdate,
-			OperationStatus:    resource.OperationStatusSuccess,
-			NativeID:           *resp.Id,
-			ResourceProperties: propertiesBytes,
+			Operation:       resource.OperationUpdate,
+			OperationStatus: resource.OperationStatusSuccess,
+			NativeID:        *resp.Id,
 		},
 	}, nil
 }

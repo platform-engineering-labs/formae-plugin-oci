@@ -4,6 +4,8 @@
 
 package util
 
+import "sort"
+
 // ExtractFreeformTags converts Listing<oci.FreeformTag> ([{Key, Value}]) to map[string]string for OCI API
 func ExtractFreeformTags(props map[string]any, key string) (map[string]string, bool) {
 	slice, ok := props[key].([]any)
@@ -57,9 +59,14 @@ func FreeformTagsToList(tags map[string]string) []map[string]string {
 	if len(tags) == 0 {
 		return nil
 	}
+	keys := make([]string, 0, len(tags))
+	for k := range tags {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
 	result := make([]map[string]string, 0, len(tags))
-	for k, v := range tags {
-		result = append(result, map[string]string{"Key": k, "Value": v})
+	for _, k := range keys {
+		result = append(result, map[string]string{"Key": k, "Value": tags[k]})
 	}
 	return result
 }
@@ -69,10 +76,20 @@ func DefinedTagsToList(tags map[string]map[string]any) []map[string]any {
 	if len(tags) == 0 {
 		return nil
 	}
+	namespaces := make([]string, 0, len(tags))
+	for ns := range tags {
+		namespaces = append(namespaces, ns)
+	}
+	sort.Strings(namespaces)
 	result := make([]map[string]any, 0)
-	for ns, kvs := range tags {
-		for k, v := range kvs {
-			result = append(result, map[string]any{"Namespace": ns, "Key": k, "Value": v})
+	for _, ns := range namespaces {
+		keys := make([]string, 0, len(tags[ns]))
+		for k := range tags[ns] {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+		for _, k := range keys {
+			result = append(result, map[string]any{"Namespace": ns, "Key": k, "Value": tags[ns][k]})
 		}
 	}
 	return result
