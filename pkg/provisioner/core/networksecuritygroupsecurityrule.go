@@ -401,7 +401,7 @@ func (p *NetworkSecurityGroupSecurityRuleProvisioner) List(ctx context.Context, 
 
 	nativeIDs := make([]string, 0, len(resp.Items))
 	for _, rule := range resp.Items {
-		nativeIDs = append(nativeIDs, *rule.Id)
+		nativeIDs = append(nativeIDs, fmt.Sprintf("%s/%s", nsgId, *rule.Id))
 	}
 
 	return &resource.ListResult{

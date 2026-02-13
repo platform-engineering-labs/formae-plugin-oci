@@ -8,19 +8,28 @@ amends "@formae/forma.pkl"
 import "@formae/formae.pkl"
 
 import "@oci/oci.pkl"
-import "@oci/objectstorage/bucket.pkl"
+import "@oci/core/vcn.pkl"
+import "@oci/core/internetgateway.pkl"
 import "@oci/identity/compartment.pkl"
 
 // These values need to be set for your OCI tenancy
 local testCompartmentId = read("env:OCI_COMPARTMENT_ID")
+
 local testRunID = read("env:FORMAE_TEST_RUN_ID")
 
 local stackName = "plugin-sdk-test-stack"
 
+local testVcn = new vcn.VCN {
+    label = "plugin-sdk-test-vcn"
+    compartmentId = testCompartmentId
+    cidrBlock = "10.0.0.0/16"
+    displayName = "formae-plugin-sdk-test-\(testRunID)"
+}
+
 forma {
   new formae.Stack {
     label = stackName
-    description = "Plugin SDK test for OCI Bucket"
+    description = "Plugin SDK test for OCI InternetGateway"
   }
 
   new formae.Target {
@@ -38,12 +47,13 @@ forma {
     description = "Compartment for conformance tests"
   }
 
-  new bucket.Bucket {
-    label = "plugin-sdk-test-bucket"
+  testVcn
+
+  new internetgateway.InternetGateway {
+    label = "plugin-sdk-test-igw"
     compartmentId = testCompartmentId
-    name = "formae-plugin-sdk-test-\(testRunID)"
-    storageTier = "Standard"
-    // Changed from "NoPublicAccess" to "ObjectRead" - this is an in-place update
-    publicAccessType = "ObjectRead"
+    vcnId = testVcn.res.id
+    isEnabled = true
+    displayName = "formae-plugin-sdk-test-\(testRunID)"
   }
 }
