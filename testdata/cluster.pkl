@@ -1,0 +1,79 @@
+/*
+ * © 2025 Platform Engineering Labs Inc.
+ *
+ * SPDX-License-Identifier: FSL-1.1-ALv2
+ */
+
+amends "@formae/forma.pkl"
+import "@formae/formae.pkl"
+
+import "@oci/oci.pkl"
+import "@oci/core/vcn.pkl"
+import "@oci/core/subnet.pkl"
+import "@oci/containerengine/cluster.pkl"
+import "@oci/identity/compartment.pkl"
+
+// These values need to be set for your OCI tenancy
+local testCompartmentId = read("env:OCI_COMPARTMENT_ID")
+local testRunID = read("env:FORMAE_TEST_RUN_ID")
+
+local stackName = "plugin-sdk-test-stack"
+
+local testVcn = new vcn.VCN {
+    label = "plugin-sdk-test-vcn"
+    compartmentId = testCompartmentId
+    cidrBlock = "10.0.0.0/16"
+    displayName = "formae-plugin-sdk-test-\(testRunID)"
+}
+
+local testSubnet = new subnet.Subnet {
+    label = "plugin-sdk-test-subnet"
+    compartmentId = testCompartmentId
+    vcnId = testVcn.res.id
+    cidrBlock = "10.0.1.0/24"
+    displayName = "formae-plugin-sdk-test-\(testRunID)"
+}
+
+forma {
+  new formae.Stack {
+    label = stackName
+    description = "Plugin SDK test for OCI Cluster"
+  }
+
+  new formae.Target {
+    label = "oci-target"
+    config = new oci.Config {
+      profile = testProfile
+      region = "us-chicago-1"
+    }
+  }
+
+  new compartment.Compartment {
+    label = "plugin-sdk-test-compartment"
+    compartmentId = testCompartmentId
+    name = "formae-plugin-sdk-test-\(testRunID)"
+    description = "Compartment for conformance tests"
+  }
+
+  testVcn
+  testSubnet
+
+  new cluster.Cluster {
+    label = "plugin-sdk-test-cluster"
+    compartmentId = testCompartmentId
+    vcnId = testVcn.res.id
+    kubernetesVersion = "v1.34.2"
+    name = "formae-plugin-sdk-test-\(testRunID)"
+    clusterType = "BASIC_CLUSTER"
+    endpointConfig = new cluster.ClusterEndpointConfig {
+      subnetId = testSubnet.res.id
+      isPublicIpEnabled = true
+    }
+    options = new cluster.ClusterCreateOptions {
+      kubernetesNetworkConfig = new cluster.KubernetesNetworkConfig {
+        podsCidr = "10.244.0.0/16"
+        servicesCidr = "10.96.0.0/16"
+      }
+    }
+  }
+}

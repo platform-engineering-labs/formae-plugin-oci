@@ -78,11 +78,13 @@ func (p *VolumeProvisioner) Create(ctx context.Context, request *resource.Create
 		return nil, fmt.Errorf("failed to create Volume: %w", err)
 	}
 
+	// Volume creation is async — return in-progress, poll lifecycle in Status()
 	return &resource.CreateResult{
 		ProgressResult: &resource.ProgressResult{
 			Operation:       resource.OperationCreate,
-			OperationStatus: resource.OperationStatusSuccess,
+			OperationStatus: resource.OperationStatusInProgress,
 			NativeID:        *resp.Id,
+			RequestID:       *resp.Id,
 		},
 	}, nil
 }
@@ -204,23 +206,87 @@ func (p *VolumeProvisioner) Delete(ctx context.Context, request *resource.Delete
 		return nil, fmt.Errorf("failed to delete Volume: %w", err)
 	}
 
+	// Volume deletion is async — return in-progress, poll lifecycle in Status()
 	return &resource.DeleteResult{
 		ProgressResult: &resource.ProgressResult{
 			Operation:       resource.OperationDelete,
-			OperationStatus: resource.OperationStatusSuccess,
+			OperationStatus: resource.OperationStatusInProgress,
 			NativeID:        request.NativeID,
+			RequestID:       request.NativeID,
 		},
 	}, nil
 }
 
 func (p *VolumeProvisioner) Status(ctx context.Context, request *resource.StatusRequest) (*resource.StatusResult, error) {
-	return &resource.StatusResult{
-		ProgressResult: &resource.ProgressResult{
-			Operation:       resource.OperationCheckStatus,
-			OperationStatus: resource.OperationStatusSuccess,
-			RequestID:       request.RequestID,
-		},
-	}, nil
+	svc, err := p.clients.GetBlockstorageClient()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get Blockstorage client: %w", err)
+	}
+
+	getReq := core.GetVolumeRequest{
+		VolumeId: common.String(request.RequestID),
+	}
+
+	resp, err := svc.GetVolume(ctx, getReq)
+	if err != nil {
+		if serviceErr, ok := common.IsServiceError(err); ok && serviceErr.GetHTTPStatusCode() == 404 {
+			// Volume gone — if we were deleting, that's success
+			return &resource.StatusResult{
+				ProgressResult: &resource.ProgressResult{
+					Operation:       resource.OperationCheckStatus,
+					OperationStatus: resource.OperationStatusSuccess,
+					NativeID:        request.RequestID,
+				},
+			}, nil
+		}
+		return nil, fmt.Errorf("failed to check Volume status: %w", err)
+	}
+
+	switch resp.LifecycleState {
+	case core.VolumeLifecycleStateAvailable:
+		properties := buildVolumeProperties(resp.Volume)
+		propertiesBytes, err := json.Marshal(properties)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal properties: %w", err)
+		}
+		return &resource.StatusResult{
+			ProgressResult: &resource.ProgressResult{
+				Operation:          resource.OperationCheckStatus,
+				OperationStatus:    resource.OperationStatusSuccess,
+				NativeID:           *resp.Id,
+				ResourceProperties: json.RawMessage(propertiesBytes),
+			},
+		}, nil
+
+	case core.VolumeLifecycleStateTerminated:
+		return &resource.StatusResult{
+			ProgressResult: &resource.ProgressResult{
+				Operation:       resource.OperationCheckStatus,
+				OperationStatus: resource.OperationStatusSuccess,
+				NativeID:        *resp.Id,
+			},
+		}, nil
+
+	case core.VolumeLifecycleStateFaulty:
+		return &resource.StatusResult{
+			ProgressResult: &resource.ProgressResult{
+				Operation:       resource.OperationCheckStatus,
+				OperationStatus: resource.OperationStatusFailure,
+				NativeID:        *resp.Id,
+				StatusMessage:   "Volume is in FAULTY state",
+			},
+		}, nil
+
+	default: // PROVISIONING, RESTORING, TERMINATING
+		return &resource.StatusResult{
+			ProgressResult: &resource.ProgressResult{
+				Operation:       resource.OperationCheckStatus,
+				OperationStatus: resource.OperationStatusInProgress,
+				RequestID:       request.RequestID,
+				StatusMessage:   fmt.Sprintf("Volume lifecycle state: %s", resp.LifecycleState),
+			},
+		}, nil
+	}
 }
 
 func (p *VolumeProvisioner) List(ctx context.Context, request *resource.ListRequest) (*resource.ListResult, error) {

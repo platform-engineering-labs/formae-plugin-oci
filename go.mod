@@ -2,12 +2,14 @@ module github.com/platform-engineering-labs/formae-plugin-oci
 
 go 1.25
 
+replace github.com/platform-engineering-labs/formae/pkg/model => ../formae/pkg/model
+
 require (
 	github.com/apple/pkl-go v0.12.0
 	github.com/evanphx/json-patch/v5 v5.9.11
 	github.com/oracle/oci-go-sdk/v65 v65.81.0
 	github.com/platform-engineering-labs/formae/pkg/model v0.1.4
-	github.com/platform-engineering-labs/formae/pkg/plugin v0.1.11
+	github.com/platform-engineering-labs/formae/pkg/plugin v0.1.12
 	github.com/platform-engineering-labs/formae/pkg/plugin-conformance-tests v0.1.19
 	github.com/stretchr/testify v1.11.1
 )
