@@ -2,7 +2,9 @@ amends "pkl:Project"
 
 dependencies {
   ["formae"] {
-    uri = "package://hub.platform.engineering/plugins/pkl/schema/pkl/formae/formae@0.81.0"
+    uri = "package://hub.platform.engineering/plugins/pkl/schema/pkl/formae/formae@0.82.0"
   }
-  ["oci"] = import("../schema/pkl/PklProject")
+  ["oci"] {
+    uri = "package://hub.platform.engineering/plugins/oci/schema/pkl/oci/oci@0.1.0"
+  }
 }
