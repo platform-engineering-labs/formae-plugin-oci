@@ -41,7 +41,16 @@ func (p *Plugin) DiscoveryFilters() []plugin.MatchFilter {
 }
 
 func (p *Plugin) LabelConfig() plugin.LabelConfig {
-	return plugin.LabelConfig{}
+	return plugin.LabelConfig{
+		DefaultQuery: "$.DisplayName",
+		ResourceOverrides: map[string]string{
+			"OCI::Identity::Compartment":       "$.Name",
+			"OCI::Identity::Policy":            "$.Name",
+			"OCI::ContainerEngine::Cluster":    "$.Name",
+			"OCI::ContainerEngine::NodePool":   "$.Name",
+			"OCI::ObjectStorage::Bucket":       "$.Name",
+		},
+	}
 }
 
 func (p *Plugin) Create(ctx context.Context, request *resource.CreateRequest) (*resource.CreateResult, error) {

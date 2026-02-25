@@ -3,10 +3,8 @@ module github.com/platform-engineering-labs/formae-plugin-oci
 go 1.25
 
 require (
-	github.com/apple/pkl-go v0.12.0
 	github.com/evanphx/json-patch/v5 v5.9.11
 	github.com/oracle/oci-go-sdk/v65 v65.81.0
-	github.com/platform-engineering-labs/formae/pkg/model v0.1.5
 	github.com/platform-engineering-labs/formae/pkg/plugin v0.1.14
 	github.com/platform-engineering-labs/formae/pkg/plugin-conformance-tests v0.1.21
 	github.com/stretchr/testify v1.11.1
@@ -15,6 +13,7 @@ require (
 require (
 	ergo.services/actor/statemachine v0.0.0-20251202053101-c0aa08b403e5 // indirect
 	ergo.services/ergo v1.999.310 // indirect
+	github.com/apple/pkl-go v0.12.0 // indirect
 	github.com/cenkalti/backoff/v5 v5.0.3 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -28,6 +27,7 @@ require (
 	github.com/lufia/plan9stats v0.0.0-20251013123823-9fd1530e3ec3 // indirect
 	github.com/masterminds/semver v1.5.0 // indirect
 	github.com/platform-engineering-labs/formae/pkg/api/model v0.1.1 // indirect
+	github.com/platform-engineering-labs/formae/pkg/model v0.1.5 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
 	github.com/shirou/gopsutil/v4 v4.26.1 // indirect
