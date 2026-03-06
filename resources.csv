@@ -1,0 +1,686 @@
+Category,Priority,Resource Type,Friendly Name,Status,Documentation URL
+#,,,,,
+# P0 = Critical foundation (every deployment needs these),,,,,
+# P1 = High (common platform engineering resources),,,,,
+# P2 = Medium (frequently used but more specialized),,,,,
+# P3 = Low (specialized / niche services),,,,,
+# P4 = Very Low (rarely provisioned or managed externally),,,,,
+#,,,,,
+# ============================================================,,,,,
+# IDENTITY & ACCESS MANAGEMENT,,,,,
+# ============================================================,,,,,
+Identity,P0,oci_identity_compartment,Compartment,Implemented,https://docs.oracle.com/en-us/iaas/Content/Identity/compartments/managingcompartments.htm
+Identity,P0,oci_identity_policy,IAM Policy,Implemented,https://docs.oracle.com/en-us/iaas/Content/Identity/policieshow/how-policies-work.htm
+Identity,P1,oci_identity_dynamic_group,Dynamic Group,Not Started,https://docs.oracle.com/en-us/iaas/Content/Identity/dynamicgroups/To_create_a_dynamic_group.htm
+Identity,P1,oci_identity_group,Group,Not Started,https://docs.oracle.com/en-us/iaas/Content/Identity/groups/managinggroups.htm
+Identity,P1,oci_identity_user,User,Not Started,https://docs.oracle.com/en-us/iaas/Content/Identity/users/about-managing-users.htm
+Identity,P2,oci_identity_tag_namespace,Tag Namespace,Not Started,https://docs.oracle.com/en-us/iaas/Content/Tagging/Tasks/managingtagsandtagnamespaces.htm
+Identity,P2,oci_identity_tag,Tag Definition,Not Started,https://docs.oracle.com/en-us/iaas/Content/Tagging/Tasks/managingtagsandtagnamespaces.htm
+Identity,P2,oci_identity_tag_default,Tag Default,Not Started,https://docs.oracle.com/en-us/iaas/Content/Tagging/Tasks/managingtagdefaults.htm
+Identity,P2,oci_identity_authentication_policy,Authentication Policy,Not Started,https://docs.oracle.com/en-us/iaas/Content/Identity/passwordpolicies/Managing_Password_Policies.htm
+Identity,P2,oci_identity_network_source,Network Source,Not Started,https://docs.oracle.com/en-us/iaas/Content/Identity/networksources/managingnetworksources.htm
+Identity,P3,oci_identity_api_key,API Key,Not Started,https://docs.oracle.com/en-us/iaas/Content/Identity/access/managing-user-credentials.htm
+Identity,P3,oci_identity_auth_token,Auth Token,Not Started,https://docs.oracle.com/en-us/iaas/Content/Identity/access/managing-user-credentials.htm
+Identity,P3,oci_identity_customer_secret_key,Customer Secret Key,Not Started,https://docs.oracle.com/en-us/iaas/Content/Identity/access/managing-user-credentials.htm
+Identity,P3,oci_identity_smtp_credential,SMTP Credential,Not Started,https://docs.oracle.com/en-us/iaas/Content/Identity/access/managing-user-credentials.htm
+Identity,P3,oci_identity_user_group_membership,User Group Membership,Not Started,https://docs.oracle.com/en-us/iaas/Content/Identity/groups/managinggroups.htm
+Identity Domains,P2,oci_identity_domain,Identity Domain,Not Started,https://docs.oracle.com/en-us/iaas/Content/Identity/domains/overview.htm
+Identity Domains,P3,oci_identity_domains_user,Identity Domain User,Not Started,https://docs.oracle.com/en-us/iaas/Content/Identity/domains/overview.htm
+Identity Domains,P3,oci_identity_domains_group,Identity Domain Group,Not Started,https://docs.oracle.com/en-us/iaas/Content/Identity/domains/overview.htm
+Identity Domains,P3,oci_identity_domains_identity_provider,Identity Domain IdP,Not Started,https://docs.oracle.com/en-us/iaas/Content/Identity/domains/overview.htm
+#,,,,,
+# ============================================================,,,,,
+# CORE NETWORKING,,,,,
+# ============================================================,,,,,
+Networking,P0,oci_core_vcn,Virtual Cloud Network,Implemented,https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/VCNs.htm
+Networking,P0,oci_core_subnet,Subnet,Implemented,https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/create_subnet.htm
+Networking,P0,oci_core_internet_gateway,Internet Gateway,Implemented,https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/managingIGs.htm
+Networking,P0,oci_core_nat_gateway,NAT Gateway,Implemented,https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/NATgateway.htm
+Networking,P0,oci_core_service_gateway,Service Gateway,Implemented,https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/servicegateway.htm
+Networking,P0,oci_core_route_table,Route Table,Implemented,https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/managingroutetables.htm
+Networking,P0,oci_core_security_list,Security List,Implemented,https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/securitylists.htm
+Networking,P0,oci_core_network_security_group,Network Security Group,Implemented,https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/networksecuritygroups.htm
+Networking,P0,oci_core_network_security_group_security_rule,NSG Security Rule,Implemented,https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/networksecuritygroups.htm
+Networking,P0,oci_core_dhcp_options,DHCP Options,Implemented,https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/managingDHCP.htm
+Networking,P1,oci_core_drg,Dynamic Routing Gateway,Not Started,https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/managingDRGs.htm
+Networking,P1,oci_core_drg_attachment,DRG Attachment,Not Started,https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/managingDRGs.htm
+Networking,P1,oci_core_drg_route_table,DRG Route Table,Not Started,https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/managingDRGs.htm
+Networking,P1,oci_core_drg_route_distribution,DRG Route Distribution,Not Started,https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/managingDRGs.htm
+Networking,P1,oci_core_local_peering_gateway,Local Peering Gateway,Not Started,https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/localVCNpeering.htm
+Networking,P1,oci_core_remote_peering_connection,Remote Peering Connection,Not Started,https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/remoteVCNpeering.htm
+Networking,P1,oci_core_public_ip,Public IP,Not Started,https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/managingpublicIPs.htm
+Networking,P1,oci_core_public_ip_pool,Public IP Pool,Not Started,https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/managingpublicIPs.htm
+Networking,P2,oci_core_private_ip,Private IP,Not Started,https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/managingIPaddresses.htm
+Networking,P2,oci_core_vlan,VLAN,Not Started,https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/managingVLANs.htm
+Networking,P2,oci_core_ipsec,IPSec Connection,Not Started,https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/managingIPsec.htm
+Networking,P2,oci_core_cpe,Customer Premises Equipment,Not Started,https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/managingCPEs.htm
+Networking,P2,oci_core_virtual_circuit,Virtual Circuit (FastConnect),Not Started,https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/fastconnect.htm
+Networking,P2,oci_core_cross_connect,Cross Connect,Not Started,https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/fastconnectoverview.htm
+Networking,P2,oci_core_cross_connect_group,Cross Connect Group,Not Started,https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/fastconnectoverview.htm
+Networking,P3,oci_core_capture_filter,Capture Filter (VTAP),Not Started,https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/vtap.htm
+Networking,P3,oci_core_vtap,VTAP,Not Started,https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/vtap.htm
+Networking,P3,oci_core_byoip_range,BYOIP Range,Not Started,https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/BYOIP.htm
+Networking,P3,oci_core_ip_inventory,IP Inventory,Not Started,https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/managingIPaddresses.htm
+#,,,,,
+# ============================================================,,,,,
+# COMPUTE,,,,,
+# ============================================================,,,,,
+Compute,P0,oci_core_instance,Compute Instance,Implemented,https://docs.oracle.com/en-us/iaas/Content/Compute/Tasks/launchinginstance.htm
+Compute,P1,oci_core_instance_configuration,Instance Configuration,Not Started,https://docs.oracle.com/en-us/iaas/Content/Compute/Tasks/creatinginstanceconfig.htm
+Compute,P1,oci_core_instance_pool,Instance Pool,Not Started,https://docs.oracle.com/en-us/iaas/Content/Compute/Tasks/creatinginstancepool.htm
+Compute,P1,oci_core_image,Custom Image,Not Started,https://docs.oracle.com/en-us/iaas/Content/Compute/Tasks/managingcustomimages.htm
+Compute,P1,oci_core_dedicated_vm_host,Dedicated VM Host,Not Started,https://docs.oracle.com/en-us/iaas/Content/Compute/Concepts/dedicatedvmhosts.htm
+Compute,P2,oci_core_compute_capacity_reservation,Capacity Reservation,Not Started,https://docs.oracle.com/en-us/iaas/Content/Compute/Tasks/reserve-capacity.htm
+Compute,P2,oci_core_compute_cluster,Compute Cluster,Not Started,https://docs.oracle.com/en-us/iaas/Content/Compute/Tasks/compute-clusters.htm
+Compute,P2,oci_core_cluster_network,Cluster Network,Not Started,https://docs.oracle.com/en-us/iaas/Content/Compute/Tasks/managingclusternetworks.htm
+Compute,P3,oci_core_shape_management,Shape Management,Not Started,https://docs.oracle.com/en-us/iaas/Content/Compute/References/computeshapes.htm
+Compute,P3,oci_core_app_catalog_subscription,App Catalog Subscription,Not Started,https://docs.oracle.com/en-us/iaas/Content/Compute/Tasks/managingimages.htm
+Compute,P3,oci_computeinstanceagent_instance_agent_command,Instance Agent Command,Not Started,https://docs.oracle.com/en-us/iaas/Content/Compute/Tasks/runningcommands.htm
+Autoscaling,P1,oci_autoscaling_auto_scaling_configuration,Auto Scaling Configuration,Not Started,https://docs.oracle.com/en-us/iaas/Content/Compute/Tasks/autoscalinginstancepools.htm
+#,,,,,
+# ============================================================,,,,,
+# BLOCK VOLUME,,,,,
+# ============================================================,,,,,
+Block Volume,P0,oci_core_volume,Block Volume,Implemented,https://docs.oracle.com/en-us/iaas/Content/Block/Tasks/creatingavolume.htm
+Block Volume,P1,oci_core_volume_attachment,Volume Attachment,Not Started,https://docs.oracle.com/en-us/iaas/Content/Block/Tasks/attachingavolume.htm
+Block Volume,P1,oci_core_volume_backup,Volume Backup,Not Started,https://docs.oracle.com/en-us/iaas/Content/Block/Tasks/schedulingvolumebackups.htm
+Block Volume,P2,oci_core_volume_group,Volume Group,Not Started,https://docs.oracle.com/en-us/iaas/Content/Block/Tasks/creatingavolumegroup.htm
+Block Volume,P2,oci_core_volume_group_backup,Volume Group Backup,Not Started,https://docs.oracle.com/en-us/iaas/Content/Block/Tasks/creatingavolumegroup.htm
+Block Volume,P2,oci_core_volume_backup_policy,Volume Backup Policy,Not Started,https://docs.oracle.com/en-us/iaas/Content/Block/Tasks/schedulingvolumebackups.htm
+Block Volume,P2,oci_core_volume_backup_policy_assignment,Backup Policy Assignment,Not Started,https://docs.oracle.com/en-us/iaas/Content/Block/Tasks/schedulingvolumebackups.htm
+Block Volume,P1,oci_core_boot_volume,Boot Volume,Not Started,https://docs.oracle.com/en-us/iaas/Content/Block/Tasks/managingbootvolumes.htm
+Block Volume,P2,oci_core_boot_volume_backup,Boot Volume Backup,Not Started,https://docs.oracle.com/en-us/iaas/Content/Block/Tasks/managingbootvolumes.htm
+#,,,,,
+# ============================================================,,,,,
+# OBJECT STORAGE,,,,,
+# ============================================================,,,,,
+Object Storage,P1,oci_objectstorage_bucket,Bucket,Implemented,https://docs.oracle.com/en-us/iaas/Content/Object/Tasks/managingbuckets.htm
+Object Storage,P2,oci_objectstorage_object,Object,Not Started,https://docs.oracle.com/en-us/iaas/Content/Object/Tasks/managingobjects.htm
+Object Storage,P2,oci_objectstorage_preauthrequest,Preauthenticated Request,Not Started,https://docs.oracle.com/en-us/iaas/Content/Object/Tasks/usingpreauthenticatedrequests.htm
+Object Storage,P2,oci_objectstorage_object_lifecycle_policy,Object Lifecycle Policy,Not Started,https://docs.oracle.com/en-us/iaas/Content/Object/Tasks/usinglifecyclepolicies.htm
+Object Storage,P3,oci_objectstorage_replication_policy,Replication Policy,Not Started,https://docs.oracle.com/en-us/iaas/Content/Object/Tasks/usingreplication.htm
+Object Storage,P3,oci_objectstorage_namespace_metadata,Namespace Metadata,Not Started,https://docs.oracle.com/en-us/iaas/Content/Object/Tasks/managingbuckets.htm
+#,,,,,
+# ============================================================,,,,,
+# FILE STORAGE,,,,,
+# ============================================================,,,,,
+File Storage,P1,oci_file_storage_file_system,File System,Not Started,https://docs.oracle.com/en-us/iaas/Content/File/Tasks/creatingfilesystems.htm
+File Storage,P1,oci_file_storage_mount_target,Mount Target,Not Started,https://docs.oracle.com/en-us/iaas/Content/File/Tasks/creatingmounttargets.htm
+File Storage,P1,oci_file_storage_export,Export,Not Started,https://docs.oracle.com/en-us/iaas/Content/File/Tasks/exportoptions.htm
+File Storage,P2,oci_file_storage_export_set,Export Set,Not Started,https://docs.oracle.com/en-us/iaas/Content/File/Tasks/exportoptions.htm
+File Storage,P2,oci_file_storage_snapshot,Snapshot,Not Started,https://docs.oracle.com/en-us/iaas/Content/File/Tasks/managingsnapshots.htm
+File Storage,P3,oci_file_storage_replication,Replication,Not Started,https://docs.oracle.com/en-us/iaas/Content/File/Tasks/filestoragefsreplication.htm
+File Storage,P3,oci_file_storage_outbound_connector,Outbound Connector (LDAP),Not Started,https://docs.oracle.com/en-us/iaas/Content/File/Tasks/managingoutboundconnectors.htm
+File Storage,P3,oci_file_storage_filesystem_snapshot_policy,Filesystem Snapshot Policy,Not Started,https://docs.oracle.com/en-us/iaas/Content/File/Tasks/managingsnapshots.htm
+Lustre File Storage,P3,oci_lustre_file_storage_lustre_file_system,Lustre File System,Not Started,https://docs.oracle.com/en-us/iaas/Content/lustre/home.htm
+#,,,,,
+# ============================================================,,,,,
+# CONTAINER ENGINE FOR KUBERNETES (OKE),,,,,
+# ============================================================,,,,,
+Container Engine,P0,oci_containerengine_cluster,OKE Cluster,Implemented,https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengcreatingclusterusingoke.htm
+Container Engine,P0,oci_containerengine_node_pool,Node Pool,Implemented,https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengscalingclusters.htm
+Container Engine,P1,oci_containerengine_virtual_node_pool,Virtual Node Pool,Implemented,https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengworkingwithvirtualnodes.htm
+Container Engine,P2,oci_containerengine_addon,OKE Addon,Not Started,https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengconfiguringclusteraddons.htm
+Container Instances,P2,oci_container_instances_container_instance,Container Instance,Not Started,https://docs.oracle.com/en-us/iaas/Content/container-instances/home.htm
+#,,,,,
+# ============================================================,,,,,
+# LOAD BALANCER,,,,,
+# ============================================================,,,,,
+Load Balancer,P1,oci_load_balancer_load_balancer,Load Balancer,Not Started,https://docs.oracle.com/en-us/iaas/Content/Balance/Tasks/managingloadbalancer.htm
+Load Balancer,P1,oci_load_balancer_backend_set,LB Backend Set,Not Started,https://docs.oracle.com/en-us/iaas/Content/Balance/Tasks/managingbackendsets.htm
+Load Balancer,P1,oci_load_balancer_backend,LB Backend,Not Started,https://docs.oracle.com/en-us/iaas/Content/Balance/Tasks/managingbackendservers.htm
+Load Balancer,P1,oci_load_balancer_listener,LB Listener,Not Started,https://docs.oracle.com/en-us/iaas/Content/Balance/Tasks/managinglisteners.htm
+Load Balancer,P2,oci_load_balancer_certificate,LB Certificate,Not Started,https://docs.oracle.com/en-us/iaas/Content/Balance/Tasks/managingcertificates.htm
+Load Balancer,P2,oci_load_balancer_hostname,LB Hostname,Not Started,https://docs.oracle.com/en-us/iaas/Content/Balance/Tasks/virtual_hostnames.htm
+Load Balancer,P2,oci_load_balancer_path_route_set,LB Path Route Set,Not Started,https://docs.oracle.com/en-us/iaas/Content/Balance/Tasks/managingrequest.htm
+Load Balancer,P2,oci_load_balancer_rule_set,LB Rule Set,Not Started,https://docs.oracle.com/en-us/iaas/Content/Balance/Tasks/managingrulesets.htm
+Load Balancer,P2,oci_load_balancer_routing_policy,LB Routing Policy,Not Started,https://docs.oracle.com/en-us/iaas/Content/Balance/Tasks/managingrequest.htm
+Load Balancer,P3,oci_load_balancer_ssl_cipher_suite,LB SSL Cipher Suite,Not Started,https://docs.oracle.com/en-us/iaas/Content/Balance/Tasks/managingciphersuites.htm
+Network Load Balancer,P1,oci_network_load_balancer_network_load_balancer,Network Load Balancer,Not Started,https://docs.oracle.com/en-us/iaas/Content/NetworkLoadBalancer/overview.htm
+Network Load Balancer,P1,oci_network_load_balancer_backend_set,NLB Backend Set,Not Started,https://docs.oracle.com/en-us/iaas/Content/NetworkLoadBalancer/BackendSets/backend_set_management.htm
+Network Load Balancer,P1,oci_network_load_balancer_backend,NLB Backend,Not Started,https://docs.oracle.com/en-us/iaas/Content/NetworkLoadBalancer/BackendSets/backend_set_management.htm
+Network Load Balancer,P1,oci_network_load_balancer_listener,NLB Listener,Not Started,https://docs.oracle.com/en-us/iaas/Content/NetworkLoadBalancer/Listeners/listener_management.htm
+#,,,,,
+# ============================================================,,,,,
+# DNS,,,,,
+# ============================================================,,,,,
+DNS,P1,oci_dns_zone,DNS Zone,Not Started,https://docs.oracle.com/en-us/iaas/Content/DNS/Tasks/managingdnszones.htm
+DNS,P1,oci_dns_record,DNS Record,Not Started,https://docs.oracle.com/en-us/iaas/Content/DNS/Tasks/managingdnsrecords.htm
+DNS,P2,oci_dns_resolver,DNS Resolver,Not Started,https://docs.oracle.com/en-us/iaas/Content/DNS/Tasks/dns-resolver.htm
+DNS,P2,oci_dns_view,DNS View,Not Started,https://docs.oracle.com/en-us/iaas/Content/DNS/Tasks/dns-view.htm
+DNS,P2,oci_dns_steering_policy,DNS Steering Policy,Not Started,https://docs.oracle.com/en-us/iaas/Content/TrafficManagement/Tasks/managingpolicies.htm
+DNS,P2,oci_dns_steering_policy_attachment,Steering Policy Attachment,Not Started,https://docs.oracle.com/en-us/iaas/Content/TrafficManagement/Tasks/managingpolicies.htm
+DNS,P3,oci_dns_tsig_key,DNS TSIG Key,Not Started,https://docs.oracle.com/en-us/iaas/Content/DNS/Tasks/dns-tsig.htm
+#,,,,,
+# ============================================================,,,,,
+# DATABASE - AUTONOMOUS,,,,,
+# ============================================================,,,,,
+Database,P1,oci_database_autonomous_database,Autonomous Database,Not Started,https://docs.oracle.com/en-us/iaas/Content/Database/Concepts/adboverview.htm
+Database,P2,oci_database_autonomous_container_database,Autonomous Container DB,Not Started,https://docs.oracle.com/en-us/iaas/Content/Database/Concepts/adbddoverview.htm
+Database,P2,oci_database_autonomous_exadata_infrastructure,Autonomous Exadata Infra,Not Started,https://docs.oracle.com/en-us/iaas/Content/Database/Concepts/adbddoverview.htm
+Database,P2,oci_database_autonomous_vm_cluster,Autonomous VM Cluster,Not Started,https://docs.oracle.com/en-us/iaas/Content/Database/Concepts/adbddoverview.htm
+Database,P3,oci_database_autonomous_database_backup,Autonomous DB Backup,Not Started,https://docs.oracle.com/en-us/iaas/Content/Database/Tasks/adbbackingup.htm
+Database,P3,oci_database_autonomous_database_wallet,Autonomous DB Wallet,Not Started,https://docs.oracle.com/en-us/iaas/Content/Database/Tasks/adbconnecting.htm
+#,,,,,
+# ============================================================,,,,,
+# DATABASE - BASE DB / EXADATA,,,,,
+# ============================================================,,,,,
+Database,P1,oci_database_db_system,DB System,Not Started,https://docs.oracle.com/en-us/iaas/Content/Database/Tasks/creatingDBsystem.htm
+Database,P2,oci_database_db_home,DB Home,Not Started,https://docs.oracle.com/en-us/iaas/Content/Database/Tasks/creatingDBsystem.htm
+Database,P2,oci_database_database,Database,Not Started,https://docs.oracle.com/en-us/iaas/Content/Database/Tasks/creatingDBsystem.htm
+Database,P2,oci_database_exadata_infrastructure,Exadata Infrastructure,Not Started,https://docs.oracle.com/en-us/iaas/Content/Database/Concepts/exaflexsystem.htm
+Database,P2,oci_database_cloud_vm_cluster,Cloud VM Cluster,Not Started,https://docs.oracle.com/en-us/iaas/Content/Database/Concepts/exaflexsystem.htm
+Database,P2,oci_database_vm_cluster,VM Cluster (ExaCC),Not Started,https://docs.oracle.com/en-us/iaas/Content/Database/Concepts/exaaboroverview.htm
+Database,P2,oci_database_vm_cluster_network,VM Cluster Network,Not Started,https://docs.oracle.com/en-us/iaas/Content/Database/Concepts/exaaboroverview.htm
+Database,P2,oci_database_pluggable_database,Pluggable Database,Not Started,https://docs.oracle.com/en-us/iaas/Content/Database/Tasks/pluggabledatabases.htm
+Database,P3,oci_database_backup,DB Backup,Not Started,https://docs.oracle.com/en-us/iaas/Content/Database/Tasks/backingup.htm
+Database,P3,oci_database_backup_destination,Backup Destination,Not Started,https://docs.oracle.com/en-us/iaas/Content/Database/Tasks/backingup.htm
+Database,P3,oci_database_database_software_image,DB Software Image,Not Started,https://docs.oracle.com/en-us/iaas/Content/Database/Tasks/daboreleaseupdates.htm
+Database,P3,oci_database_key_store,DB Key Store,Not Started,https://docs.oracle.com/en-us/iaas/Content/Database/Concepts/aaborkeystoreoverview.htm
+Database,P3,oci_database_external_database_connector,External DB Connector,Not Started,https://docs.oracle.com/en-us/iaas/Content/Database/Concepts/externaloverview.htm
+Database,P3,oci_database_external_container_database,External Container DB,Not Started,https://docs.oracle.com/en-us/iaas/Content/Database/Concepts/externaloverview.htm
+Database,P3,oci_database_external_pluggable_database,External Pluggable DB,Not Started,https://docs.oracle.com/en-us/iaas/Content/Database/Concepts/externaloverview.htm
+Database,P3,oci_database_external_non_container_database,External Non-Container DB,Not Started,https://docs.oracle.com/en-us/iaas/Content/Database/Concepts/externaloverview.htm
+#,,,,,
+# ============================================================,,,,,
+# MYSQL,,,,,
+# ============================================================,,,,,
+MySQL,P1,oci_mysql_mysql_db_system,MySQL DB System,Not Started,https://docs.oracle.com/en-us/iaas/mysql-database/doc/overview-mysql-database-service.htm
+MySQL,P2,oci_mysql_mysql_backup,MySQL Backup,Not Started,https://docs.oracle.com/en-us/iaas/mysql-database/doc/backing-db-system.htm
+MySQL,P2,oci_mysql_channel,MySQL Channel (Replication),Not Started,https://docs.oracle.com/en-us/iaas/mysql-database/doc/replication.htm
+MySQL,P2,oci_mysql_heat_wave_cluster,MySQL HeatWave Cluster,Not Started,https://docs.oracle.com/en-us/iaas/mysql-database/doc/heatwave.htm
+MySQL,P3,oci_mysql_mysql_configuration,MySQL Configuration,Not Started,https://docs.oracle.com/en-us/iaas/mysql-database/doc/db-system-configuration.htm
+#,,,,,
+# ============================================================,,,,,
+# POSTGRESQL,,,,,
+# ============================================================,,,,,
+PostgreSQL,P1,oci_psql_db_system,PostgreSQL DB System,Not Started,https://docs.oracle.com/en-us/iaas/Content/postgresql/home.htm
+PostgreSQL,P2,oci_psql_backup,PostgreSQL Backup,Not Started,https://docs.oracle.com/en-us/iaas/Content/postgresql/home.htm
+PostgreSQL,P3,oci_psql_configuration,PostgreSQL Configuration,Not Started,https://docs.oracle.com/en-us/iaas/Content/postgresql/home.htm
+#,,,,,
+# ============================================================,,,,,
+# NOSQL,,,,,
+# ============================================================,,,,,
+NoSQL,P2,oci_nosql_table,NoSQL Table,Not Started,https://docs.oracle.com/en-us/iaas/nosql-database/doc/overview-nosql-database.htm
+NoSQL,P2,oci_nosql_index,NoSQL Index,Not Started,https://docs.oracle.com/en-us/iaas/nosql-database/doc/overview-nosql-database.htm
+#,,,,,
+# ============================================================,,,,,
+# REDIS / OPENSEARCH / MANAGED KAFKA,,,,,
+# ============================================================,,,,,
+Redis,P2,oci_redis_redis_cluster,Redis Cluster,Not Started,https://docs.oracle.com/en-us/iaas/Content/redis/home.htm
+OpenSearch,P2,oci_opensearch_opensearch_cluster,OpenSearch Cluster,Not Started,https://docs.oracle.com/en-us/iaas/Content/search-opensearch/home.htm
+Managed Kafka,P2,oci_managed_kafka_cluster,Managed Kafka Cluster,Not Started,https://docs.oracle.com/en-us/iaas/Content/managed-kafka/home.htm
+#,,,,,
+# ============================================================,,,,,
+# DISTRIBUTED DATABASE,,,,,
+# ============================================================,,,,,
+Distributed Database,P3,oci_globally_distributed_database_sharded_database,Sharded Database,Not Started,https://docs.oracle.com/en-us/iaas/Content/globally-distributed-autonomous-database/index.htm
+Distributed Database,P3,oci_globally_distributed_database_private_endpoint,Distributed DB Private Endpoint,Not Started,https://docs.oracle.com/en-us/iaas/Content/globally-distributed-autonomous-database/index.htm
+#,,,,,
+# ============================================================,,,,,
+# VAULT / KEY MANAGEMENT / SECRETS,,,,,
+# ============================================================,,,,,
+Vault,P1,oci_kms_vault,Vault,Not Started,https://docs.oracle.com/en-us/iaas/Content/KeyManagement/Concepts/keyoverview.htm
+Vault,P1,oci_kms_key,Key,Not Started,https://docs.oracle.com/en-us/iaas/Content/KeyManagement/Tasks/managingkeys.htm
+Vault,P1,oci_kms_key_version,Key Version,Not Started,https://docs.oracle.com/en-us/iaas/Content/KeyManagement/Tasks/managingkeys.htm
+Vault,P1,oci_vault_secret,Secret,Not Started,https://docs.oracle.com/en-us/iaas/Content/KeyManagement/Tasks/managingsecrets.htm
+#,,,,,
+# ============================================================,,,,,
+# CERTIFICATES,,,,,
+# ============================================================,,,,,
+Certificates,P2,oci_certificates_management_certificate_authority,Certificate Authority,Not Started,https://docs.oracle.com/en-us/iaas/Content/certificates/home.htm
+Certificates,P2,oci_certificates_management_certificate,Certificate,Not Started,https://docs.oracle.com/en-us/iaas/Content/certificates/managing-certificates.htm
+Certificates,P2,oci_certificates_management_ca_bundle,CA Bundle,Not Started,https://docs.oracle.com/en-us/iaas/Content/certificates/managing-ca-bundles.htm
+#,,,,,
+# ============================================================,,,,,
+# FUNCTIONS (SERVERLESS),,,,,
+# ============================================================,,,,,
+Functions,P2,oci_functions_application,Functions Application,Not Started,https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionscreatingapps.htm
+Functions,P2,oci_functions_function,Function,Not Started,https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionscreatingfuncs.htm
+#,,,,,
+# ============================================================,,,,,
+# API GATEWAY,,,,,
+# ============================================================,,,,,
+API Gateway,P2,oci_apigateway_gateway,API Gateway,Not Started,https://docs.oracle.com/en-us/iaas/Content/APIGateway/Tasks/apigatewaycreatinggateway.htm
+API Gateway,P2,oci_apigateway_deployment,API Gateway Deployment,Not Started,https://docs.oracle.com/en-us/iaas/Content/APIGateway/Tasks/apigatewaycreatingdeployment.htm
+API Gateway,P3,oci_apigateway_api,API Gateway API,Not Started,https://docs.oracle.com/en-us/iaas/Content/APIGateway/Tasks/apigatewayvalidatingapi.htm
+API Gateway,P3,oci_apigateway_certificate,API Gateway Certificate,Not Started,https://docs.oracle.com/en-us/iaas/Content/APIGateway/Tasks/apigatewaycreatinggateway.htm
+API Gateway,P3,oci_apigateway_subscriber,API Gateway Subscriber,Not Started,https://docs.oracle.com/en-us/iaas/Content/APIGateway/Tasks/apigatewaymanagingsubscribers.htm
+API Gateway,P3,oci_apigateway_usage_plan,API Gateway Usage Plan,Not Started,https://docs.oracle.com/en-us/iaas/Content/APIGateway/Tasks/apigatewaymanagingusageplans.htm
+#,,,,,
+# ============================================================,,,,,
+# EVENTS / NOTIFICATIONS / STREAMING,,,,,
+# ============================================================,,,,,
+Events,P2,oci_events_rule,Events Rule,Not Started,https://docs.oracle.com/en-us/iaas/Content/Events/Task/managingrules.htm
+Notifications,P2,oci_ons_notification_topic,Notification Topic,Not Started,https://docs.oracle.com/en-us/iaas/Content/Notification/Tasks/managingtopicsandsubscriptions.htm
+Notifications,P2,oci_ons_subscription,Notification Subscription,Not Started,https://docs.oracle.com/en-us/iaas/Content/Notification/Tasks/managingtopicsandsubscriptions.htm
+Streaming,P2,oci_streaming_stream,Stream,Not Started,https://docs.oracle.com/en-us/iaas/Content/Streaming/Tasks/managingstreams.htm
+Streaming,P2,oci_streaming_stream_pool,Stream Pool,Not Started,https://docs.oracle.com/en-us/iaas/Content/Streaming/Tasks/managingstreampools.htm
+Streaming,P3,oci_streaming_connect_harness,Connect Harness,Not Started,https://docs.oracle.com/en-us/iaas/Content/Streaming/Tasks/managingconnectharnesses.htm
+Queue,P2,oci_queue_queue,Queue,Not Started,https://docs.oracle.com/en-us/iaas/Content/queue/home.htm
+#,,,,,
+# ============================================================,,,,,
+# MONITORING / LOGGING / AUDIT,,,,,
+# ============================================================,,,,,
+Monitoring,P1,oci_monitoring_alarm,Monitoring Alarm,Not Started,https://docs.oracle.com/en-us/iaas/Content/Monitoring/Tasks/managingalarms.htm
+Logging,P1,oci_logging_log_group,Log Group,Not Started,https://docs.oracle.com/en-us/iaas/Content/Logging/Task/managinglogs.htm
+Logging,P1,oci_logging_log,Log,Not Started,https://docs.oracle.com/en-us/iaas/Content/Logging/Task/managinglogs.htm
+Logging,P2,oci_logging_unified_agent_configuration,Unified Agent Configuration,Not Started,https://docs.oracle.com/en-us/iaas/Content/Logging/Task/custom-agent.htm
+Log Analytics,P2,oci_log_analytics_namespace,Log Analytics Namespace,Not Started,https://docs.oracle.com/en-us/iaas/logging-analytics/home.htm
+Log Analytics,P2,oci_log_analytics_log_analytics_entity,Log Analytics Entity,Not Started,https://docs.oracle.com/en-us/iaas/logging-analytics/home.htm
+Log Analytics,P3,oci_log_analytics_log_analytics_log_group,Log Analytics Log Group,Not Started,https://docs.oracle.com/en-us/iaas/logging-analytics/home.htm
+Audit,P2,oci_audit_configuration,Audit Configuration,Not Started,https://docs.oracle.com/en-us/iaas/Content/Audit/Tasks/settingupaudit.htm
+Service Connector Hub,P2,oci_sch_service_connector,Service Connector,Not Started,https://docs.oracle.com/en-us/iaas/Content/service-connector-hub/overview.htm
+#,,,,,
+# ============================================================,,,,,
+# DEVOPS,,,,,
+# ============================================================,,,,,
+DevOps,P2,oci_devops_project,DevOps Project,Not Started,https://docs.oracle.com/en-us/iaas/Content/devops/using/devops_overview.htm
+DevOps,P2,oci_devops_repository,DevOps Repository,Not Started,https://docs.oracle.com/en-us/iaas/Content/devops/using/managing_coderepos.htm
+DevOps,P2,oci_devops_build_pipeline,Build Pipeline,Not Started,https://docs.oracle.com/en-us/iaas/Content/devops/using/managing_build_pipelines.htm
+DevOps,P2,oci_devops_build_pipeline_stage,Build Pipeline Stage,Not Started,https://docs.oracle.com/en-us/iaas/Content/devops/using/managing_build_pipelines.htm
+DevOps,P2,oci_devops_deploy_pipeline,Deploy Pipeline,Not Started,https://docs.oracle.com/en-us/iaas/Content/devops/using/managing_deploy_pipelines.htm
+DevOps,P2,oci_devops_deploy_stage,Deploy Stage,Not Started,https://docs.oracle.com/en-us/iaas/Content/devops/using/managing_deploy_pipelines.htm
+DevOps,P2,oci_devops_deploy_artifact,Deploy Artifact,Not Started,https://docs.oracle.com/en-us/iaas/Content/devops/using/managing_artifacts.htm
+DevOps,P2,oci_devops_deploy_environment,Deploy Environment,Not Started,https://docs.oracle.com/en-us/iaas/Content/devops/using/managing_environments.htm
+DevOps,P3,oci_devops_connection,DevOps Connection,Not Started,https://docs.oracle.com/en-us/iaas/Content/devops/using/managing_connections.htm
+DevOps,P3,oci_devops_trigger,DevOps Trigger,Not Started,https://docs.oracle.com/en-us/iaas/Content/devops/using/managing_triggers.htm
+#,,,,,
+# ============================================================,,,,,
+# ARTIFACTS / CONTAINER REGISTRY,,,,,
+# ============================================================,,,,,
+Artifacts,P1,oci_artifacts_container_repository,Container Repository (OCIR),Not Started,https://docs.oracle.com/en-us/iaas/Content/Registry/Tasks/registrycreatingarepository.htm
+Artifacts,P2,oci_artifacts_repository,Artifact Repository,Not Started,https://docs.oracle.com/en-us/iaas/Content/artifacts/home.htm
+Artifacts,P3,oci_artifacts_container_image_signature,Container Image Signature,Not Started,https://docs.oracle.com/en-us/iaas/Content/Registry/Tasks/registrysigningimages.htm
+Artifacts,P3,oci_artifacts_generic_artifact,Generic Artifact,Not Started,https://docs.oracle.com/en-us/iaas/Content/artifacts/home.htm
+#,,,,,
+# ============================================================,,,,,
+# RESOURCE MANAGER (TERRAFORM),,,,,
+# ============================================================,,,,,
+Resource Manager,P2,oci_resourcemanager_stack,Resource Manager Stack,Not Started,https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/managingstacks.htm
+Resource Manager,P3,oci_resourcemanager_job,Resource Manager Job,Not Started,https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/jobs.htm
+Resource Manager,P3,oci_resourcemanager_private_endpoint,RM Private Endpoint,Not Started,https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/private-endpoints.htm
+#,,,,,
+# ============================================================,,,,,
+# WAF / NETWORK FIREWALL / SECURITY,,,,,
+# ============================================================,,,,,
+WAF,P2,oci_waf_web_app_firewall,Web App Firewall,Not Started,https://docs.oracle.com/en-us/iaas/Content/WAF/home.htm
+WAF,P2,oci_waf_web_app_firewall_policy,WAF Policy,Not Started,https://docs.oracle.com/en-us/iaas/Content/WAF/home.htm
+WAAS,P3,oci_waas_waas_policy,WAAS Policy (Legacy),Not Started,https://docs.oracle.com/en-us/iaas/Content/WAF/Concepts/overview.htm
+WAAS,P3,oci_waas_certificate,WAAS Certificate,Not Started,https://docs.oracle.com/en-us/iaas/Content/WAF/Concepts/overview.htm
+Network Firewall,P2,oci_network_firewall_network_firewall,Network Firewall,Not Started,https://docs.oracle.com/en-us/iaas/Content/network-firewall/overview.htm
+Network Firewall,P2,oci_network_firewall_network_firewall_policy,Network Firewall Policy,Not Started,https://docs.oracle.com/en-us/iaas/Content/network-firewall/overview.htm
+Cloud Guard,P2,oci_cloud_guard_target,Cloud Guard Target,Not Started,https://docs.oracle.com/en-us/iaas/cloud-guard/home.htm
+Cloud Guard,P2,oci_cloud_guard_detector_recipe,Cloud Guard Detector Recipe,Not Started,https://docs.oracle.com/en-us/iaas/cloud-guard/home.htm
+Cloud Guard,P3,oci_cloud_guard_responder_recipe,Cloud Guard Responder Recipe,Not Started,https://docs.oracle.com/en-us/iaas/cloud-guard/home.htm
+Cloud Guard,P3,oci_cloud_guard_data_mask_rule,Cloud Guard Data Mask Rule,Not Started,https://docs.oracle.com/en-us/iaas/cloud-guard/home.htm
+Vulnerability Scanning,P3,oci_vulnerability_scanning_host_scan_recipe,Host Scan Recipe,Not Started,https://docs.oracle.com/en-us/iaas/scanning/home.htm
+Vulnerability Scanning,P3,oci_vulnerability_scanning_host_scan_target,Host Scan Target,Not Started,https://docs.oracle.com/en-us/iaas/scanning/home.htm
+Vulnerability Scanning,P3,oci_vulnerability_scanning_container_scan_recipe,Container Scan Recipe,Not Started,https://docs.oracle.com/en-us/iaas/scanning/home.htm
+Vulnerability Scanning,P3,oci_vulnerability_scanning_container_scan_target,Container Scan Target,Not Started,https://docs.oracle.com/en-us/iaas/scanning/home.htm
+Zero Trust Packet Routing,P3,oci_zpr_zpr_policy,ZPR Policy,Not Started,https://docs.oracle.com/en-us/iaas/Content/zero-trust-packet-routing/home.htm
+Security Attribute,P3,oci_security_attribute_security_attribute_namespace,Security Attribute Namespace,Not Started,https://docs.oracle.com/en-us/iaas/Content/zero-trust-packet-routing/home.htm
+Security Attribute,P3,oci_security_attribute_security_attribute,Security Attribute,Not Started,https://docs.oracle.com/en-us/iaas/Content/zero-trust-packet-routing/home.htm
+#,,,,,
+# ============================================================,,,,,
+# BASTION,,,,,
+# ============================================================,,,,,
+Bastion,P2,oci_bastion_bastion,Bastion,Not Started,https://docs.oracle.com/en-us/iaas/Content/Bastion/home.htm
+Bastion,P2,oci_bastion_session,Bastion Session,Not Started,https://docs.oracle.com/en-us/iaas/Content/Bastion/home.htm
+#,,,,,
+# ============================================================,,,,,
+# HEALTH CHECKS,,,,,
+# ============================================================,,,,,
+Health Checks,P2,oci_health_checks_http_monitor,HTTP Monitor,Not Started,https://docs.oracle.com/en-us/iaas/Content/HealthChecks/home.htm
+Health Checks,P2,oci_health_checks_ping_monitor,Ping Monitor,Not Started,https://docs.oracle.com/en-us/iaas/Content/HealthChecks/home.htm
+#,,,,,
+# ============================================================,,,,,
+# EMAIL DELIVERY,,,,,
+# ============================================================,,,,,
+Email,P2,oci_email_email_domain,Email Domain,Not Started,https://docs.oracle.com/en-us/iaas/Content/Email/home.htm
+Email,P2,oci_email_sender,Email Sender,Not Started,https://docs.oracle.com/en-us/iaas/Content/Email/Tasks/managingsenders.htm
+Email,P3,oci_email_suppression,Email Suppression,Not Started,https://docs.oracle.com/en-us/iaas/Content/Email/Tasks/managingsuppressionlist.htm
+Email,P3,oci_email_dkim,Email DKIM,Not Started,https://docs.oracle.com/en-us/iaas/Content/Email/Tasks/configuredkim.htm
+#,,,,,
+# ============================================================,,,,,
+# DATA SAFE,,,,,
+# ============================================================,,,,,
+Data Safe,P3,oci_data_safe_data_safe_configuration,Data Safe Configuration,Not Started,https://docs.oracle.com/en-us/iaas/data-safe/index.htm
+Data Safe,P3,oci_data_safe_data_safe_private_endpoint,Data Safe Private Endpoint,Not Started,https://docs.oracle.com/en-us/iaas/data-safe/index.htm
+Data Safe,P3,oci_data_safe_target_database,Data Safe Target Database,Not Started,https://docs.oracle.com/en-us/iaas/data-safe/index.htm
+Data Safe,P3,oci_data_safe_security_assessment,Data Safe Security Assessment,Not Started,https://docs.oracle.com/en-us/iaas/data-safe/index.htm
+Data Safe,P3,oci_data_safe_audit_trail,Data Safe Audit Trail,Not Started,https://docs.oracle.com/en-us/iaas/data-safe/index.htm
+#,,,,,
+# ============================================================,,,,,
+# DATABASE MANAGEMENT,,,,,
+# ============================================================,,,,,
+Database Management,P3,oci_database_management_managed_database,Managed Database,Not Started,https://docs.oracle.com/en-us/iaas/database-management/index.htm
+Database Management,P3,oci_database_management_managed_database_group,Managed Database Group,Not Started,https://docs.oracle.com/en-us/iaas/database-management/index.htm
+Database Management,P3,oci_database_management_db_management_private_endpoint,DB Mgmt Private Endpoint,Not Started,https://docs.oracle.com/en-us/iaas/database-management/index.htm
+#,,,,,
+# ============================================================,,,,,
+# DATABASE MIGRATION,,,,,
+# ============================================================,,,,,
+Database Migration,P3,oci_database_migration_migration,DB Migration,Not Started,https://docs.oracle.com/en-us/iaas/Content/database-migration/home.htm
+Database Migration,P3,oci_database_migration_connection,DB Migration Connection,Not Started,https://docs.oracle.com/en-us/iaas/Content/database-migration/home.htm
+#,,,,,
+# ============================================================,,,,,
+# DATABASE TOOLS,,,,,
+# ============================================================,,,,,
+Database Tools,P3,oci_database_tools_database_tools_connection,DB Tools Connection,Not Started,https://docs.oracle.com/en-us/iaas/Content/database-tools/home.htm
+Database Tools,P3,oci_database_tools_database_tools_private_endpoint,DB Tools Private Endpoint,Not Started,https://docs.oracle.com/en-us/iaas/Content/database-tools/home.htm
+#,,,,,
+# ============================================================,,,,,
+# GOLDENGATE,,,,,
+# ============================================================,,,,,
+GoldenGate,P3,oci_golden_gate_deployment,GoldenGate Deployment,Not Started,https://docs.oracle.com/en-us/iaas/Content/goldengate/home.htm
+GoldenGate,P3,oci_golden_gate_connection,GoldenGate Connection,Not Started,https://docs.oracle.com/en-us/iaas/Content/goldengate/home.htm
+GoldenGate,P3,oci_golden_gate_database_registration,GoldenGate DB Registration,Not Started,https://docs.oracle.com/en-us/iaas/Content/goldengate/home.htm
+#,,,,,
+# ============================================================,,,,,
+# SERVICE MESH,,,,,
+# ============================================================,,,,,
+Service Mesh,P2,oci_service_mesh_mesh,Service Mesh,Not Started,https://docs.oracle.com/en-us/iaas/Content/service-mesh/home.htm
+Service Mesh,P2,oci_service_mesh_virtual_service,Virtual Service,Not Started,https://docs.oracle.com/en-us/iaas/Content/service-mesh/home.htm
+Service Mesh,P2,oci_service_mesh_virtual_deployment,Virtual Deployment,Not Started,https://docs.oracle.com/en-us/iaas/Content/service-mesh/home.htm
+Service Mesh,P3,oci_service_mesh_virtual_service_route_table,VS Route Table,Not Started,https://docs.oracle.com/en-us/iaas/Content/service-mesh/home.htm
+Service Mesh,P3,oci_service_mesh_access_policy,Mesh Access Policy,Not Started,https://docs.oracle.com/en-us/iaas/Content/service-mesh/home.htm
+Service Mesh,P3,oci_service_mesh_ingress_gateway,Ingress Gateway,Not Started,https://docs.oracle.com/en-us/iaas/Content/service-mesh/home.htm
+Service Mesh,P3,oci_service_mesh_ingress_gateway_route_table,Ingress Gateway Route Table,Not Started,https://docs.oracle.com/en-us/iaas/Content/service-mesh/home.htm
+#,,,,,
+# ============================================================,,,,,
+# DISASTER RECOVERY,,,,,
+# ============================================================,,,,,
+Disaster Recovery,P2,oci_disaster_recovery_dr_protection_group,DR Protection Group,Not Started,https://docs.oracle.com/en-us/iaas/disaster-recovery/index.htm
+Disaster Recovery,P3,oci_disaster_recovery_dr_plan,DR Plan,Not Started,https://docs.oracle.com/en-us/iaas/disaster-recovery/index.htm
+Disaster Recovery,P3,oci_disaster_recovery_dr_plan_execution,DR Plan Execution,Not Started,https://docs.oracle.com/en-us/iaas/disaster-recovery/index.htm
+#,,,,,
+# ============================================================,,,,,
+# BUDGET,,,,,
+# ============================================================,,,,,
+Budget,P2,oci_budget_budget,Budget,Not Started,https://docs.oracle.com/en-us/iaas/Content/Billing/Tasks/managingbudgets.htm
+Budget,P2,oci_budget_alert_rule,Budget Alert Rule,Not Started,https://docs.oracle.com/en-us/iaas/Content/Billing/Tasks/managingbudgets.htm
+#,,,,,
+# ============================================================,,,,,
+# DATA SCIENCE,,,,,
+# ============================================================,,,,,
+Data Science,P3,oci_datascience_project,Data Science Project,Not Started,https://docs.oracle.com/en-us/iaas/data-science/using/overview.htm
+Data Science,P3,oci_datascience_notebook_session,Notebook Session,Not Started,https://docs.oracle.com/en-us/iaas/data-science/using/manage-notebook-sessions.htm
+Data Science,P3,oci_datascience_model,Data Science Model,Not Started,https://docs.oracle.com/en-us/iaas/data-science/using/models-about.htm
+Data Science,P3,oci_datascience_model_deployment,Model Deployment,Not Started,https://docs.oracle.com/en-us/iaas/data-science/using/model-dep-about.htm
+Data Science,P3,oci_datascience_pipeline,Data Science Pipeline,Not Started,https://docs.oracle.com/en-us/iaas/data-science/using/pipelines-about.htm
+Data Science,P3,oci_datascience_job,Data Science Job,Not Started,https://docs.oracle.com/en-us/iaas/data-science/using/jobs-about.htm
+#,,,,,
+# ============================================================,,,,,
+# DATA FLOW (SPARK),,,,,
+# ============================================================,,,,,
+Data Flow,P3,oci_dataflow_application,Data Flow Application,Not Started,https://docs.oracle.com/en-us/iaas/data-flow/using/home.htm
+Data Flow,P3,oci_dataflow_run,Data Flow Run,Not Started,https://docs.oracle.com/en-us/iaas/data-flow/using/home.htm
+Data Flow,P3,oci_dataflow_pool,Data Flow Pool,Not Started,https://docs.oracle.com/en-us/iaas/data-flow/using/home.htm
+Data Flow,P3,oci_dataflow_private_endpoint,Data Flow Private Endpoint,Not Started,https://docs.oracle.com/en-us/iaas/data-flow/using/home.htm
+#,,,,,
+# ============================================================,,,,,
+# DATA CATALOG,,,,,
+# ============================================================,,,,,
+Data Catalog,P3,oci_datacatalog_catalog,Data Catalog,Not Started,https://docs.oracle.com/en-us/iaas/data-catalog/home.htm
+Data Catalog,P3,oci_datacatalog_data_asset,Data Catalog Data Asset,Not Started,https://docs.oracle.com/en-us/iaas/data-catalog/home.htm
+Data Catalog,P3,oci_datacatalog_connection,Data Catalog Connection,Not Started,https://docs.oracle.com/en-us/iaas/data-catalog/home.htm
+#,,,,,
+# ============================================================,,,,,
+# DATA INTEGRATION,,,,,
+# ============================================================,,,,,
+Data Integration,P3,oci_dataintegration_workspace,Data Integration Workspace,Not Started,https://docs.oracle.com/en-us/iaas/data-integration/home.htm
+#,,,,,
+# ============================================================,,,,,
+# GENERATIVE AI,,,,,
+# ============================================================,,,,,
+Generative AI,P3,oci_generative_ai_model,Generative AI Model,Not Started,https://docs.oracle.com/en-us/iaas/Content/generative-ai/home.htm
+Generative AI,P3,oci_generative_ai_endpoint,Generative AI Endpoint,Not Started,https://docs.oracle.com/en-us/iaas/Content/generative-ai/home.htm
+Generative AI,P3,oci_generative_ai_dedicated_ai_cluster,Dedicated AI Cluster,Not Started,https://docs.oracle.com/en-us/iaas/Content/generative-ai/home.htm
+Generative AI,P3,oci_generative_ai_agent_agent,Generative AI Agent,Not Started,https://docs.oracle.com/en-us/iaas/Content/generative-ai-agents/home.htm
+Generative AI,P3,oci_generative_ai_agent_knowledge_base,AI Agent Knowledge Base,Not Started,https://docs.oracle.com/en-us/iaas/Content/generative-ai-agents/home.htm
+Generative AI,P3,oci_generative_ai_agent_data_source,AI Agent Data Source,Not Started,https://docs.oracle.com/en-us/iaas/Content/generative-ai-agents/home.htm
+#,,,,,
+# ============================================================,,,,,
+# AI SERVICES (LANGUAGE / VISION / DOCUMENT / SPEECH),,,,,
+# ============================================================,,,,,
+AI Language,P3,oci_ai_language_project,AI Language Project,Not Started,https://docs.oracle.com/en-us/iaas/language/home.htm
+AI Language,P3,oci_ai_language_model,AI Language Model,Not Started,https://docs.oracle.com/en-us/iaas/language/home.htm
+AI Language,P3,oci_ai_language_endpoint,AI Language Endpoint,Not Started,https://docs.oracle.com/en-us/iaas/language/home.htm
+AI Vision,P3,oci_ai_vision_project,AI Vision Project,Not Started,https://docs.oracle.com/en-us/iaas/vision/home.htm
+AI Vision,P3,oci_ai_vision_model,AI Vision Model,Not Started,https://docs.oracle.com/en-us/iaas/vision/home.htm
+AI Document,P3,oci_ai_document_project,AI Document Project,Not Started,https://docs.oracle.com/en-us/iaas/document-understanding/home.htm
+AI Document,P3,oci_ai_document_model,AI Document Model,Not Started,https://docs.oracle.com/en-us/iaas/document-understanding/home.htm
+AI Speech,P3,oci_ai_speech_transcription_job,AI Speech Transcription Job,Not Started,https://docs.oracle.com/en-us/iaas/Content/speech/home.htm
+#,,,,,
+# ============================================================,,,,,
+# ANALYTICS,,,,,
+# ============================================================,,,,,
+Analytics,P3,oci_analytics_analytics_instance,Analytics Instance,Not Started,https://docs.oracle.com/en-us/iaas/analytics-cloud/index.html
+#,,,,,
+# ============================================================,,,,,
+# INTEGRATION,,,,,
+# ============================================================,,,,,
+Integration,P3,oci_integration_integration_instance,Integration Instance,Not Started,https://docs.oracle.com/en-us/iaas/integration/index.html
+#,,,,,
+# ============================================================,,,,,
+# VISUAL BUILDER / PROCESS AUTOMATION,,,,,
+# ============================================================,,,,,
+Visual Builder,P4,oci_visual_builder_vb_instance,Visual Builder Instance,Not Started,https://docs.oracle.com/en-us/iaas/visual-builder/index.html
+Process Automation,P4,oci_opa_opa_instance,Process Automation Instance,Not Started,https://docs.oracle.com/en-us/iaas/process-automation/index.html
+#,,,,,
+# ============================================================,,,,,
+# DIGITAL ASSISTANT,,,,,
+# ============================================================,,,,,
+Digital Assistant,P4,oci_oda_oda_instance,Digital Assistant Instance,Not Started,https://docs.oracle.com/en-us/iaas/digital-assistant/index.html
+#,,,,,
+# ============================================================,,,,,
+# BIG DATA SERVICE,,,,,
+# ============================================================,,,,,
+Big Data Service,P3,oci_bds_bds_instance,Big Data Service Instance,Not Started,https://docs.oracle.com/en-us/iaas/Content/bigdata/home.htm
+Big Data Service,P3,oci_bds_auto_scaling_configuration,BDS Auto Scaling Config,Not Started,https://docs.oracle.com/en-us/iaas/Content/bigdata/home.htm
+#,,,,,
+# ============================================================,,,,,
+# BLOCKCHAIN,,,,,
+# ============================================================,,,,,
+Blockchain,P4,oci_blockchain_blockchain_platform,Blockchain Platform,Not Started,https://docs.oracle.com/en-us/iaas/blockchain-platform/index.html
+#,,,,,
+# ============================================================,,,,,
+# OCVP (VMWARE),,,,,
+# ============================================================,,,,,
+OCVP,P3,oci_ocvp_sddc,VMware SDDC,Not Started,https://docs.oracle.com/en-us/iaas/Content/VMware/Concepts/ocvsoverview.htm
+OCVP,P3,oci_ocvp_cluster,VMware Cluster,Not Started,https://docs.oracle.com/en-us/iaas/Content/VMware/Concepts/ocvsoverview.htm
+OCVP,P3,oci_ocvp_esxi_host,VMware ESXi Host,Not Started,https://docs.oracle.com/en-us/iaas/Content/VMware/Concepts/ocvsoverview.htm
+#,,,,,
+# ============================================================,,,,,
+# MEDIA SERVICES,,,,,
+# ============================================================,,,,,
+Media Services,P4,oci_media_services_media_workflow,Media Workflow,Not Started,https://docs.oracle.com/en-us/iaas/Content/media-services/home.htm
+Media Services,P4,oci_media_services_stream_cdn_config,Stream CDN Config,Not Started,https://docs.oracle.com/en-us/iaas/Content/media-services/home.htm
+Media Services,P4,oci_media_services_stream_distribution_channel,Stream Distribution Channel,Not Started,https://docs.oracle.com/en-us/iaas/Content/media-services/home.htm
+Media Services,P4,oci_media_services_stream_packaging_config,Stream Packaging Config,Not Started,https://docs.oracle.com/en-us/iaas/Content/media-services/home.htm
+#,,,,,
+# ============================================================,,,,,
+# MARKETPLACE / SERVICE CATALOG,,,,,
+# ============================================================,,,,,
+Marketplace,P3,oci_marketplace_listing,Marketplace Listing,Not Started,https://docs.oracle.com/en-us/iaas/Content/Marketplace/home.htm
+Marketplace,P3,oci_marketplace_accepted_agreement,Marketplace Accepted Agreement,Not Started,https://docs.oracle.com/en-us/iaas/Content/Marketplace/home.htm
+Service Catalog,P3,oci_service_catalog_service_catalog,Service Catalog,Not Started,https://docs.oracle.com/en-us/iaas/Content/service-catalog/home.htm
+Service Catalog,P3,oci_service_catalog_private_application,Private Application,Not Started,https://docs.oracle.com/en-us/iaas/Content/service-catalog/home.htm
+#,,,,,
+# ============================================================,,,,,
+# APM (APPLICATION PERFORMANCE MONITORING),,,,,
+# ============================================================,,,,,
+APM,P2,oci_apm_apm_domain,APM Domain,Not Started,https://docs.oracle.com/en-us/iaas/application-performance-monitoring/index.html
+APM,P3,oci_apm_synthetics_monitor,APM Synthetic Monitor,Not Started,https://docs.oracle.com/en-us/iaas/application-performance-monitoring/index.html
+APM,P3,oci_apm_config_config,APM Config,Not Started,https://docs.oracle.com/en-us/iaas/application-performance-monitoring/index.html
+#,,,,,
+# ============================================================,,,,,
+# STACK MONITORING / OPERATIONS INSIGHTS,,,,,
+# ============================================================,,,,,
+Stack Monitoring,P3,oci_stack_monitoring_monitored_resource,Monitored Resource,Not Started,https://docs.oracle.com/en-us/iaas/stack-monitoring/index.htm
+Stack Monitoring,P3,oci_stack_monitoring_discovery_job,Stack Monitoring Discovery Job,Not Started,https://docs.oracle.com/en-us/iaas/stack-monitoring/index.htm
+Stack Monitoring,P3,oci_stack_monitoring_config,Stack Monitoring Config,Not Started,https://docs.oracle.com/en-us/iaas/stack-monitoring/index.htm
+Operations Insights,P3,oci_opsi_enterprise_manager_bridge,OPSI EM Bridge,Not Started,https://docs.oracle.com/en-us/iaas/operations-insights/index.htm
+Operations Insights,P3,oci_opsi_operations_insights_warehouse,OPSI Warehouse,Not Started,https://docs.oracle.com/en-us/iaas/operations-insights/index.htm
+#,,,,,
+# ============================================================,,,,,
+# RECOVERY SERVICE,,,,,
+# ============================================================,,,,,
+Recovery,P3,oci_recovery_protection_policy,Recovery Protection Policy,Not Started,https://docs.oracle.com/en-us/iaas/recovery-service/index.htm
+Recovery,P3,oci_recovery_recovery_service_subnet,Recovery Service Subnet,Not Started,https://docs.oracle.com/en-us/iaas/recovery-service/index.htm
+#,,,,,
+# ============================================================,,,,,
+# DESKTOPS,,,,,
+# ============================================================,,,,,
+Desktops,P4,oci_desktops_desktop_pool,Desktop Pool,Not Started,https://docs.oracle.com/en-us/iaas/secure-desktops/home.htm
+#,,,,,
+# ============================================================,,,,,
+# ROVER (EDGE),,,,,
+# ============================================================,,,,,
+Rover,P4,oci_rover_rover_cluster,Rover Cluster,Not Started,https://docs.oracle.com/en-us/iaas/Content/Rover/home.htm
+Rover,P4,oci_rover_rover_node,Rover Node,Not Started,https://docs.oracle.com/en-us/iaas/Content/Rover/home.htm
+Rover,P4,oci_rover_rover_entitlement,Rover Entitlement,Not Started,https://docs.oracle.com/en-us/iaas/Content/Rover/home.htm
+#,,,,,
+# ============================================================,,,,,
+# COMPUTE CLOUD AT CUSTOMER,,,,,
+# ============================================================,,,,,
+Compute Cloud@Customer,P4,oci_compute_cloud_at_customer_ccc_infrastructure,CCC Infrastructure,Not Started,https://docs.oracle.com/en-us/iaas/compute-cloud-at-customer/home.htm
+Compute Cloud@Customer,P4,oci_compute_cloud_at_customer_ccc_upgrade_schedule,CCC Upgrade Schedule,Not Started,https://docs.oracle.com/en-us/iaas/compute-cloud-at-customer/home.htm
+#,,,,,
+# ============================================================,,,,,
+# CLOUD MIGRATIONS / CLOUD BRIDGE,,,,,
+# ============================================================,,,,,
+Cloud Migrations,P3,oci_cloud_migrations_migration,Cloud Migration,Not Started,https://docs.oracle.com/en-us/iaas/Content/cloud-migration/home.htm
+Cloud Migrations,P3,oci_cloud_migrations_migration_asset,Migration Asset,Not Started,https://docs.oracle.com/en-us/iaas/Content/cloud-migration/home.htm
+Cloud Migrations,P3,oci_cloud_migrations_replication_schedule,Replication Schedule,Not Started,https://docs.oracle.com/en-us/iaas/Content/cloud-migration/home.htm
+Cloud Bridge,P3,oci_cloud_bridge_environment,Cloud Bridge Environment,Not Started,https://docs.oracle.com/en-us/iaas/Content/cloud-bridge/home.htm
+Cloud Bridge,P3,oci_cloud_bridge_asset_source,Cloud Bridge Asset Source,Not Started,https://docs.oracle.com/en-us/iaas/Content/cloud-bridge/home.htm
+Cloud Bridge,P3,oci_cloud_bridge_inventory,Cloud Bridge Inventory,Not Started,https://docs.oracle.com/en-us/iaas/Content/cloud-bridge/home.htm
+#,,,,,
+# ============================================================,,,,,
+# FLEET / OS / LICENSE / JAVA MANAGEMENT,,,,,
+# ============================================================,,,,,
+Fleet Apps Management,P3,oci_fleet_apps_management_fleet,Fleet,Not Started,https://docs.oracle.com/en-us/iaas/Content/fleet-management/home.htm
+Fleet Apps Management,P3,oci_fleet_apps_management_onboarding,Fleet Onboarding,Not Started,https://docs.oracle.com/en-us/iaas/Content/fleet-management/home.htm
+Fleet Software Update,P3,oci_fleet_software_update_fsu_cycle,Fleet Software Update Cycle,Not Started,https://docs.oracle.com/en-us/iaas/Content/fleet-management/home.htm
+OS Management Hub,P3,oci_os_management_hub_management_station,OS Mgmt Hub Station,Not Started,https://docs.oracle.com/en-us/iaas/osmh/home.htm
+OS Management Hub,P3,oci_os_management_hub_profile,OS Mgmt Hub Profile,Not Started,https://docs.oracle.com/en-us/iaas/osmh/home.htm
+OS Management Hub,P3,oci_os_management_hub_lifecycle_environment,OS Mgmt Hub Lifecycle Env,Not Started,https://docs.oracle.com/en-us/iaas/osmh/home.htm
+OS Management Hub,P3,oci_os_management_hub_software_source,OS Mgmt Hub Software Source,Not Started,https://docs.oracle.com/en-us/iaas/osmh/home.htm
+License Manager,P3,oci_license_manager_product_license,Product License,Not Started,https://docs.oracle.com/en-us/iaas/Content/license-manager/home.htm
+License Manager,P3,oci_license_manager_license_record,License Record,Not Started,https://docs.oracle.com/en-us/iaas/Content/license-manager/home.htm
+Java Management,P3,oci_jms_fleet,JMS Fleet,Not Started,https://docs.oracle.com/en-us/iaas/jms/index.html
+Management Agent,P3,oci_management_agent_management_agent,Management Agent,Not Started,https://docs.oracle.com/en-us/iaas/management-agents/index.htm
+Management Agent,P3,oci_management_agent_management_agent_install_key,Mgmt Agent Install Key,Not Started,https://docs.oracle.com/en-us/iaas/management-agents/index.htm
+#,,,,,
+# ============================================================,,,,,
+# ACCESS GOVERNANCE / OPERATOR ACCESS / DELEGATE ACCESS,,,,,
+# ============================================================,,,,,
+Access Governance,P4,oci_access_governance_cp_governance_instance,Governance Instance,Not Started,https://docs.oracle.com/en-us/iaas/access-governance/home.htm
+Operator Access Control,P4,oci_operator_access_control_operator_control,Operator Control,Not Started,https://docs.oracle.com/en-us/iaas/Content/operator-access-control/home.htm
+Operator Access Control,P4,oci_operator_access_control_operator_control_assignment,Operator Control Assignment,Not Started,https://docs.oracle.com/en-us/iaas/Content/operator-access-control/home.htm
+Delegate Access Control,P4,oci_delegate_access_control_delegation_control,Delegation Control,Not Started,https://docs.oracle.com/en-us/iaas/Content/delegate-access-control/home.htm
+Delegate Access Control,P4,oci_delegate_access_control_delegation_subscription,Delegation Subscription,Not Started,https://docs.oracle.com/en-us/iaas/Content/delegate-access-control/home.htm
+Lockbox,P4,oci_lockbox_lockbox,Lockbox,Not Started,https://docs.oracle.com/en-us/iaas/Content/lockbox/home.htm
+#,,,,,
+# ============================================================,,,,,
+# CAPACITY / DEMAND / RESOURCE SCHEDULER,,,,,
+# ============================================================,,,,,
+Capacity Management,P3,oci_capacity_management_occ_capacity_request,Capacity Request,Not Started,https://docs.oracle.com/en-us/iaas/Content/capacity-management/home.htm
+Capacity Management,P3,oci_capacity_management_occ_availability_catalog,Availability Catalog,Not Started,https://docs.oracle.com/en-us/iaas/Content/capacity-management/home.htm
+Demand Signal,P4,oci_demand_signal_occ_demand_signal,Demand Signal,Not Started,https://docs.oracle.com/en-us/iaas/Content/demand-signal/home.htm
+Resource Scheduler,P3,oci_resource_scheduler_schedule,Resource Schedule,Not Started,https://docs.oracle.com/en-us/iaas/Content/resource-scheduler/home.htm
+#,,,,,
+# ============================================================,,,,,
+# CLUSTER PLACEMENT GROUPS,,,,,
+# ============================================================,,,,,
+Cluster Placement Groups,P3,oci_cluster_placement_groups_cluster_placement_group,Cluster Placement Group,Not Started,https://docs.oracle.com/en-us/iaas/Content/cluster-placement-groups/home.htm
+#,,,,,
+# ============================================================,,,,,
+# LIMITS / QUOTAS / GOVERNANCE,,,,,
+# ============================================================,,,,,
+Limits,P3,oci_limits_quota,Quota,Not Started,https://docs.oracle.com/en-us/iaas/Content/Governance/Tasks/managingquotas.htm
+Governance Rules,P3,oci_governance_rules_governance_rule,Governance Rule,Not Started,https://docs.oracle.com/en-us/iaas/Content/Governance/home.htm
+Governance Rules,P3,oci_governance_rules_inclusion_criteria,Inclusion Criteria,Not Started,https://docs.oracle.com/en-us/iaas/Content/Governance/home.htm
+#,,,,,
+# ============================================================,,,,,
+# DASHBOARD,,,,,
+# ============================================================,,,,,
+Dashboard,P3,oci_dashboard_service_dashboard_group,Dashboard Group,Not Started,https://docs.oracle.com/en-us/iaas/Content/dashboard/home.htm
+Dashboard,P3,oci_dashboard_service_dashboard,Dashboard,Not Started,https://docs.oracle.com/en-us/iaas/Content/dashboard/home.htm
+#,,,,,
+# ============================================================,,,,,
+# ADM (APPLICATION DEPENDENCY MANAGEMENT),,,,,
+# ============================================================,,,,,
+ADM,P3,oci_adm_vulnerability_audit,Vulnerability Audit,Not Started,https://docs.oracle.com/en-us/iaas/Content/application-dependency-management/home.htm
+ADM,P3,oci_adm_knowledge_base,ADM Knowledge Base,Not Started,https://docs.oracle.com/en-us/iaas/Content/application-dependency-management/home.htm
+ADM,P3,oci_adm_remediation_recipe,Remediation Recipe,Not Started,https://docs.oracle.com/en-us/iaas/Content/application-dependency-management/home.htm
+#,,,,,
+# ============================================================,,,,,
+# DATA LABELING,,,,,
+# ============================================================,,,,,
+Data Labeling,P4,oci_data_labeling_service_dataset,Data Labeling Dataset,Not Started,https://docs.oracle.com/en-us/iaas/data-labeling/home.htm
+#,,,,,
+# ============================================================,,,,,
+# ANNOUNCEMENTS,,,,,
+# ============================================================,,,,,
+Announcements,P4,oci_announcements_service_announcement_subscription,Announcement Subscription,Not Started,https://docs.oracle.com/en-us/iaas/Content/General/Concepts/announcements.htm
+#,,,,,
+# ============================================================,,,,,
+# FUSION APPS,,,,,
+# ============================================================,,,,,
+Fusion Apps,P4,oci_fusion_apps_fusion_environment,Fusion Environment,Not Started,https://docs.oracle.com/en-us/iaas/Content/fusion-applications/home.htm
+Fusion Apps,P4,oci_fusion_apps_fusion_environment_family,Fusion Environment Family,Not Started,https://docs.oracle.com/en-us/iaas/Content/fusion-applications/home.htm
+#,,,,,
+# ============================================================,,,,,
+# EM WAREHOUSE,,,,,
+# ============================================================,,,,,
+EM Warehouse,P4,oci_em_warehouse_em_warehouse,EM Warehouse,Not Started,https://docs.oracle.com/en-us/iaas/Content/enterprise-manager-warehouse/home.htm
+#,,,,,
+# ============================================================,,,,,
+# TENANT MANAGEMENT,,,,,
+# ============================================================,,,,,
+Tenant Manager,P4,oci_tenant_manager_sender_invitation,Sender Invitation,Not Started,https://docs.oracle.com/en-us/iaas/Content/General/Concepts/organization_management_overview.htm
+Tenant Manager,P4,oci_tenant_manager_recipient_invitation,Recipient Invitation,Not Started,https://docs.oracle.com/en-us/iaas/Content/General/Concepts/organization_management_overview.htm
+#,,,,,
+# ============================================================,,,,,
+# WEB APP ACCELERATION,,,,,
+# ============================================================,,,,,
+Web App Acceleration,P3,oci_waa_web_app_acceleration,Web App Acceleration,Not Started,https://docs.oracle.com/en-us/iaas/Content/web-app-acceleration/home.htm
+Web App Acceleration,P3,oci_waa_web_app_acceleration_policy,WAA Policy,Not Started,https://docs.oracle.com/en-us/iaas/Content/web-app-acceleration/home.htm
+#,,,,,
+# ============================================================,,,,,
+# CONTENT EXPERIENCE (OCE),,,,,
+# ============================================================,,,,,
+Content Experience,P4,oci_oce_oce_instance,Content Experience Instance,Not Started,https://docs.oracle.com/en-us/iaas/Content/content-experience/home.htm
+#,,,,,
+# ============================================================,,,,,
+# IOT,,,,,
+# ============================================================,,,,,
+IoT,P4,oci_iot_iot_instance,IoT Instance,Not Started,https://docs.oracle.com/en-us/iaas/Content/iot/home.htm
+#,,,,,
+# ============================================================,,,,,
+# WORKLOAD MANAGEMENT (WLMS),,,,,
+# ============================================================,,,,,
+Workload Management,P4,oci_wlms_workload,Workload,Not Started,https://docs.oracle.com/en-us/iaas/Content/workload-management/home.htm
+#,,,,,
+# ============================================================,,,,,
+# DBLM (DATABASE LIFECYCLE MANAGEMENT),,,,,
+# ============================================================,,,,,
+DBLM,P4,oci_dblm_vulnerability_scan,DB Lifecycle Vulnerability Scan,Not Started,https://docs.oracle.com/en-us/iaas/Content/dblm/home.htm
+#,,,,,
+# ============================================================,,,,,
+# MULTICLOUD,,,,,
+# ============================================================,,,,,
+Multicloud,P4,oci_multicloud_oracle_db_azure,Oracle DB@Azure,Not Started,https://docs.oracle.com/en-us/iaas/Content/multicloud/oracledbazure.htm
+#,,,,,
+# ============================================================,,,,,
+# OSP GATEWAY (BILLING),,,,,
+# ============================================================,,,,,
+OSP Gateway,P4,oci_osp_gateway_subscription,OSP Gateway Subscription,Not Started,https://docs.oracle.com/en-us/iaas/Content/Billing/home.htm
+#,,,,,
+# ============================================================,,,,,
+# THREAT INTELLIGENCE,,,,,
+# ============================================================,,,,,
+Threat Intelligence,P4,oci_threat_intelligence_indicator,Threat Intelligence Indicator,Not Started,https://docs.oracle.com/en-us/iaas/Content/threat-intel/home.htm
