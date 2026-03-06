@@ -87,13 +87,12 @@ jobs:
       - name: Verify schema
         run: make verify-schema
 
-  # Integration tests run against real infrastructure.
-  # This job is disabled by default - enable it after configuring credentials.
+  # Integration tests run against real OCI infrastructure.
   integration-tests:
     needs: [build, lint]
     runs-on: ubuntu-latest
-    # Disabled by default - remove this condition after configuring credentials
-    if: false
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -108,12 +107,29 @@ jobs:
         with:
           pkl-version: 0.30.0
 
-      # Configure credentials for your infrastructure here
-      # Example:
-      # env:
-      #   MY_API_KEY: ${{ secrets.MY_API_KEY }}
+      - name: Configure OCI credentials
+        env:
+          OCI_TENANCY_OCID: ${{ secrets.OCI_TENANCY_OCID }}
+          OCI_USER_OCID: ${{ secrets.OCI_USER_OCID }}
+          OCI_FINGERPRINT: ${{ secrets.OCI_FINGERPRINT }}
+          OCI_PRIVATE_KEY: ${{ secrets.OCI_PRIVATE_KEY }}
+          OCI_REGION: ${{ secrets.OCI_REGION }}
+        run: |
+          mkdir -p ~/.oci
+          cat > ~/.oci/config << EOF
+          [DEFAULT]
+          tenancy=${OCI_TENANCY_OCID}
+          user=${OCI_USER_OCID}
+          fingerprint=${OCI_FINGERPRINT}
+          key_file=${HOME}/.oci/oci_api_key.pem
+          region=${OCI_REGION}
+          EOF
+          echo "${OCI_PRIVATE_KEY}" > ~/.oci/oci_api_key.pem
+          chmod 600 ~/.oci/oci_api_key.pem ~/.oci/config
 
       - name: Run integration tests
+        env:
+          OCI_COMPARTMENT_ID: ${{ secrets.OCI_COMPARTMENT_ID }}
         run: make test-integration
 
   # Conformance tests run against real OCI infrastructure.
@@ -130,7 +146,26 @@ jobs:
     needs: [build, lint, pkl-validate, verify-schema]
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.run_conformance == 'true' }}
-    timeout-minutes: 60
+    timeout-minutes: 45
+
+    strategy:
+      fail-fast: false
+      max-parallel: 2  # OCI VCN limit is 2 per region; most tests create a VCN
+      matrix:
+        resource:
+          - policy
+          - vcn
+          - volume
+          - bucket
+          - networksecuritygroup
+          - internetgateway
+          - routetable
+          - securitylist
+          - subnet
+          - dhcpoptions
+          - networksecuritygroupsecurityrule
+          # Excluded (service limits in us-chicago-1):
+          # natgateway, servicegateway, instance, cluster, nodepool, virtualnodepool
 
     steps:
       - name: Checkout
@@ -171,26 +206,54 @@ jobs:
           pip install oci-cli
           oci --version
 
-      - name: Verify OCI credentials
-        run: |
-          oci iam region list --output table
-          echo "Credentials verified successfully"
-
       - name: Install plugin
         run: make install
 
-      - name: Run conformance tests
+      - name: Run conformance tests (${{ matrix.resource }})
         env:
-          FORMAE_TEST_RUN_ID: ${{ github.run_id }}-${{ github.run_attempt }}
           OCI_COMPARTMENT_ID: ${{ secrets.OCI_COMPARTMENT_ID }}
+          FORMAE_TEST_RUN_ID: ${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.resource }}
+          FORMAE_TEST_FILTER: ${{ matrix.resource }}
         run: make conformance-test
 
-      - name: Cleanup test resources
-        if: always()
+  # Clean up OCI resources after all matrix jobs complete
+  conformance-cleanup:
+    needs: [conformance-tests]
+    runs-on: ubuntu-latest
+    if: always() && github.event.inputs.run_conformance == 'true'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Configure OCI credentials
+        env:
+          OCI_TENANCY_OCID: ${{ secrets.OCI_TENANCY_OCID }}
+          OCI_USER_OCID: ${{ secrets.OCI_USER_OCID }}
+          OCI_FINGERPRINT: ${{ secrets.OCI_FINGERPRINT }}
+          OCI_PRIVATE_KEY: ${{ secrets.OCI_PRIVATE_KEY }}
+          OCI_REGION: ${{ secrets.OCI_REGION }}
+        run: |
+          mkdir -p ~/.oci
+          cat > ~/.oci/config << EOF
+          [DEFAULT]
+          tenancy=${OCI_TENANCY_OCID}
+          user=${OCI_USER_OCID}
+          fingerprint=${OCI_FINGERPRINT}
+          key_file=${HOME}/.oci/oci_api_key.pem
+          region=${OCI_REGION}
+          EOF
+          echo "${OCI_PRIVATE_KEY}" > ~/.oci/oci_api_key.pem
+          chmod 600 ~/.oci/oci_api_key.pem ~/.oci/config
+
+      - name: Install OCI CLI
+        run: |
+          pip install oci-cli
+          oci --version
+
+      - name: Clean up test resources
         env:
           OCI_COMPARTMENT_ID: ${{ secrets.OCI_COMPARTMENT_ID }}
-        run: |
-          ./scripts/ci/clean-environment.sh || true
+        run: ./scripts/ci/clean-environment.sh
 
   # Notify when build is fixed (was red, now green)
   notify-fixed:

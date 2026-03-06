@@ -9,14 +9,67 @@ on:
   workflow_dispatch:
 
 jobs:
+  # Integration tests run against real OCI resources.
+  # These are self-contained: each test creates and cleans up its own resources.
+  test-integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout plugin
+        uses: actions/checkout@v6
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: "1.25"
+
+      - name: Configure OCI credentials
+        env:
+          OCI_TENANCY_OCID: ${{ secrets.OCI_TENANCY_OCID }}
+          OCI_USER_OCID: ${{ secrets.OCI_USER_OCID }}
+          OCI_FINGERPRINT: ${{ secrets.OCI_FINGERPRINT }}
+          OCI_PRIVATE_KEY: ${{ secrets.OCI_PRIVATE_KEY }}
+          OCI_REGION: ${{ secrets.OCI_REGION }}
+        run: |
+          mkdir -p ~/.oci
+          cat > ~/.oci/config << EOF
+          [DEFAULT]
+          tenancy=${OCI_TENANCY_OCID}
+          user=${OCI_USER_OCID}
+          fingerprint=${OCI_FINGERPRINT}
+          key_file=${HOME}/.oci/oci_api_key.pem
+          region=${OCI_REGION}
+          EOF
+          echo "${OCI_PRIVATE_KEY}" > ~/.oci/oci_api_key.pem
+          chmod 600 ~/.oci/oci_api_key.pem ~/.oci/config
+
+      - name: Run integration tests
+        env:
+          OCI_COMPARTMENT_ID: ${{ secrets.OCI_COMPARTMENT_ID }}
+        run: make test-integration
+
   conformance-tests-main:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 45
 
-    # Uncomment and configure for OCI:
-    # permissions:
-    #   id-token: write
-    #   contents: read
+    strategy:
+      fail-fast: false
+      max-parallel: 2  # OCI VCN limit is 2 per region; most tests create a VCN
+      matrix:
+        resource:
+          - policy
+          - vcn
+          - volume
+          - bucket
+          - networksecuritygroup
+          - internetgateway
+          - routetable
+          - securitylist
+          - subnet
+          - dhcpoptions
+          - networksecuritygroupsecurityrule
+          # Excluded (service limits in us-chicago-1):
+          # natgateway, servicegateway, instance, cluster, nodepool, virtualnodepool
 
     steps:
       - name: Checkout plugin
@@ -36,33 +89,149 @@ jobs:
         run: |
           git clone --depth 1 https://github.com/platform-engineering-labs/formae.git /tmp/formae
           cd /tmp/formae
-          # Fetch tags so `git describe` works (needed for version embedding)
-          git fetch --tags --depth=1
+          # Fetch tags with enough depth for `git describe` to resolve version
+          git fetch --tags --unshallow
           make build
           echo "FORMAE_BINARY=/tmp/formae/formae" >> $GITHUB_ENV
 
-      # =================================================================
-      # CREDENTIAL SETUP - Configure for OCI
-      # =================================================================
-      # OCI credentials via API key
-      # - name: Configure OCI Credentials
-      #   run: |
-      #     mkdir -p ~/.oci
-      #     echo "${{ secrets.OCI_CONFIG }}" > ~/.oci/config
-      #     echo "${{ secrets.OCI_KEY }}" > ~/.oci/oci_api_key.pem
-      #     chmod 600 ~/.oci/config ~/.oci/oci_api_key.pem
+      - name: Configure OCI credentials
+        env:
+          OCI_TENANCY_OCID: ${{ secrets.OCI_TENANCY_OCID }}
+          OCI_USER_OCID: ${{ secrets.OCI_USER_OCID }}
+          OCI_FINGERPRINT: ${{ secrets.OCI_FINGERPRINT }}
+          OCI_PRIVATE_KEY: ${{ secrets.OCI_PRIVATE_KEY }}
+          OCI_REGION: ${{ secrets.OCI_REGION }}
+        run: |
+          mkdir -p ~/.oci
+          cat > ~/.oci/config << EOF
+          [DEFAULT]
+          tenancy=${OCI_TENANCY_OCID}
+          user=${OCI_USER_OCID}
+          fingerprint=${OCI_FINGERPRINT}
+          key_file=${HOME}/.oci/oci_api_key.pem
+          region=${OCI_REGION}
+          EOF
+          echo "${OCI_PRIVATE_KEY}" > ~/.oci/oci_api_key.pem
+          chmod 600 ~/.oci/oci_api_key.pem ~/.oci/config
+
+      - name: Install OCI CLI
+        run: |
+          pip install oci-cli
+          oci --version
 
       - name: Install plugin
         run: make install
 
-      - name: Run conformance tests against main
+      - name: Run conformance tests against main (${{ matrix.resource }})
         env:
-          FORMAE_TEST_RUN_ID: nightly-main-${{ github.run_id }}
+          OCI_COMPARTMENT_ID: ${{ secrets.OCI_COMPARTMENT_ID }}
+          FORMAE_TEST_RUN_ID: nightly-main-${{ github.run_id }}-${{ matrix.resource }}
+          FORMAE_TEST_FILTER: ${{ matrix.resource }}
         run: make conformance-test
+
+  # Clean up OCI resources after all matrix jobs complete
+  cleanup:
+    needs: [conformance-tests-main]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Checkout plugin
+        uses: actions/checkout@v6
+
+      - name: Configure OCI credentials
+        env:
+          OCI_TENANCY_OCID: ${{ secrets.OCI_TENANCY_OCID }}
+          OCI_USER_OCID: ${{ secrets.OCI_USER_OCID }}
+          OCI_FINGERPRINT: ${{ secrets.OCI_FINGERPRINT }}
+          OCI_PRIVATE_KEY: ${{ secrets.OCI_PRIVATE_KEY }}
+          OCI_REGION: ${{ secrets.OCI_REGION }}
+        run: |
+          mkdir -p ~/.oci
+          cat > ~/.oci/config << EOF
+          [DEFAULT]
+          tenancy=${OCI_TENANCY_OCID}
+          user=${OCI_USER_OCID}
+          fingerprint=${OCI_FINGERPRINT}
+          key_file=${HOME}/.oci/oci_api_key.pem
+          region=${OCI_REGION}
+          EOF
+          echo "${OCI_PRIVATE_KEY}" > ~/.oci/oci_api_key.pem
+          chmod 600 ~/.oci/oci_api_key.pem ~/.oci/config
+
+      - name: Install OCI CLI
+        run: |
+          pip install oci-cli
+          oci --version
+
+      - name: Clean up test resources
+        env:
+          OCI_COMPARTMENT_ID: ${{ secrets.OCI_COMPARTMENT_ID }}
+        run: ./scripts/ci/clean-environment.sh
+
+  # Notify when nightly is fixed (was red, now green)
+  notify-fixed:
+    needs: [test-integration, conformance-tests-main]
+    runs-on: ubuntu-latest
+    if: success()
+    steps:
+      - name: Check if previous run failed
+        id: check_previous
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runs = await github.rest.actions.listWorkflowRuns({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'nightly.yml',
+              per_page: 2,
+              status: 'completed'
+            });
+
+            // Get previous run (skip current which isn't completed yet)
+            const previousRun = runs.data.workflow_runs.find(run => run.id !== context.runId);
+
+            if (previousRun && previousRun.conclusion === 'failure') {
+              return 'true';
+            }
+            return 'false';
+          result-encoding: string
+
+      - name: Notify Slack (Fixed)
+        if: steps.check_previous.outputs.result == 'true'
+        uses: slackapi/slack-github-action@v2.1.0
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "text": ":white_check_mark: Nightly fixed on ${{ github.repository }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": ":white_check_mark: *Nightly fixed* on `${{ github.repository }}`\n\nPlugin conformance tests now passing against formae main branch."
+                  }
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "View Run"
+                      },
+                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    }
+                  ]
+                }
+              ]
+            }
 
   # Notify on failure
   notify-failure:
-    needs: [conformance-tests-main]
+    needs: [test-integration, conformance-tests-main]
     runs-on: ubuntu-latest
     if: failure()
     steps:

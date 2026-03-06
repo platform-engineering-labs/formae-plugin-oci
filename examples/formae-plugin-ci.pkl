@@ -1,0 +1,45 @@
+amends "@formae/forma.pkl"
+import "@formae/formae.pkl"
+
+// Resource imports
+import "@oci/identity/compartment.pkl" as compartment
+import "@oci/oci.pkl" as oci
+
+forma {
+
+  local myStack = new formae.Stack {
+    label = "formae-plugin-ci"
+    description = "CI test resources for formae-plugin-oci"
+  }
+  myStack
+
+  local ociTarget = new formae.Target {
+    label = "oci-target"
+    config = new oci.Config {
+      profile = "DEFAULT"
+      region = "us-chicago-1"
+    }
+  }
+  ociTarget
+
+  new compartment.Compartment {
+    label = "ocid1.compartment.oc1..aaaaaaaalrlihjwxgvrupwi47au2aqy6rk3lfhm57bdrrq2ricjoi3sp6j5q"
+    compartmentId = "ocid1.tenancy.oc1..aaaaaaaakxm3lo5ntsbsmx3n6epvrntxsmjg6eypafyi2ldngr6bsclpcdta"
+    name = "formae-plugin-ci"
+    description = "CI test resources for formae-plugin-oci"
+    definedTags = new Listing {
+      new oci.DefinedTag {
+        namespace = "Oracle-Tags"
+        key = "CreatedBy"
+        value = "default/nicholas.browdues@platform.engineering"
+      }
+      new oci.DefinedTag {
+        namespace = "Oracle-Tags"
+        key = "CreatedOn"
+        value = "2026-02-03T18:34:06.127Z"
+      }
+    }
+    target = ociTarget.res
+    stack = myStack.res
+  }
+}

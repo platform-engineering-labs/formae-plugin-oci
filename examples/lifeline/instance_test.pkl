@@ -1,0 +1,44 @@
+/*
+ * © 2025 Platform Engineering Labs Inc.
+ *
+ * SPDX-License-Identifier: FSL-1.1-ALv2
+ */
+
+amends "@formae/forma.pkl"
+import "@formae/formae.pkl"
+import "@oci/oci.pkl"
+import "@oci/core/instance.pkl"
+
+import "./vars.pkl"
+
+forma {
+    vars.stack
+    vars.target
+
+    new instance.Instance {
+        label = "instance-test"
+        compartmentId = vars.compartmentId.value
+        availabilityDomain = "Twhb:US-CHICAGO-1-AD-1"
+        shape = "VM.Standard.A2.Flex"
+        displayName = "formae-instance-test"
+        sourceDetails = new instance.SourceDetails {
+            sourceType = "image"
+            imageId = "ocid1.image.oc1.us-chicago-1.aaaaaaaa2zhuh4picmv5uqn4zlcgyzz7z2beuvxsizo5ggntovq65jxzxeua"
+            bootVolumeSizeInGBs = 50
+        }
+        createVnicDetails = new instance.CreateVnicDetails {
+            subnetId = "ocid1.subnet.oc1.us-chicago-1.aaaaaaaao63ukiuk2v7mhyz4phyz2bpafe73xx3kt4cdm3wzufbloadlqooa"
+            assignPublicIp = false
+        }
+        shapeConfig = new instance.ShapeConfig {
+            ocpus = 1.0
+            memoryInGBs = 6.0
+        }
+        freeformTags = new Listing {
+            new oci.FreeformTag { key = "Project"; value = "formae-test" }
+            new oci.FreeformTag { key = "ManagedBy"; value = "formae" }
+        }
+        target = vars.target.res
+        stack = vars.stack.res
+    }
+}
