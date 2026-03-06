@@ -149,6 +149,9 @@ func (p *VirtualNodePoolProvisioner) Create(ctx context.Context, request *resour
 
 	resp, err := client.CreateVirtualNodePool(ctx, createReq)
 	if err != nil {
+		if result, handleErr := util.HandleCreateError(err, "OCI::ContainerEngine::VirtualNodePool", "OCI::ContainerEngine::VirtualNodePool"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to create VirtualNodePool: %w", err)
 	}
 
@@ -276,6 +279,9 @@ func (p *VirtualNodePoolProvisioner) Update(ctx context.Context, request *resour
 
 	resp, err := client.UpdateVirtualNodePool(ctx, updateReq)
 	if err != nil {
+		if result, handleErr := util.HandleUpdateError(err, "OCI::ContainerEngine::VirtualNodePool", request.NativeID, "OCI::ContainerEngine::VirtualNodePool"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to update VirtualNodePool: %w", err)
 	}
 
@@ -316,6 +322,9 @@ func (p *VirtualNodePoolProvisioner) Delete(ctx context.Context, request *resour
 
 	resp, err := client.DeleteVirtualNodePool(ctx, deleteReq)
 	if err != nil {
+		if result, handleErr := util.HandleDeleteError(err, "OCI::ContainerEngine::VirtualNodePool", request.NativeID, "OCI::ContainerEngine::VirtualNodePool"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to delete VirtualNodePool: %w", err)
 	}
 

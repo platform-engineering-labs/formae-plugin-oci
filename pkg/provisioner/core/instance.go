@@ -87,6 +87,9 @@ func (p *InstanceProvisioner) Create(ctx context.Context, request *resource.Crea
 
 	resp, err := svc.LaunchInstance(ctx, createReq)
 	if err != nil {
+		if result, handleErr := util.HandleCreateError(err, "OCI::Core::Instance", "OCI::Core::Instance"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to create Instance: %w", err)
 	}
 
@@ -188,6 +191,9 @@ func (p *InstanceProvisioner) Update(ctx context.Context, request *resource.Upda
 
 	resp, err := svc.UpdateInstance(ctx, updateReq)
 	if err != nil {
+		if result, handleErr := util.HandleUpdateError(err, "OCI::Core::Instance", request.NativeID, "OCI::Core::Instance"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to update Instance: %w", err)
 	}
 
@@ -230,6 +236,9 @@ func (p *InstanceProvisioner) Delete(ctx context.Context, request *resource.Dele
 
 	_, err = svc.TerminateInstance(ctx, deleteReq)
 	if err != nil {
+		if result, handleErr := util.HandleDeleteError(err, "OCI::Core::Instance", request.NativeID, "OCI::Core::Instance"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to delete Instance: %w", err)
 	}
 

@@ -21,7 +21,7 @@ PKL test files for the [formae plugin SDK conformance test runner](https://githu
 | SecurityList | `securitylist.pkl`, `-update` | VCN-child. Empty rules. |
 | Subnet | `subnet.pkl`, `-update` | VCN-child. |
 | DhcpOptions | `dhcpoptions.pkl`, `-update` | VCN-child. Known extraction union-type bug (doesn't affect CRUD). |
-| NSGSecurityRule | `networksecuritygroupsecurityrule.pkl` | NSG-child. No update support (delete+recreate). Bug fixed: `List` NativeID format. |
+| NSGSecurityRule | `nsg_securityrule.pkl` | NSG-child. No update support (delete+recreate). Bug fixed: `List` NativeID format. |
 
 ## Blocked by Service Limits (test files ready, not a code issue)
 

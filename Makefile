@@ -103,39 +103,53 @@ clean-environment:
 	@./scripts/ci/clean-environment.sh
 
 ## conformance-test: Run all conformance tests (CRUD + discovery)
-## Usage: make conformance-test [VERSION=0.80.0] [TEST=s3-bucket]
+## Usage: make conformance-test [VERSION=0.80.0] [TEST=bucket]
 ## Downloads the specified formae version (or latest) and runs conformance tests.
 ## Calls clean-environment before and after tests.
 ##
 ## Parameters:
 ##   VERSION - Formae version to test against (default: latest)
-##   TEST    - Filter tests by name pattern (e.g., TEST=s3-bucket)
+##   TEST    - Filter tests by name pattern (e.g., TEST=bucket)
 conformance-test: conformance-test-crud conformance-test-discovery
 
 ## conformance-test-crud: Run only CRUD lifecycle tests
-## Usage: make conformance-test-crud [VERSION=0.80.0] [TEST=s3-bucket]
+## Usage: make conformance-test-crud [VERSION=0.80.0] [TEST=bucket]
+## Note: Environment cleanup is skipped when FORMAE_TEST_FILTER is set (e.g. matrix CI)
+## to avoid parallel jobs deleting each other's resources. Use clean-environment target
+## or a separate CI cleanup job instead.
 conformance-test-crud: install
-	@echo "Pre-test cleanup..."
-	@./scripts/ci/clean-environment.sh || true
-	@echo ""
+	@if [ -z "$(FORMAE_TEST_FILTER)" ] && [ -z "$(TEST)" ]; then \
+		echo "Pre-test cleanup..."; \
+		./scripts/ci/clean-environment.sh || true; \
+		echo ""; \
+	fi
 	@echo "Running CRUD conformance tests..."
-	@FORMAE_TEST_FILTER="$(TEST)" FORMAE_TEST_TYPE=crud ./scripts/run-conformance-tests.sh $(VERSION); \
+	@FORMAE_TEST_FILTER="$(if $(TEST),$(TEST),$(FORMAE_TEST_FILTER))" FORMAE_TEST_TYPE=crud ./scripts/run-conformance-tests.sh $(VERSION); \
 	TEST_EXIT=$$?; \
-	echo ""; \
-	echo "Post-test cleanup..."; \
-	./scripts/ci/clean-environment.sh || true; \
+	if [ -z "$(FORMAE_TEST_FILTER)" ] && [ -z "$(TEST)" ]; then \
+		echo ""; \
+		echo "Post-test cleanup..."; \
+		./scripts/ci/clean-environment.sh || true; \
+	fi; \
 	exit $$TEST_EXIT
 
 ## conformance-test-discovery: Run only discovery tests
-## Usage: make conformance-test-discovery [VERSION=0.80.0] [TEST=s3-bucket]
+## Usage: make conformance-test-discovery [VERSION=0.80.0] [TEST=bucket]
+## NOTE: natgateway, servicegateway, instance, cluster, nodepool, and virtualnodepool
+## are excluded by default due to service limits in us-chicago-1.
+DISCOVERY_DEFAULT_FILTER := policy,vcn,volume,bucket,networksecuritygroup,internetgateway,routetable,securitylist,subnet,dhcpoptions,nsg_securityrule
 conformance-test-discovery: install
-	@echo "Pre-test cleanup..."
-	@./scripts/ci/clean-environment.sh || true
-	@echo ""
+	@if [ -z "$(FORMAE_TEST_FILTER)" ] && [ -z "$(TEST)" ]; then \
+		echo "Pre-test cleanup..."; \
+		./scripts/ci/clean-environment.sh || true; \
+		echo ""; \
+	fi
 	@echo "Running discovery conformance tests..."
-	@FORMAE_TEST_FILTER="$(TEST)" FORMAE_TEST_TYPE=discovery ./scripts/run-conformance-tests.sh $(VERSION); \
+	@FORMAE_TEST_FILTER="$(if $(TEST),$(TEST),$(if $(FORMAE_TEST_FILTER),$(FORMAE_TEST_FILTER),$(DISCOVERY_DEFAULT_FILTER)))" FORMAE_TEST_TYPE=discovery ./scripts/run-conformance-tests.sh $(VERSION); \
 	TEST_EXIT=$$?; \
-	echo ""; \
-	echo "Post-test cleanup..."; \
-	./scripts/ci/clean-environment.sh || true; \
+	if [ -z "$(FORMAE_TEST_FILTER)" ] && [ -z "$(TEST)" ]; then \
+		echo ""; \
+		echo "Post-test cleanup..."; \
+		./scripts/ci/clean-environment.sh || true; \
+	fi; \
 	exit $$TEST_EXIT

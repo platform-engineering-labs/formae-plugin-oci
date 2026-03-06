@@ -63,6 +63,9 @@ func (p *NetworkSecurityGroupProvisioner) Create(ctx context.Context, request *r
 
 	resp, err := client.CreateNetworkSecurityGroup(ctx, createReq)
 	if err != nil {
+		if result, handleErr := util.HandleCreateError(err, "OCI::Core::NetworkSecurityGroup", "OCI::Core::NetworkSecurityGroup"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to create NetworkSecurityGroup: %w", err)
 	}
 
@@ -107,6 +110,9 @@ func (p *NetworkSecurityGroupProvisioner) Update(ctx context.Context, request *r
 
 	resp, err := client.UpdateNetworkSecurityGroup(ctx, updateReq)
 	if err != nil {
+		if result, handleErr := util.HandleUpdateError(err, "OCI::Core::NetworkSecurityGroup", request.NativeID, "OCI::Core::NetworkSecurityGroup"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to update NetworkSecurityGroup: %w", err)
 	}
 
@@ -148,6 +154,9 @@ func (p *NetworkSecurityGroupProvisioner) Delete(ctx context.Context, request *r
 
 	_, err = client.DeleteNetworkSecurityGroup(ctx, deleteReq)
 	if err != nil {
+		if result, handleErr := util.HandleDeleteError(err, "OCI::Core::NetworkSecurityGroup", request.NativeID, "OCI::Core::NetworkSecurityGroup"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to delete NetworkSecurityGroup: %w", err)
 	}
 

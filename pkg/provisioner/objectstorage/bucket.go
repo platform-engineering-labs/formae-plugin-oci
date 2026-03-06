@@ -91,6 +91,9 @@ func (p *BucketProvisioner) Create(ctx context.Context, request *resource.Create
 
 	resp, err := client.CreateBucket(ctx, createReq)
 	if err != nil {
+		if result, handleErr := util.HandleCreateError(err, "OCI::ObjectStorage::Bucket", "OCI::ObjectStorage::Bucket"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to create Bucket: %w", err)
 	}
 
@@ -153,6 +156,9 @@ func (p *BucketProvisioner) Update(ctx context.Context, request *resource.Update
 
 	resp, err := client.UpdateBucket(ctx, updateReq)
 	if err != nil {
+		if result, handleErr := util.HandleUpdateError(err, "OCI::ObjectStorage::Bucket", request.NativeID, "OCI::ObjectStorage::Bucket"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to update Bucket: %w", err)
 	}
 
@@ -201,6 +207,9 @@ func (p *BucketProvisioner) Delete(ctx context.Context, request *resource.Delete
 
 	_, err = client.DeleteBucket(ctx, deleteReq)
 	if err != nil {
+		if result, handleErr := util.HandleDeleteError(err, "OCI::ObjectStorage::Bucket", request.NativeID, "OCI::ObjectStorage::Bucket"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to delete Bucket: %w", err)
 	}
 

@@ -164,6 +164,9 @@ func (p *NodePoolProvisioner) Create(ctx context.Context, request *resource.Crea
 
 	resp, err := client.CreateNodePool(ctx, createReq)
 	if err != nil {
+		if result, handleErr := util.HandleCreateError(err, "OCI::ContainerEngine::NodePool", "OCI::ContainerEngine::NodePool"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to create NodePool: %w", err)
 	}
 
@@ -272,6 +275,9 @@ func (p *NodePoolProvisioner) Update(ctx context.Context, request *resource.Upda
 
 	resp, err := client.UpdateNodePool(ctx, updateReq)
 	if err != nil {
+		if result, handleErr := util.HandleUpdateError(err, "OCI::ContainerEngine::NodePool", request.NativeID, "OCI::ContainerEngine::NodePool"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to update NodePool: %w", err)
 	}
 
@@ -312,6 +318,9 @@ func (p *NodePoolProvisioner) Delete(ctx context.Context, request *resource.Dele
 
 	resp, err := client.DeleteNodePool(ctx, deleteReq)
 	if err != nil {
+		if result, handleErr := util.HandleDeleteError(err, "OCI::ContainerEngine::NodePool", request.NativeID, "OCI::ContainerEngine::NodePool"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to delete NodePool: %w", err)
 	}
 

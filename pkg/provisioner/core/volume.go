@@ -75,6 +75,9 @@ func (p *VolumeProvisioner) Create(ctx context.Context, request *resource.Create
 
 	resp, err := svc.CreateVolume(ctx, createReq)
 	if err != nil {
+		if result, handleErr := util.HandleCreateError(err, "OCI::Core::Volume", "OCI::Core::Volume"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to create Volume: %w", err)
 	}
 
@@ -162,6 +165,9 @@ func (p *VolumeProvisioner) Update(ctx context.Context, request *resource.Update
 
 	resp, err := svc.UpdateVolume(ctx, updateReq)
 	if err != nil {
+		if result, handleErr := util.HandleUpdateError(err, "OCI::Core::Volume", request.NativeID, "OCI::Core::Volume"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to update Volume: %w", err)
 	}
 
@@ -203,6 +209,9 @@ func (p *VolumeProvisioner) Delete(ctx context.Context, request *resource.Delete
 
 	_, err = svc.DeleteVolume(ctx, deleteReq)
 	if err != nil {
+		if result, handleErr := util.HandleDeleteError(err, "OCI::Core::Volume", request.NativeID, "OCI::Core::Volume"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to delete Volume: %w", err)
 	}
 

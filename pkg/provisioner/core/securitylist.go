@@ -445,6 +445,9 @@ func (p *SecurityListProvisioner) Create(ctx context.Context, request *resource.
 
 	resp, err := client.CreateSecurityList(ctx, createReq)
 	if err != nil {
+		if result, handleErr := util.HandleCreateError(err, "OCI::Core::SecurityList", "OCI::Core::SecurityList"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to create SecurityList: %w", err)
 	}
 
@@ -505,6 +508,9 @@ func (p *SecurityListProvisioner) Update(ctx context.Context, request *resource.
 
 	resp, err := client.UpdateSecurityList(ctx, updateReq)
 	if err != nil {
+		if result, handleErr := util.HandleUpdateError(err, "OCI::Core::SecurityList", request.NativeID, "OCI::Core::SecurityList"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to update SecurityList: %w", err)
 	}
 
@@ -546,6 +552,9 @@ func (p *SecurityListProvisioner) Delete(ctx context.Context, request *resource.
 
 	_, err = client.DeleteSecurityList(ctx, deleteReq)
 	if err != nil {
+		if result, handleErr := util.HandleDeleteError(err, "OCI::Core::SecurityList", request.NativeID, "OCI::Core::SecurityList"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to delete SecurityList: %w", err)
 	}
 

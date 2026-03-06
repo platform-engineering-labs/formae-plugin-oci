@@ -124,6 +124,9 @@ func (p *RouteTableProvisioner) Create(ctx context.Context, request *resource.Cr
 
 	resp, err := client.CreateRouteTable(ctx, createReq)
 	if err != nil {
+		if result, handleErr := util.HandleCreateError(err, "OCI::Core::RouteTable", "OCI::Core::RouteTable"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to create RouteTable: %w", err)
 	}
 
@@ -176,6 +179,9 @@ func (p *RouteTableProvisioner) Update(ctx context.Context, request *resource.Up
 
 	resp, err := client.UpdateRouteTable(ctx, updateReq)
 	if err != nil {
+		if result, handleErr := util.HandleUpdateError(err, "OCI::Core::RouteTable", request.NativeID, "OCI::Core::RouteTable"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to update RouteTable: %w", err)
 	}
 
@@ -218,6 +224,9 @@ func (p *RouteTableProvisioner) Delete(ctx context.Context, request *resource.De
 
 	_, err = client.DeleteRouteTable(ctx, deleteReq)
 	if err != nil {
+		if result, handleErr := util.HandleDeleteError(err, "OCI::Core::RouteTable", request.NativeID, "OCI::Core::RouteTable"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to delete RouteTable: %w", err)
 	}
 

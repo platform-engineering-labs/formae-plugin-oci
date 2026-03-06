@@ -136,6 +136,9 @@ func (p *ClusterProvisioner) Create(ctx context.Context, request *resource.Creat
 
 	resp, err := client.CreateCluster(ctx, createReq)
 	if err != nil {
+		if result, handleErr := util.HandleCreateError(err, "OCI::ContainerEngine::Cluster", "OCI::ContainerEngine::Cluster"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to create Cluster: %w", err)
 	}
 
@@ -193,6 +196,9 @@ func (p *ClusterProvisioner) Update(ctx context.Context, request *resource.Updat
 
 	resp, err := client.UpdateCluster(ctx, updateReq)
 	if err != nil {
+		if result, handleErr := util.HandleUpdateError(err, "OCI::ContainerEngine::Cluster", request.NativeID, "OCI::ContainerEngine::Cluster"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to update Cluster: %w", err)
 	}
 
@@ -233,6 +239,9 @@ func (p *ClusterProvisioner) Delete(ctx context.Context, request *resource.Delet
 
 	resp, err := client.DeleteCluster(ctx, deleteReq)
 	if err != nil {
+		if result, handleErr := util.HandleDeleteError(err, "OCI::ContainerEngine::Cluster", request.NativeID, "OCI::ContainerEngine::Cluster"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to delete Cluster: %w", err)
 	}
 

@@ -64,6 +64,9 @@ func (p *InternetGatewayProvisioner) Create(ctx context.Context, request *resour
 
 	resp, err := client.CreateInternetGateway(ctx, createReq)
 	if err != nil {
+		if result, handleErr := util.HandleCreateError(err, "OCI::Core::InternetGateway", "OCI::Core::InternetGateway"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to create InternetGateway: %w", err)
 	}
 
@@ -109,6 +112,9 @@ func (p *InternetGatewayProvisioner) Update(ctx context.Context, request *resour
 
 	resp, err := client.UpdateInternetGateway(ctx, updateReq)
 	if err != nil {
+		if result, handleErr := util.HandleUpdateError(err, "OCI::Core::InternetGateway", request.NativeID, "OCI::Core::InternetGateway"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to update InternetGateway: %w", err)
 	}
 
@@ -151,6 +157,9 @@ func (p *InternetGatewayProvisioner) Delete(ctx context.Context, request *resour
 
 	_, err = client.DeleteInternetGateway(ctx, deleteReq)
 	if err != nil {
+		if result, handleErr := util.HandleDeleteError(err, "OCI::Core::InternetGateway", request.NativeID, "OCI::Core::InternetGateway"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to delete InternetGateway: %w", err)
 	}
 

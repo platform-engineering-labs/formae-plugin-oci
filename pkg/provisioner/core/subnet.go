@@ -88,6 +88,9 @@ func (p *SubnetProvisioner) Create(ctx context.Context, request *resource.Create
 
 	resp, err := client.CreateSubnet(ctx, createReq)
 	if err != nil {
+		if result, handleErr := util.HandleCreateError(err, "OCI::Core::Subnet", "OCI::Core::Subnet"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to create Subnet: %w", err)
 	}
 
@@ -140,6 +143,9 @@ func (p *SubnetProvisioner) Update(ctx context.Context, request *resource.Update
 
 	resp, err := client.UpdateSubnet(ctx, updateReq)
 	if err != nil {
+		if result, handleErr := util.HandleUpdateError(err, "OCI::Core::Subnet", request.NativeID, "OCI::Core::Subnet"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to update Subnet: %w", err)
 	}
 
@@ -182,6 +188,9 @@ func (p *SubnetProvisioner) Delete(ctx context.Context, request *resource.Delete
 
 	_, err = client.DeleteSubnet(ctx, deleteReq)
 	if err != nil {
+		if result, handleErr := util.HandleDeleteError(err, "OCI::Core::Subnet", request.NativeID, "OCI::Core::Subnet"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to delete Subnet: %w", err)
 	}
 

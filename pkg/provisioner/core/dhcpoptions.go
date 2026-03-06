@@ -162,6 +162,9 @@ func (p *DhcpOptionsProvisioner) Create(ctx context.Context, request *resource.C
 
 	resp, err := svc.CreateDhcpOptions(ctx, createReq)
 	if err != nil {
+		if result, handleErr := util.HandleCreateError(err, "OCI::Core::DhcpOptions", "OCI::Core::DhcpOptions"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to create DhcpOptions: %w", err)
 	}
 
@@ -248,6 +251,9 @@ func (p *DhcpOptionsProvisioner) Update(ctx context.Context, request *resource.U
 
 	resp, err := svc.UpdateDhcpOptions(ctx, updateReq)
 	if err != nil {
+		if result, handleErr := util.HandleUpdateError(err, "OCI::Core::DhcpOptions", request.NativeID, "OCI::Core::DhcpOptions"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to update DhcpOptions: %w", err)
 	}
 
@@ -289,6 +295,9 @@ func (p *DhcpOptionsProvisioner) Delete(ctx context.Context, request *resource.D
 
 	_, err = svc.DeleteDhcpOptions(ctx, deleteReq)
 	if err != nil {
+		if result, handleErr := util.HandleDeleteError(err, "OCI::Core::DhcpOptions", request.NativeID, "OCI::Core::DhcpOptions"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to delete DhcpOptions: %w", err)
 	}
 

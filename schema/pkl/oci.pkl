@@ -86,7 +86,9 @@ open class Config {
   fixed Region: Region = region
 }
 
-class FieldHint extends formae.FieldHint {}
+class FieldHint extends formae.FieldHint {
+  hidden hasProviderDefault: Boolean = true
+}
 
 class ResourceHint extends formae.ResourceHint {
   hidden outputKeyTransformation: (String) -> String = (it) -> it.capitalize()
