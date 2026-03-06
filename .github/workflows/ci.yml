@@ -150,6 +150,7 @@ jobs:
 
     strategy:
       fail-fast: false
+      max-parallel: 2  # OCI VCN limit is 2 per region; most tests create a VCN
       matrix:
         resource:
           - policy
