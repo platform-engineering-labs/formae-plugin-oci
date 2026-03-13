@@ -93,6 +93,9 @@ func (p *ServiceGatewayProvisioner) Create(ctx context.Context, request *resourc
 
 	resp, err := client.CreateServiceGateway(ctx, createReq)
 	if err != nil {
+		if result, handleErr := util.HandleCreateError(err, "OCI::Core::ServiceGateway", "OCI::Core::ServiceGateway"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to create ServiceGateway: %w", err)
 	}
 
@@ -162,6 +165,9 @@ func (p *ServiceGatewayProvisioner) Update(ctx context.Context, request *resourc
 
 	resp, err := client.UpdateServiceGateway(ctx, updateReq)
 	if err != nil {
+		if result, handleErr := util.HandleUpdateError(err, "OCI::Core::ServiceGateway", request.NativeID, "OCI::Core::ServiceGateway"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to update ServiceGateway: %w", err)
 	}
 
@@ -204,6 +210,9 @@ func (p *ServiceGatewayProvisioner) Delete(ctx context.Context, request *resourc
 
 	_, err = client.DeleteServiceGateway(ctx, deleteReq)
 	if err != nil {
+		if result, handleErr := util.HandleDeleteError(err, "OCI::Core::ServiceGateway", request.NativeID, "OCI::Core::ServiceGateway"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to delete ServiceGateway: %w", err)
 	}
 

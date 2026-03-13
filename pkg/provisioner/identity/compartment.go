@@ -61,6 +61,24 @@ func (p *CompartmentProvisioner) Create(ctx context.Context, request *resource.C
 
 	resp, err := client.CreateCompartment(ctx, createReq)
 	if err != nil {
+		// If the compartment already exists, look it up by name and return it.
+		// Compartment names are unique within a parent, so this is safe.
+		errorCode, ok := util.HandleOCIServiceError(err)
+		if ok && errorCode == resource.OperationErrorCodeAlreadyExists {
+			existingID, lookupErr := p.findCompartmentByName(ctx, *createDetails.CompartmentId, *createDetails.Name)
+			if lookupErr == nil && existingID != "" {
+				return &resource.CreateResult{
+					ProgressResult: &resource.ProgressResult{
+						Operation:       resource.OperationCreate,
+						OperationStatus: resource.OperationStatusSuccess,
+						NativeID:        existingID,
+					},
+				}, nil
+			}
+		}
+		if result, handleErr := util.HandleCreateError(err, "OCI::Identity::Compartment", "OCI::Identity::Compartment"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to create Compartment: %w", err)
 	}
 
@@ -71,6 +89,29 @@ func (p *CompartmentProvisioner) Create(ctx context.Context, request *resource.C
 			NativeID:        *resp.Id,
 		},
 	}, nil
+}
+
+// findCompartmentByName lists child compartments under parentID and returns the OCID
+// of the active compartment matching the given name, or "" if not found.
+func (p *CompartmentProvisioner) findCompartmentByName(ctx context.Context, parentID, name string) (string, error) {
+	client, err := p.clients.GetIdentityClient()
+	if err != nil {
+		return "", err
+	}
+	resp, err := client.ListCompartments(ctx, identity.ListCompartmentsRequest{
+		CompartmentId: common.String(parentID),
+		Name:          common.String(name),
+		AccessLevel:   identity.ListCompartmentsAccessLevelAccessible,
+	})
+	if err != nil {
+		return "", err
+	}
+	for _, c := range resp.Items {
+		if c.LifecycleState == identity.CompartmentLifecycleStateActive {
+			return *c.Id, nil
+		}
+	}
+	return "", nil
 }
 
 func (p *CompartmentProvisioner) Read(ctx context.Context, request *resource.ReadRequest) (*resource.ReadResult, error) {
@@ -102,7 +143,6 @@ func (p *CompartmentProvisioner) Read(ctx context.Context, request *resource.Rea
 	if resp.CompartmentId != nil {
 		properties["CompartmentId"] = *resp.CompartmentId
 	} else {
-		fmt.Printf("DEBUG: CompartmentId is nil for compartment %s, using Id as fallback\n", *resp.Id)
 		properties["CompartmentId"] = *resp.Id
 	}
 
@@ -164,6 +204,9 @@ func (p *CompartmentProvisioner) Update(ctx context.Context, request *resource.U
 
 	resp, err := client.UpdateCompartment(ctx, updateReq)
 	if err != nil {
+		if result, handleErr := util.HandleUpdateError(err, "OCI::Identity::Compartment", request.NativeID, "OCI::Identity::Compartment"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to update Compartment: %w", err)
 	}
 
@@ -206,6 +249,9 @@ func (p *CompartmentProvisioner) Delete(ctx context.Context, request *resource.D
 
 	_, err = client.DeleteCompartment(ctx, deleteReq)
 	if err != nil {
+		if result, handleErr := util.HandleDeleteError(err, "OCI::Identity::Compartment", request.NativeID, "OCI::Identity::Compartment"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to delete Compartment: %w", err)
 	}
 
@@ -255,16 +301,10 @@ func (p *CompartmentProvisioner) List(ctx context.Context, request *resource.Lis
 		AccessLevel:            identity.ListCompartmentsAccessLevelAccessible,
 	}
 
-	// DEBUG logging
-	fmt.Printf("DEBUG Compartment List: compartmentId=%s, subtree=%v\n", compartmentId, *listReq.CompartmentIdInSubtree)
-
 	resp, err := client.ListCompartments(ctx, listReq)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list Compartments: %w", err)
 	}
-
-	// DEBUG logging
-	fmt.Printf("DEBUG Compartment List: found %d child compartments\n", len(resp.Items))
 
 	var nativeIDs []string
 
@@ -272,7 +312,6 @@ func (p *CompartmentProvisioner) List(ctx context.Context, request *resource.Lis
 	// Include the root compartment (tenancy) itself as a discoverable resource
 	if _, ok := request.AdditionalProperties["CompartmentId"]; !ok {
 		nativeIDs = append(nativeIDs, compartmentId)
-		fmt.Printf("DEBUG Compartment List: added root compartment (tenancy) id=%s\n", compartmentId)
 	}
 	for _, compartment := range resp.Items {
 		nativeIDs = append(nativeIDs, *compartment.Id)

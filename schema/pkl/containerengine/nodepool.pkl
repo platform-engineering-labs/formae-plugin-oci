@@ -40,7 +40,7 @@ class NodePoolPlacementConfig {
     availabilityDomain: String?
 
     /// The OCID of the subnet for the nodes
-    subnetId: String|formae.Resolvable?
+    subnetId: (String|formae.Resolvable)?
 
     /// Optional capacity reservation ID
     capacityReservationId: String?

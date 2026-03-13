@@ -70,6 +70,9 @@ func (p *PolicyProvisioner) Create(ctx context.Context, request *resource.Create
 
 	resp, err := svc.CreatePolicy(ctx, createReq)
 	if err != nil {
+		if result, handleErr := util.HandleCreateError(err, "OCI::Identity::Policy", "OCI::Identity::Policy"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to create Policy: %w", err)
 	}
 
@@ -154,6 +157,9 @@ func (p *PolicyProvisioner) Update(ctx context.Context, request *resource.Update
 
 	resp, err := svc.UpdatePolicy(ctx, updateReq)
 	if err != nil {
+		if result, handleErr := util.HandleUpdateError(err, "OCI::Identity::Policy", request.NativeID, "OCI::Identity::Policy"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to update Policy: %w", err)
 	}
 
@@ -195,6 +201,9 @@ func (p *PolicyProvisioner) Delete(ctx context.Context, request *resource.Delete
 
 	_, err = svc.DeletePolicy(ctx, deleteReq)
 	if err != nil {
+		if result, handleErr := util.HandleDeleteError(err, "OCI::Identity::Policy", request.NativeID, "OCI::Identity::Policy"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to delete Policy: %w", err)
 	}
 

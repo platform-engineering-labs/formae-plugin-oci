@@ -74,6 +74,9 @@ func (p *VCNProvisioner) Create(ctx context.Context, request *resource.CreateReq
 
 	resp, err := client.CreateVcn(ctx, createReq)
 	if err != nil {
+		if result, handleErr := util.HandleCreateError(err, "OCI::Core::VCN", "OCI::Core::VCN"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to create VCN: %w", err)
 	}
 
@@ -116,6 +119,9 @@ func (p *VCNProvisioner) Update(ctx context.Context, request *resource.UpdateReq
 
 	resp, err := client.UpdateVcn(ctx, updateReq)
 	if err != nil {
+		if result, handleErr := util.HandleUpdateError(err, "OCI::Core::VCN", request.NativeID, "OCI::Core::VCN"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to update VCN: %w", err)
 	}
 
@@ -159,6 +165,9 @@ func (p *VCNProvisioner) Delete(ctx context.Context, request *resource.DeleteReq
 
 	_, err = client.DeleteVcn(ctx, deleteReq)
 	if err != nil {
+		if result, handleErr := util.HandleDeleteError(err, "OCI::Core::VCN", request.NativeID, "OCI::Core::VCN"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to delete VCN: %w", err)
 	}
 

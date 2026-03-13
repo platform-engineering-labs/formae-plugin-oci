@@ -66,6 +66,9 @@ func (p *NatGatewayProvisioner) Create(ctx context.Context, request *resource.Cr
 
 	resp, err := client.CreateNatGateway(ctx, createReq)
 	if err != nil {
+		if result, handleErr := util.HandleCreateError(err, "OCI::Core::NatGateway", "OCI::Core::NatGateway"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to create NatGateway: %w", err)
 	}
 
@@ -111,6 +114,9 @@ func (p *NatGatewayProvisioner) Update(ctx context.Context, request *resource.Up
 
 	resp, err := client.UpdateNatGateway(ctx, updateReq)
 	if err != nil {
+		if result, handleErr := util.HandleUpdateError(err, "OCI::Core::NatGateway", request.NativeID, "OCI::Core::NatGateway"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to update NatGateway: %w", err)
 	}
 
@@ -153,6 +159,9 @@ func (p *NatGatewayProvisioner) Delete(ctx context.Context, request *resource.De
 
 	_, err = client.DeleteNatGateway(ctx, deleteReq)
 	if err != nil {
+		if result, handleErr := util.HandleDeleteError(err, "OCI::Core::NatGateway", request.NativeID, "OCI::Core::NatGateway"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to delete NatGateway: %w", err)
 	}
 

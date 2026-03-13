@@ -158,6 +158,9 @@ func (p *NetworkSecurityGroupSecurityRuleProvisioner) Create(ctx context.Context
 
 	resp, err := client.AddNetworkSecurityGroupSecurityRules(ctx, addReq)
 	if err != nil {
+		if result, handleErr := util.HandleCreateError(err, "OCI::Core::NetworkSecurityGroupSecurityRule", "OCI::Core::NetworkSecurityGroupSecurityRule"); result != nil {
+			return result, handleErr
+		}
 		return nil, fmt.Errorf("failed to create NetworkSecurityGroupSecurityRule: %w", err)
 	}
 
@@ -221,6 +224,9 @@ func (p *NetworkSecurityGroupSecurityRuleProvisioner) Delete(ctx context.Context
 					NativeID:        request.NativeID,
 				},
 			}, nil
+		}
+		if result, handleErr := util.HandleDeleteError(err, "OCI::Core::NetworkSecurityGroupSecurityRule", request.NativeID, "OCI::Core::NetworkSecurityGroupSecurityRule"); result != nil {
+			return result, handleErr
 		}
 		return nil, fmt.Errorf("failed to delete NetworkSecurityGroupSecurityRule: %w", err)
 	}
