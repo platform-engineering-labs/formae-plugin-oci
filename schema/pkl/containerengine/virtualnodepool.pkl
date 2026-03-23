@@ -113,10 +113,10 @@ open class VirtualNodePool extends formae.Resource {
     @oci.FieldHint
     taints: Listing<Taint>?
 
-    @oci.FieldHint
+    @oci.FieldHint{ hasProviderDefault = true }
     freeformTags: Listing<oci.FreeformTag>?
 
-    @oci.FieldHint
+    @oci.FieldHint{ hasProviderDefault = true }
     definedTags: Listing<oci.DefinedTag>?
 
     local parent = this

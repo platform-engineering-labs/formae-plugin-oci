@@ -58,10 +58,10 @@ open class RouteTable extends formae.Resource {
     @oci.FieldHint
     routeRules: Listing<RouteRule>?
 
-    @oci.FieldHint
+    @oci.FieldHint{ hasProviderDefault = true }
     freeformTags: Listing<oci.FreeformTag>?
 
-    @oci.FieldHint
+    @oci.FieldHint{ hasProviderDefault = true }
     definedTags: Listing<oci.DefinedTag>?
 
     local parent = this

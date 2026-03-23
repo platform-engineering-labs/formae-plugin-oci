@@ -49,10 +49,10 @@ open class ServiceGateway extends formae.Resource {
     @oci.FieldHint
     displayName: String?
 
-    @oci.FieldHint
+    @oci.FieldHint{ hasProviderDefault = true }
     freeformTags: Listing<oci.FreeformTag>?
 
-    @oci.FieldHint
+    @oci.FieldHint{ hasProviderDefault = true }
     definedTags: Listing<oci.DefinedTag>?
 
     local parent = this
