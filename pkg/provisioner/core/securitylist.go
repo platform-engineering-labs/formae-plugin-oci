@@ -558,23 +558,94 @@ func (p *SecurityListProvisioner) Delete(ctx context.Context, request *resource.
 		return nil, fmt.Errorf("failed to delete SecurityList: %w", err)
 	}
 
+	// SecurityList deletion is async — return in-progress, poll lifecycle in Status()
 	return &resource.DeleteResult{
 		ProgressResult: &resource.ProgressResult{
 			Operation:       resource.OperationDelete,
-			OperationStatus: resource.OperationStatusSuccess,
+			OperationStatus: resource.OperationStatusInProgress,
 			NativeID:        request.NativeID,
+			RequestID:       request.NativeID,
 		},
 	}, nil
 }
 
 func (p *SecurityListProvisioner) Status(ctx context.Context, request *resource.StatusRequest) (*resource.StatusResult, error) {
-	return &resource.StatusResult{
-		ProgressResult: &resource.ProgressResult{
-			Operation:       resource.OperationCheckStatus,
-			OperationStatus: resource.OperationStatusSuccess,
-			RequestID:       request.RequestID,
-		},
-	}, nil
+	client, err := p.clients.GetVirtualNetworkClient()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
+	}
+
+	getReq := core.GetSecurityListRequest{
+		SecurityListId: common.String(request.RequestID),
+	}
+
+	resp, err := client.GetSecurityList(ctx, getReq)
+	if err != nil {
+		if serviceErr, ok := common.IsServiceError(err); ok && serviceErr.GetHTTPStatusCode() == 404 {
+			// SecurityList gone — if we were deleting, that's success
+			return &resource.StatusResult{
+				ProgressResult: &resource.ProgressResult{
+					Operation:       resource.OperationCheckStatus,
+					OperationStatus: resource.OperationStatusSuccess,
+					NativeID:        request.RequestID,
+				},
+			}, nil
+		}
+		return nil, fmt.Errorf("failed to check SecurityList status: %w", err)
+	}
+
+	switch resp.LifecycleState {
+	case core.SecurityListLifecycleStateAvailable:
+		props := map[string]any{
+			"CompartmentId":        *resp.CompartmentId,
+			"VcnId":                *resp.VcnId,
+			"Id":                   *resp.Id,
+			"IngressSecurityRules": serializeIngressRules(resp.IngressSecurityRules),
+			"EgressSecurityRules":  serializeEgressRules(resp.EgressSecurityRules),
+		}
+
+		if resp.DisplayName != nil {
+			props["DisplayName"] = *resp.DisplayName
+		}
+		if resp.FreeformTags != nil {
+			props["FreeformTags"] = util.FreeformTagsToList(resp.FreeformTags)
+		}
+		if resp.DefinedTags != nil {
+			props["DefinedTags"] = util.DefinedTagsToList(resp.DefinedTags)
+		}
+
+		propertiesBytes, err := json.Marshal(props)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal properties: %w", err)
+		}
+		return &resource.StatusResult{
+			ProgressResult: &resource.ProgressResult{
+				Operation:          resource.OperationCheckStatus,
+				OperationStatus:    resource.OperationStatusSuccess,
+				NativeID:           *resp.Id,
+				ResourceProperties: json.RawMessage(propertiesBytes),
+			},
+		}, nil
+
+	case core.SecurityListLifecycleStateTerminated:
+		return &resource.StatusResult{
+			ProgressResult: &resource.ProgressResult{
+				Operation:       resource.OperationCheckStatus,
+				OperationStatus: resource.OperationStatusSuccess,
+				NativeID:        *resp.Id,
+			},
+		}, nil
+
+	default: // PROVISIONING, TERMINATING
+		return &resource.StatusResult{
+			ProgressResult: &resource.ProgressResult{
+				Operation:       resource.OperationCheckStatus,
+				OperationStatus: resource.OperationStatusInProgress,
+				RequestID:       request.RequestID,
+				StatusMessage:   fmt.Sprintf("SecurityList lifecycle state: %s", resp.LifecycleState),
+			},
+		}, nil
+	}
 }
 
 func (p *SecurityListProvisioner) Read(ctx context.Context, request *resource.ReadRequest) (*resource.ReadResult, error) {

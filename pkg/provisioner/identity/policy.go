@@ -207,23 +207,87 @@ func (p *PolicyProvisioner) Delete(ctx context.Context, request *resource.Delete
 		return nil, fmt.Errorf("failed to delete Policy: %w", err)
 	}
 
+	// Policy deletion is async — return in-progress, poll lifecycle in Status()
 	return &resource.DeleteResult{
 		ProgressResult: &resource.ProgressResult{
 			Operation:       resource.OperationDelete,
-			OperationStatus: resource.OperationStatusSuccess,
+			OperationStatus: resource.OperationStatusInProgress,
 			NativeID:        request.NativeID,
+			RequestID:       request.NativeID,
 		},
 	}, nil
 }
 
 func (p *PolicyProvisioner) Status(ctx context.Context, request *resource.StatusRequest) (*resource.StatusResult, error) {
-	return &resource.StatusResult{
-		ProgressResult: &resource.ProgressResult{
-			Operation:       resource.OperationCheckStatus,
-			OperationStatus: resource.OperationStatusSuccess,
-			RequestID:       request.RequestID,
-		},
-	}, nil
+	svc, err := p.clients.GetIdentityClient()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get Identity client: %w", err)
+	}
+
+	getReq := identity.GetPolicyRequest{
+		PolicyId: common.String(request.RequestID),
+	}
+
+	resp, err := svc.GetPolicy(ctx, getReq)
+	if err != nil {
+		if serviceErr, ok := common.IsServiceError(err); ok && serviceErr.GetHTTPStatusCode() == 404 {
+			// Policy gone — if we were deleting, that's success
+			return &resource.StatusResult{
+				ProgressResult: &resource.ProgressResult{
+					Operation:       resource.OperationCheckStatus,
+					OperationStatus: resource.OperationStatusSuccess,
+					NativeID:        request.RequestID,
+				},
+			}, nil
+		}
+		return nil, fmt.Errorf("failed to check Policy status: %w", err)
+	}
+
+	switch resp.LifecycleState {
+	case identity.PolicyLifecycleStateActive:
+		properties := buildPolicyProperties(resp.Policy)
+		propertiesBytes, err := json.Marshal(properties)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal properties: %w", err)
+		}
+		return &resource.StatusResult{
+			ProgressResult: &resource.ProgressResult{
+				Operation:          resource.OperationCheckStatus,
+				OperationStatus:    resource.OperationStatusSuccess,
+				NativeID:           *resp.Id,
+				ResourceProperties: json.RawMessage(propertiesBytes),
+			},
+		}, nil
+
+	case identity.PolicyLifecycleStateDeleted:
+		return &resource.StatusResult{
+			ProgressResult: &resource.ProgressResult{
+				Operation:       resource.OperationCheckStatus,
+				OperationStatus: resource.OperationStatusSuccess,
+				NativeID:        *resp.Id,
+			},
+		}, nil
+
+	case identity.PolicyLifecycleStateInactive:
+		return &resource.StatusResult{
+			ProgressResult: &resource.ProgressResult{
+				Operation:       resource.OperationCheckStatus,
+				OperationStatus: resource.OperationStatusFailure,
+				NativeID:        *resp.Id,
+				StatusMessage:   "Policy is in INACTIVE state",
+			},
+		}, nil
+
+	default: // CREATING, DELETING
+		return &resource.StatusResult{
+			ProgressResult: &resource.ProgressResult{
+				Operation:       resource.OperationCheckStatus,
+				OperationStatus: resource.OperationStatusInProgress,
+				RequestID:       request.RequestID,
+				StatusMessage:   fmt.Sprintf("Policy lifecycle state: %s", resp.LifecycleState),
+			},
+		}, nil
+	}
 }
 
 func (p *PolicyProvisioner) List(ctx context.Context, request *resource.ListRequest) (*resource.ListResult, error) {

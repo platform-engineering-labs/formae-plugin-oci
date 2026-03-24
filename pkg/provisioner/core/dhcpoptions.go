@@ -301,23 +301,77 @@ func (p *DhcpOptionsProvisioner) Delete(ctx context.Context, request *resource.D
 		return nil, fmt.Errorf("failed to delete DhcpOptions: %w", err)
 	}
 
+	// DhcpOptions deletion is async — return in-progress, poll lifecycle in Status()
 	return &resource.DeleteResult{
 		ProgressResult: &resource.ProgressResult{
 			Operation:       resource.OperationDelete,
-			OperationStatus: resource.OperationStatusSuccess,
+			OperationStatus: resource.OperationStatusInProgress,
 			NativeID:        request.NativeID,
+			RequestID:       request.NativeID,
 		},
 	}, nil
 }
 
 func (p *DhcpOptionsProvisioner) Status(ctx context.Context, request *resource.StatusRequest) (*resource.StatusResult, error) {
-	return &resource.StatusResult{
-		ProgressResult: &resource.ProgressResult{
-			Operation:       resource.OperationCheckStatus,
-			OperationStatus: resource.OperationStatusSuccess,
-			RequestID:       request.RequestID,
-		},
-	}, nil
+	svc, err := p.clients.GetVirtualNetworkClient()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
+	}
+
+	getReq := core.GetDhcpOptionsRequest{
+		DhcpId: common.String(request.RequestID),
+	}
+
+	resp, err := svc.GetDhcpOptions(ctx, getReq)
+	if err != nil {
+		if serviceErr, ok := common.IsServiceError(err); ok && serviceErr.GetHTTPStatusCode() == 404 {
+			// DhcpOptions gone — if we were deleting, that's success
+			return &resource.StatusResult{
+				ProgressResult: &resource.ProgressResult{
+					Operation:       resource.OperationCheckStatus,
+					OperationStatus: resource.OperationStatusSuccess,
+					NativeID:        request.RequestID,
+				},
+			}, nil
+		}
+		return nil, fmt.Errorf("failed to check DhcpOptions status: %w", err)
+	}
+
+	switch resp.LifecycleState {
+	case core.DhcpOptionsLifecycleStateAvailable:
+		properties := buildDhcpOptionsProperties(resp.DhcpOptions)
+		propertiesBytes, err := json.Marshal(properties)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal properties: %w", err)
+		}
+		return &resource.StatusResult{
+			ProgressResult: &resource.ProgressResult{
+				Operation:          resource.OperationCheckStatus,
+				OperationStatus:    resource.OperationStatusSuccess,
+				NativeID:           *resp.Id,
+				ResourceProperties: json.RawMessage(propertiesBytes),
+			},
+		}, nil
+
+	case core.DhcpOptionsLifecycleStateTerminated:
+		return &resource.StatusResult{
+			ProgressResult: &resource.ProgressResult{
+				Operation:       resource.OperationCheckStatus,
+				OperationStatus: resource.OperationStatusSuccess,
+				NativeID:        *resp.Id,
+			},
+		}, nil
+
+	default: // PROVISIONING, TERMINATING
+		return &resource.StatusResult{
+			ProgressResult: &resource.ProgressResult{
+				Operation:       resource.OperationCheckStatus,
+				OperationStatus: resource.OperationStatusInProgress,
+				RequestID:       request.RequestID,
+				StatusMessage:   fmt.Sprintf("DhcpOptions lifecycle state: %s", resp.LifecycleState),
+			},
+		}, nil
+	}
 }
 
 func (p *DhcpOptionsProvisioner) List(ctx context.Context, request *resource.ListRequest) (*resource.ListResult, error) {

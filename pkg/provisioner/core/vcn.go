@@ -171,24 +171,110 @@ func (p *VCNProvisioner) Delete(ctx context.Context, request *resource.DeleteReq
 		return nil, fmt.Errorf("failed to delete VCN: %w", err)
 	}
 
+	// VCN deletion is async — return in-progress, poll lifecycle in Status()
 	return &resource.DeleteResult{
 		ProgressResult: &resource.ProgressResult{
 			Operation:       resource.OperationDelete,
-			OperationStatus: resource.OperationStatusSuccess,
+			OperationStatus: resource.OperationStatusInProgress,
 			NativeID:        request.NativeID,
+			RequestID:       request.NativeID,
 		},
 	}, nil
 }
 
 func (p *VCNProvisioner) Status(ctx context.Context, request *resource.StatusRequest) (*resource.StatusResult, error) {
-	// VCN operations are synchronous, no status check needed
-	return &resource.StatusResult{
-		ProgressResult: &resource.ProgressResult{
-			Operation:       resource.OperationCheckStatus,
-			OperationStatus: resource.OperationStatusSuccess,
-			RequestID:       request.RequestID,
-		},
-	}, nil
+	client, err := p.clients.GetVirtualNetworkClient()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
+	}
+
+	getReq := core.GetVcnRequest{
+		VcnId: common.String(request.RequestID),
+	}
+
+	resp, err := client.GetVcn(ctx, getReq)
+	if err != nil {
+		if serviceErr, ok := common.IsServiceError(err); ok && serviceErr.GetHTTPStatusCode() == 404 {
+			// VCN gone — if we were deleting, that's success
+			return &resource.StatusResult{
+				ProgressResult: &resource.ProgressResult{
+					Operation:       resource.OperationCheckStatus,
+					OperationStatus: resource.OperationStatusSuccess,
+					NativeID:        request.RequestID,
+				},
+			}, nil
+		}
+		return nil, fmt.Errorf("failed to check VCN status: %w", err)
+	}
+
+	switch resp.LifecycleState {
+	case core.VcnLifecycleStateAvailable:
+		// Build properties map
+		props := map[string]any{
+			"CompartmentId": *resp.CompartmentId,
+			"Id":            *resp.Id,
+		}
+
+		if resp.CidrBlock != nil {
+			props["CidrBlock"] = *resp.CidrBlock
+		}
+		if resp.CidrBlocks != nil {
+			props["CidrBlocks"] = resp.CidrBlocks
+		}
+		if resp.DisplayName != nil {
+			props["DisplayName"] = *resp.DisplayName
+		}
+		if resp.DnsLabel != nil {
+			props["DnsLabel"] = *resp.DnsLabel
+		}
+		if resp.DefaultDhcpOptionsId != nil {
+			props["DefaultDhcpOptionsId"] = *resp.DefaultDhcpOptionsId
+		}
+		if resp.DefaultRouteTableId != nil {
+			props["DefaultRouteTableId"] = *resp.DefaultRouteTableId
+		}
+		if resp.DefaultSecurityListId != nil {
+			props["DefaultSecurityListId"] = *resp.DefaultSecurityListId
+		}
+		if resp.FreeformTags != nil {
+			props["FreeformTags"] = util.FreeformTagsToList(resp.FreeformTags)
+		}
+		if resp.DefinedTags != nil {
+			props["DefinedTags"] = util.DefinedTagsToList(resp.DefinedTags)
+		}
+
+		propertiesBytes, err := json.Marshal(props)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal properties: %w", err)
+		}
+		return &resource.StatusResult{
+			ProgressResult: &resource.ProgressResult{
+				Operation:          resource.OperationCheckStatus,
+				OperationStatus:    resource.OperationStatusSuccess,
+				NativeID:           *resp.Id,
+				ResourceProperties: json.RawMessage(propertiesBytes),
+			},
+		}, nil
+
+	case core.VcnLifecycleStateTerminated:
+		return &resource.StatusResult{
+			ProgressResult: &resource.ProgressResult{
+				Operation:       resource.OperationCheckStatus,
+				OperationStatus: resource.OperationStatusSuccess,
+				NativeID:        *resp.Id,
+			},
+		}, nil
+
+	default: // PROVISIONING, TERMINATING, UPDATING
+		return &resource.StatusResult{
+			ProgressResult: &resource.ProgressResult{
+				Operation:       resource.OperationCheckStatus,
+				OperationStatus: resource.OperationStatusInProgress,
+				RequestID:       request.RequestID,
+				StatusMessage:   fmt.Sprintf("VCN lifecycle state: %s", resp.LifecycleState),
+			},
+		}, nil
+	}
 }
 
 func (p *VCNProvisioner) Read(ctx context.Context, request *resource.ReadRequest) (*resource.ReadResult, error) {

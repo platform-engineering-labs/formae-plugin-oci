@@ -163,23 +163,93 @@ func (p *InternetGatewayProvisioner) Delete(ctx context.Context, request *resour
 		return nil, fmt.Errorf("failed to delete InternetGateway: %w", err)
 	}
 
+	// InternetGateway deletion is async — return in-progress, poll lifecycle in Status()
 	return &resource.DeleteResult{
 		ProgressResult: &resource.ProgressResult{
 			Operation:       resource.OperationDelete,
-			OperationStatus: resource.OperationStatusSuccess,
+			OperationStatus: resource.OperationStatusInProgress,
 			NativeID:        request.NativeID,
+			RequestID:       request.NativeID,
 		},
 	}, nil
 }
 
 func (p *InternetGatewayProvisioner) Status(ctx context.Context, request *resource.StatusRequest) (*resource.StatusResult, error) {
-	return &resource.StatusResult{
-		ProgressResult: &resource.ProgressResult{
-			Operation:       resource.OperationCheckStatus,
-			OperationStatus: resource.OperationStatusSuccess,
-			RequestID:       request.RequestID,
-		},
-	}, nil
+	client, err := p.clients.GetVirtualNetworkClient()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
+	}
+
+	getReq := core.GetInternetGatewayRequest{
+		IgId: common.String(request.RequestID),
+	}
+
+	resp, err := client.GetInternetGateway(ctx, getReq)
+	if err != nil {
+		if serviceErr, ok := common.IsServiceError(err); ok && serviceErr.GetHTTPStatusCode() == 404 {
+			// InternetGateway gone — if we were deleting, that's success
+			return &resource.StatusResult{
+				ProgressResult: &resource.ProgressResult{
+					Operation:       resource.OperationCheckStatus,
+					OperationStatus: resource.OperationStatusSuccess,
+					NativeID:        request.RequestID,
+				},
+			}, nil
+		}
+		return nil, fmt.Errorf("failed to check InternetGateway status: %w", err)
+	}
+
+	switch resp.LifecycleState {
+	case core.InternetGatewayLifecycleStateAvailable:
+		props := map[string]any{
+			"CompartmentId": *resp.CompartmentId,
+			"VcnId":         *resp.VcnId,
+			"Id":            *resp.Id,
+			"IsEnabled":     *resp.IsEnabled,
+		}
+
+		if resp.DisplayName != nil {
+			props["DisplayName"] = *resp.DisplayName
+		}
+		if resp.FreeformTags != nil {
+			props["FreeformTags"] = util.FreeformTagsToList(resp.FreeformTags)
+		}
+		if resp.DefinedTags != nil {
+			props["DefinedTags"] = util.DefinedTagsToList(resp.DefinedTags)
+		}
+
+		propertiesBytes, err := json.Marshal(props)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal properties: %w", err)
+		}
+		return &resource.StatusResult{
+			ProgressResult: &resource.ProgressResult{
+				Operation:          resource.OperationCheckStatus,
+				OperationStatus:    resource.OperationStatusSuccess,
+				NativeID:           *resp.Id,
+				ResourceProperties: json.RawMessage(propertiesBytes),
+			},
+		}, nil
+
+	case core.InternetGatewayLifecycleStateTerminated:
+		return &resource.StatusResult{
+			ProgressResult: &resource.ProgressResult{
+				Operation:       resource.OperationCheckStatus,
+				OperationStatus: resource.OperationStatusSuccess,
+				NativeID:        *resp.Id,
+			},
+		}, nil
+
+	default: // PROVISIONING, TERMINATING
+		return &resource.StatusResult{
+			ProgressResult: &resource.ProgressResult{
+				Operation:       resource.OperationCheckStatus,
+				OperationStatus: resource.OperationStatusInProgress,
+				RequestID:       request.RequestID,
+				StatusMessage:   fmt.Sprintf("InternetGateway lifecycle state: %s", resp.LifecycleState),
+			},
+		}, nil
+	}
 }
 
 func (p *InternetGatewayProvisioner) Read(ctx context.Context, request *resource.ReadRequest) (*resource.ReadResult, error) {
