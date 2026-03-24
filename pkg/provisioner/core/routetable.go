@@ -270,6 +270,14 @@ func (p *RouteTableProvisioner) Read(ctx context.Context, request *resource.Read
 		return nil, fmt.Errorf("failed to read RouteTable: %w", err)
 	}
 
+	// Treat TERMINATING/TERMINATED as not found — the resource is being deleted
+	if resp.LifecycleState == core.RouteTableLifecycleStateTerminating || resp.LifecycleState == core.RouteTableLifecycleStateTerminated {
+		return &resource.ReadResult{
+			ResourceType: "OCI::Core::RouteTable",
+			ErrorCode:    resource.OperationErrorCodeNotFound,
+		}, nil
+	}
+
 	props := map[string]any{
 		"CompartmentId": *resp.CompartmentId,
 		"VcnId":         *resp.VcnId,

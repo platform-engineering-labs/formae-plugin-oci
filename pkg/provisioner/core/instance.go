@@ -125,8 +125,8 @@ func (p *InstanceProvisioner) Read(ctx context.Context, request *resource.ReadRe
 		return nil, fmt.Errorf("failed to read Instance: %w", err)
 	}
 
-	// Treat terminated instances as not found
-	if resp.LifecycleState == core.InstanceLifecycleStateTerminated {
+	// Treat TERMINATING/TERMINATED as not found — the resource is being deleted
+	if resp.LifecycleState == core.InstanceLifecycleStateTerminating || resp.LifecycleState == core.InstanceLifecycleStateTerminated {
 		return &resource.ReadResult{
 			ResourceType: "OCI::Core::Instance",
 			ErrorCode:    resource.OperationErrorCodeNotFound,

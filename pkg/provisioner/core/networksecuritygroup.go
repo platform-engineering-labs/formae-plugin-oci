@@ -200,6 +200,14 @@ func (p *NetworkSecurityGroupProvisioner) Read(ctx context.Context, request *res
 		return nil, fmt.Errorf("failed to read NetworkSecurityGroup: %w", err)
 	}
 
+	// Treat TERMINATING/TERMINATED as not found — the resource is being deleted
+	if resp.LifecycleState == core.NetworkSecurityGroupLifecycleStateTerminating || resp.LifecycleState == core.NetworkSecurityGroupLifecycleStateTerminated {
+		return &resource.ReadResult{
+			ResourceType: "OCI::Core::NetworkSecurityGroup",
+			ErrorCode:    resource.OperationErrorCodeNotFound,
+		}, nil
+	}
+
 	props := map[string]any{
 		"CompartmentId": *resp.CompartmentId,
 		"VcnId":         *resp.VcnId,

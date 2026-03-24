@@ -234,6 +234,14 @@ func (p *SubnetProvisioner) Read(ctx context.Context, request *resource.ReadRequ
 		return nil, fmt.Errorf("failed to read Subnet: %w", err)
 	}
 
+	// Treat TERMINATING/TERMINATED as not found — the resource is being deleted
+	if resp.LifecycleState == core.SubnetLifecycleStateTerminating || resp.LifecycleState == core.SubnetLifecycleStateTerminated {
+		return &resource.ReadResult{
+			ResourceType: "OCI::Core::Subnet",
+			ErrorCode:    resource.OperationErrorCodeNotFound,
+		}, nil
+	}
+
 	props := map[string]any{
 		"CompartmentId": *resp.CompartmentId,
 		"VcnId":         *resp.VcnId,

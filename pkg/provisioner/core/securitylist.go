@@ -598,6 +598,14 @@ func (p *SecurityListProvisioner) Read(ctx context.Context, request *resource.Re
 		return nil, fmt.Errorf("failed to read SecurityList: %w", err)
 	}
 
+	// Treat TERMINATING/TERMINATED as not found — the resource is being deleted
+	if resp.LifecycleState == core.SecurityListLifecycleStateTerminating || resp.LifecycleState == core.SecurityListLifecycleStateTerminated {
+		return &resource.ReadResult{
+			ResourceType: "OCI::Core::SecurityList",
+			ErrorCode:    resource.OperationErrorCodeNotFound,
+		}, nil
+	}
+
 	props := map[string]any{
 		"CompartmentId":        *resp.CompartmentId,
 		"VcnId":                *resp.VcnId,

@@ -203,6 +203,14 @@ func (p *InternetGatewayProvisioner) Read(ctx context.Context, request *resource
 		return nil, fmt.Errorf("failed to read InternetGateway: %w", err)
 	}
 
+	// Treat TERMINATING/TERMINATED as not found — the resource is being deleted
+	if resp.LifecycleState == core.InternetGatewayLifecycleStateTerminating || resp.LifecycleState == core.InternetGatewayLifecycleStateTerminated {
+		return &resource.ReadResult{
+			ResourceType: "OCI::Core::InternetGateway",
+			ErrorCode:    resource.OperationErrorCodeNotFound,
+		}, nil
+	}
+
 	props := map[string]any{
 		"CompartmentId": *resp.CompartmentId,
 		"VcnId":         *resp.VcnId,

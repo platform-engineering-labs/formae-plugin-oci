@@ -113,6 +113,14 @@ func (p *VolumeProvisioner) Read(ctx context.Context, request *resource.ReadRequ
 		return nil, fmt.Errorf("failed to read Volume: %w", err)
 	}
 
+	// Treat TERMINATING/TERMINATED as not found — the resource is being deleted
+	if resp.LifecycleState == core.VolumeLifecycleStateTerminating || resp.LifecycleState == core.VolumeLifecycleStateTerminated {
+		return &resource.ReadResult{
+			ResourceType: "OCI::Core::Volume",
+			ErrorCode:    resource.OperationErrorCodeNotFound,
+		}, nil
+	}
+
 	properties := buildVolumeProperties(resp.Volume)
 
 	propBytes, err := json.Marshal(properties)

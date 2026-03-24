@@ -256,6 +256,14 @@ func (p *ServiceGatewayProvisioner) Read(ctx context.Context, request *resource.
 		return nil, fmt.Errorf("failed to read ServiceGateway: %w", err)
 	}
 
+	// Treat TERMINATING/TERMINATED as not found — the resource is being deleted
+	if resp.LifecycleState == core.ServiceGatewayLifecycleStateTerminating || resp.LifecycleState == core.ServiceGatewayLifecycleStateTerminated {
+		return &resource.ReadResult{
+			ResourceType: "OCI::Core::ServiceGateway",
+			ErrorCode:    resource.OperationErrorCodeNotFound,
+		}, nil
+	}
+
 	props := map[string]any{
 		"CompartmentId": *resp.CompartmentId,
 		"VcnId":         *resp.VcnId,

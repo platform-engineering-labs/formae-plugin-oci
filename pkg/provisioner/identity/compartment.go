@@ -135,6 +135,14 @@ func (p *CompartmentProvisioner) Read(ctx context.Context, request *resource.Rea
 		return nil, fmt.Errorf("failed to read Compartment: %w", err)
 	}
 
+	// Treat DELETING/DELETED as not found — the resource is being deleted
+	if resp.LifecycleState == identity.CompartmentLifecycleStateDeleting || resp.LifecycleState == identity.CompartmentLifecycleStateDeleted {
+		return &resource.ReadResult{
+			ResourceType: "OCI::Identity::Compartment",
+			ErrorCode:    resource.OperationErrorCodeNotFound,
+		}, nil
+	}
+
 	properties := map[string]any{
 		"Id": *resp.Id,
 	}
