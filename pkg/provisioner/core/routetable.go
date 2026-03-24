@@ -230,112 +230,23 @@ func (p *RouteTableProvisioner) Delete(ctx context.Context, request *resource.De
 		return nil, fmt.Errorf("failed to delete RouteTable: %w", err)
 	}
 
-	// RouteTable deletion is async — return in-progress, poll lifecycle in Status()
 	return &resource.DeleteResult{
 		ProgressResult: &resource.ProgressResult{
 			Operation:       resource.OperationDelete,
-			OperationStatus: resource.OperationStatusInProgress,
+			OperationStatus: resource.OperationStatusSuccess,
 			NativeID:        request.NativeID,
-			RequestID:       request.NativeID,
 		},
 	}, nil
 }
 
 func (p *RouteTableProvisioner) Status(ctx context.Context, request *resource.StatusRequest) (*resource.StatusResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
-	}
-
-	getReq := core.GetRouteTableRequest{
-		RtId: common.String(request.RequestID),
-	}
-
-	resp, err := client.GetRouteTable(ctx, getReq)
-	if err != nil {
-		if serviceErr, ok := common.IsServiceError(err); ok && serviceErr.GetHTTPStatusCode() == 404 {
-			// RouteTable gone — if we were deleting, that's success
-			return &resource.StatusResult{
-				ProgressResult: &resource.ProgressResult{
-					Operation:       resource.OperationCheckStatus,
-					OperationStatus: resource.OperationStatusSuccess,
-					NativeID:        request.RequestID,
-				},
-			}, nil
-		}
-		return nil, fmt.Errorf("failed to check RouteTable status: %w", err)
-	}
-
-	switch resp.LifecycleState {
-	case core.RouteTableLifecycleStateAvailable:
-		props := map[string]any{
-			"CompartmentId": *resp.CompartmentId,
-			"VcnId":         *resp.VcnId,
-			"Id":            *resp.Id,
-		}
-
-		if resp.DisplayName != nil {
-			props["DisplayName"] = *resp.DisplayName
-		}
-
-		// Always include RouteRules, even if empty
-		rules := make([]map[string]any, len(resp.RouteRules))
-		for i, rule := range resp.RouteRules {
-			ruleMap := map[string]any{
-				"networkEntityId": *rule.NetworkEntityId,
-			}
-			if rule.Destination != nil {
-				ruleMap["destination"] = *rule.Destination
-			}
-			if rule.DestinationType != "" {
-				ruleMap["destinationType"] = string(rule.DestinationType)
-			}
-			if rule.Description != nil {
-				ruleMap["description"] = *rule.Description
-			}
-			rules[i] = ruleMap
-		}
-		props["RouteRules"] = rules
-
-		if resp.FreeformTags != nil {
-			props["FreeformTags"] = util.FreeformTagsToList(resp.FreeformTags)
-		}
-		if resp.DefinedTags != nil {
-			props["DefinedTags"] = util.DefinedTagsToList(resp.DefinedTags)
-		}
-
-		propertiesBytes, err := json.Marshal(props)
-		if err != nil {
-			return nil, fmt.Errorf("failed to marshal properties: %w", err)
-		}
-		return &resource.StatusResult{
-			ProgressResult: &resource.ProgressResult{
-				Operation:          resource.OperationCheckStatus,
-				OperationStatus:    resource.OperationStatusSuccess,
-				NativeID:           *resp.Id,
-				ResourceProperties: json.RawMessage(propertiesBytes),
-			},
-		}, nil
-
-	case core.RouteTableLifecycleStateTerminated:
-		return &resource.StatusResult{
-			ProgressResult: &resource.ProgressResult{
-				Operation:       resource.OperationCheckStatus,
-				OperationStatus: resource.OperationStatusSuccess,
-				NativeID:        *resp.Id,
-			},
-		}, nil
-
-	default: // PROVISIONING, TERMINATING
-		return &resource.StatusResult{
-			ProgressResult: &resource.ProgressResult{
-				Operation:       resource.OperationCheckStatus,
-				OperationStatus: resource.OperationStatusInProgress,
-				RequestID:       request.RequestID,
-				StatusMessage:   fmt.Sprintf("RouteTable lifecycle state: %s", resp.LifecycleState),
-			},
-		}, nil
-	}
+	return &resource.StatusResult{
+		ProgressResult: &resource.ProgressResult{
+			Operation:       resource.OperationCheckStatus,
+			OperationStatus: resource.OperationStatusSuccess,
+			RequestID:       request.RequestID,
+		},
+	}, nil
 }
 
 func (p *RouteTableProvisioner) Read(ctx context.Context, request *resource.ReadRequest) (*resource.ReadResult, error) {

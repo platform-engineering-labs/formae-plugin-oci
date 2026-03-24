@@ -216,101 +216,23 @@ func (p *ServiceGatewayProvisioner) Delete(ctx context.Context, request *resourc
 		return nil, fmt.Errorf("failed to delete ServiceGateway: %w", err)
 	}
 
-	// ServiceGateway deletion is async — return in-progress, poll lifecycle in Status()
 	return &resource.DeleteResult{
 		ProgressResult: &resource.ProgressResult{
 			Operation:       resource.OperationDelete,
-			OperationStatus: resource.OperationStatusInProgress,
+			OperationStatus: resource.OperationStatusSuccess,
 			NativeID:        request.NativeID,
-			RequestID:       request.NativeID,
 		},
 	}, nil
 }
 
 func (p *ServiceGatewayProvisioner) Status(ctx context.Context, request *resource.StatusRequest) (*resource.StatusResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
-	}
-
-	getReq := core.GetServiceGatewayRequest{
-		ServiceGatewayId: common.String(request.RequestID),
-	}
-
-	resp, err := client.GetServiceGateway(ctx, getReq)
-	if err != nil {
-		if serviceErr, ok := common.IsServiceError(err); ok && serviceErr.GetHTTPStatusCode() == 404 {
-			// ServiceGateway gone — if we were deleting, that's success
-			return &resource.StatusResult{
-				ProgressResult: &resource.ProgressResult{
-					Operation:       resource.OperationCheckStatus,
-					OperationStatus: resource.OperationStatusSuccess,
-					NativeID:        request.RequestID,
-				},
-			}, nil
-		}
-		return nil, fmt.Errorf("failed to check ServiceGateway status: %w", err)
-	}
-
-	switch resp.LifecycleState {
-	case core.ServiceGatewayLifecycleStateAvailable:
-		props := map[string]any{
-			"CompartmentId": *resp.CompartmentId,
-			"VcnId":         *resp.VcnId,
-			"Id":            *resp.Id,
-		}
-
-		// Convert services to array of maps
-		servicesArray := make([]map[string]string, 0, len(resp.Services))
-		for _, svc := range resp.Services {
-			servicesArray = append(servicesArray, map[string]string{
-				"serviceId": *svc.ServiceId,
-			})
-		}
-		props["Services"] = servicesArray
-
-		if resp.DisplayName != nil {
-			props["DisplayName"] = *resp.DisplayName
-		}
-		if resp.FreeformTags != nil {
-			props["FreeformTags"] = util.FreeformTagsToList(resp.FreeformTags)
-		}
-		if resp.DefinedTags != nil {
-			props["DefinedTags"] = util.DefinedTagsToList(resp.DefinedTags)
-		}
-
-		propertiesBytes, err := json.Marshal(props)
-		if err != nil {
-			return nil, fmt.Errorf("failed to marshal properties: %w", err)
-		}
-		return &resource.StatusResult{
-			ProgressResult: &resource.ProgressResult{
-				Operation:          resource.OperationCheckStatus,
-				OperationStatus:    resource.OperationStatusSuccess,
-				NativeID:           *resp.Id,
-				ResourceProperties: json.RawMessage(propertiesBytes),
-			},
-		}, nil
-
-	case core.ServiceGatewayLifecycleStateTerminated:
-		return &resource.StatusResult{
-			ProgressResult: &resource.ProgressResult{
-				Operation:       resource.OperationCheckStatus,
-				OperationStatus: resource.OperationStatusSuccess,
-				NativeID:        *resp.Id,
-			},
-		}, nil
-
-	default: // PROVISIONING, TERMINATING
-		return &resource.StatusResult{
-			ProgressResult: &resource.ProgressResult{
-				Operation:       resource.OperationCheckStatus,
-				OperationStatus: resource.OperationStatusInProgress,
-				RequestID:       request.RequestID,
-				StatusMessage:   fmt.Sprintf("ServiceGateway lifecycle state: %s", resp.LifecycleState),
-			},
-		}, nil
-	}
+	return &resource.StatusResult{
+		ProgressResult: &resource.ProgressResult{
+			Operation:       resource.OperationCheckStatus,
+			OperationStatus: resource.OperationStatusSuccess,
+			RequestID:       request.RequestID,
+		},
+	}, nil
 }
 
 func (p *ServiceGatewayProvisioner) Read(ctx context.Context, request *resource.ReadRequest) (*resource.ReadResult, error) {

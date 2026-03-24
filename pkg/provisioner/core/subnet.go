@@ -194,123 +194,23 @@ func (p *SubnetProvisioner) Delete(ctx context.Context, request *resource.Delete
 		return nil, fmt.Errorf("failed to delete Subnet: %w", err)
 	}
 
-	// Subnet deletion is async — return in-progress, poll lifecycle in Status()
 	return &resource.DeleteResult{
 		ProgressResult: &resource.ProgressResult{
 			Operation:       resource.OperationDelete,
-			OperationStatus: resource.OperationStatusInProgress,
+			OperationStatus: resource.OperationStatusSuccess,
 			NativeID:        request.NativeID,
-			RequestID:       request.NativeID,
 		},
 	}, nil
 }
 
 func (p *SubnetProvisioner) Status(ctx context.Context, request *resource.StatusRequest) (*resource.StatusResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
-	}
-
-	getReq := core.GetSubnetRequest{
-		SubnetId: common.String(request.RequestID),
-	}
-
-	resp, err := client.GetSubnet(ctx, getReq)
-	if err != nil {
-		if serviceErr, ok := common.IsServiceError(err); ok && serviceErr.GetHTTPStatusCode() == 404 {
-			// Subnet gone — if we were deleting, that's success
-			return &resource.StatusResult{
-				ProgressResult: &resource.ProgressResult{
-					Operation:       resource.OperationCheckStatus,
-					OperationStatus: resource.OperationStatusSuccess,
-					NativeID:        request.RequestID,
-				},
-			}, nil
-		}
-		return nil, fmt.Errorf("failed to check Subnet status: %w", err)
-	}
-
-	switch resp.LifecycleState {
-	case core.SubnetLifecycleStateAvailable:
-		props := map[string]any{
-			"CompartmentId": *resp.CompartmentId,
-			"VcnId":         *resp.VcnId,
-			"Id":            *resp.Id,
-			"CidrBlock":     *resp.CidrBlock,
-		}
-
-		if resp.AvailabilityDomain != nil {
-			props["AvailabilityDomain"] = *resp.AvailabilityDomain
-		}
-		if resp.DisplayName != nil {
-			props["DisplayName"] = *resp.DisplayName
-		}
-		if resp.DnsLabel != nil {
-			props["DnsLabel"] = *resp.DnsLabel
-		}
-		if resp.ProhibitPublicIpOnVnic != nil {
-			props["ProhibitPublicIpOnVnic"] = *resp.ProhibitPublicIpOnVnic
-		}
-		if resp.ProhibitInternetIngress != nil {
-			props["ProhibitInternetIngress"] = *resp.ProhibitInternetIngress
-		}
-		if resp.RouteTableId != nil {
-			props["RouteTableId"] = *resp.RouteTableId
-		}
-		if resp.SecurityListIds != nil {
-			props["SecurityListIds"] = resp.SecurityListIds
-		}
-		if resp.VirtualRouterIp != nil {
-			props["VirtualRouterIp"] = *resp.VirtualRouterIp
-		}
-		if resp.VirtualRouterMac != nil {
-			props["VirtualRouterMac"] = *resp.VirtualRouterMac
-		}
-		if resp.Ipv6CidrBlock != nil {
-			props["Ipv6CidrBlock"] = *resp.Ipv6CidrBlock
-		}
-		if resp.Ipv6CidrBlocks != nil {
-			props["Ipv6CidrBlocks"] = resp.Ipv6CidrBlocks
-		}
-		if resp.FreeformTags != nil {
-			props["FreeformTags"] = util.FreeformTagsToList(resp.FreeformTags)
-		}
-		if resp.DefinedTags != nil {
-			props["DefinedTags"] = util.DefinedTagsToList(resp.DefinedTags)
-		}
-
-		propertiesBytes, err := json.Marshal(props)
-		if err != nil {
-			return nil, fmt.Errorf("failed to marshal properties: %w", err)
-		}
-		return &resource.StatusResult{
-			ProgressResult: &resource.ProgressResult{
-				Operation:          resource.OperationCheckStatus,
-				OperationStatus:    resource.OperationStatusSuccess,
-				NativeID:           *resp.Id,
-				ResourceProperties: json.RawMessage(propertiesBytes),
-			},
-		}, nil
-
-	case core.SubnetLifecycleStateTerminated:
-		return &resource.StatusResult{
-			ProgressResult: &resource.ProgressResult{
-				Operation:       resource.OperationCheckStatus,
-				OperationStatus: resource.OperationStatusSuccess,
-				NativeID:        *resp.Id,
-			},
-		}, nil
-
-	default: // PROVISIONING, TERMINATING, UPDATING
-		return &resource.StatusResult{
-			ProgressResult: &resource.ProgressResult{
-				Operation:       resource.OperationCheckStatus,
-				OperationStatus: resource.OperationStatusInProgress,
-				RequestID:       request.RequestID,
-				StatusMessage:   fmt.Sprintf("Subnet lifecycle state: %s", resp.LifecycleState),
-			},
-		}, nil
-	}
+	return &resource.StatusResult{
+		ProgressResult: &resource.ProgressResult{
+			Operation:       resource.OperationCheckStatus,
+			OperationStatus: resource.OperationStatusSuccess,
+			RequestID:       request.RequestID,
+		},
+	}, nil
 }
 
 func (p *SubnetProvisioner) Read(ctx context.Context, request *resource.ReadRequest) (*resource.ReadResult, error) {

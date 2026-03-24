@@ -255,110 +255,24 @@ func (p *CompartmentProvisioner) Delete(ctx context.Context, request *resource.D
 		return nil, fmt.Errorf("failed to delete Compartment: %w", err)
 	}
 
-	// Compartment deletion is async — return in-progress, poll lifecycle in Status()
 	return &resource.DeleteResult{
 		ProgressResult: &resource.ProgressResult{
 			Operation:       resource.OperationDelete,
-			OperationStatus: resource.OperationStatusInProgress,
+			OperationStatus: resource.OperationStatusSuccess,
 			NativeID:        request.NativeID,
-			RequestID:       request.NativeID,
 		},
 	}, nil
 }
 
 func (p *CompartmentProvisioner) Status(ctx context.Context, request *resource.StatusRequest) (*resource.StatusResult, error) {
-	client, err := p.clients.GetIdentityClient()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get Identity client: %w", err)
-	}
-
-	getReq := identity.GetCompartmentRequest{
-		CompartmentId: common.String(request.RequestID),
-	}
-
-	resp, err := client.GetCompartment(ctx, getReq)
-	if err != nil {
-		if serviceErr, ok := common.IsServiceError(err); ok && serviceErr.GetHTTPStatusCode() == 404 {
-			// Compartment gone — if we were deleting, that's success
-			return &resource.StatusResult{
-				ProgressResult: &resource.ProgressResult{
-					Operation:       resource.OperationCheckStatus,
-					OperationStatus: resource.OperationStatusSuccess,
-					NativeID:        request.RequestID,
-				},
-			}, nil
-		}
-		return nil, fmt.Errorf("failed to check Compartment status: %w", err)
-	}
-
-	switch resp.LifecycleState {
-	case identity.CompartmentLifecycleStateActive:
-		properties := map[string]any{
-			"Id": *resp.Id,
-		}
-
-		// CompartmentId for root compartment may be nil, use Id as fallback
-		if resp.CompartmentId != nil {
-			properties["CompartmentId"] = *resp.CompartmentId
-		} else {
-			properties["CompartmentId"] = *resp.Id
-		}
-
-		if resp.Name != nil {
-			properties["Name"] = *resp.Name
-		}
-		if resp.Description != nil {
-			properties["Description"] = *resp.Description
-		}
-		if resp.FreeformTags != nil {
-			properties["FreeformTags"] = util.FreeformTagsToList(resp.FreeformTags)
-		}
-		if resp.DefinedTags != nil {
-			properties["DefinedTags"] = util.DefinedTagsToList(resp.DefinedTags)
-		}
-
-		propertiesBytes, err := json.Marshal(properties)
-		if err != nil {
-			return nil, fmt.Errorf("failed to marshal properties: %w", err)
-		}
-		return &resource.StatusResult{
-			ProgressResult: &resource.ProgressResult{
-				Operation:          resource.OperationCheckStatus,
-				OperationStatus:    resource.OperationStatusSuccess,
-				NativeID:           *resp.Id,
-				ResourceProperties: json.RawMessage(propertiesBytes),
-			},
-		}, nil
-
-	case identity.CompartmentLifecycleStateDeleted:
-		return &resource.StatusResult{
-			ProgressResult: &resource.ProgressResult{
-				Operation:       resource.OperationCheckStatus,
-				OperationStatus: resource.OperationStatusSuccess,
-				NativeID:        *resp.Id,
-			},
-		}, nil
-
-	case identity.CompartmentLifecycleStateInactive:
-		return &resource.StatusResult{
-			ProgressResult: &resource.ProgressResult{
-				Operation:       resource.OperationCheckStatus,
-				OperationStatus: resource.OperationStatusFailure,
-				NativeID:        *resp.Id,
-				StatusMessage:   "Compartment is in INACTIVE state",
-			},
-		}, nil
-
-	default: // CREATING, DELETING
-		return &resource.StatusResult{
-			ProgressResult: &resource.ProgressResult{
-				Operation:       resource.OperationCheckStatus,
-				OperationStatus: resource.OperationStatusInProgress,
-				RequestID:       request.RequestID,
-				StatusMessage:   fmt.Sprintf("Compartment lifecycle state: %s", resp.LifecycleState),
-			},
-		}, nil
-	}
+	// Compartment operations are synchronous, no status check needed
+	return &resource.StatusResult{
+		ProgressResult: &resource.ProgressResult{
+			Operation:       resource.OperationCheckStatus,
+			OperationStatus: resource.OperationStatusSuccess,
+			RequestID:       request.RequestID,
+		},
+	}, nil
 }
 
 func (p *CompartmentProvisioner) List(ctx context.Context, request *resource.ListRequest) (*resource.ListResult, error) {
