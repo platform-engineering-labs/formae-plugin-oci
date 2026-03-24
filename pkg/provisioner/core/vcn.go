@@ -213,14 +213,6 @@ func (p *VCNProvisioner) Read(ctx context.Context, request *resource.ReadRequest
 		return nil, fmt.Errorf("failed to read VCN: %w", err)
 	}
 
-	// Treat TERMINATING/TERMINATED as not found — the resource is being deleted
-	if resp.LifecycleState == core.VcnLifecycleStateTerminating || resp.LifecycleState == core.VcnLifecycleStateTerminated {
-		return &resource.ReadResult{
-			ResourceType: "OCI::Core::VCN",
-			ErrorCode:    resource.OperationErrorCodeNotFound,
-		}, nil
-	}
-
 	// Build properties map
 	props := map[string]any{
 		"CompartmentId": *resp.CompartmentId,

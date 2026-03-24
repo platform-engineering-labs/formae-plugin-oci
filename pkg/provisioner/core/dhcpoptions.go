@@ -198,14 +198,6 @@ func (p *DhcpOptionsProvisioner) Read(ctx context.Context, request *resource.Rea
 		return nil, fmt.Errorf("failed to read DhcpOptions: %w", err)
 	}
 
-	// Treat TERMINATING/TERMINATED as not found — the resource is being deleted
-	if resp.LifecycleState == core.DhcpOptionsLifecycleStateTerminating || resp.LifecycleState == core.DhcpOptionsLifecycleStateTerminated {
-		return &resource.ReadResult{
-			ResourceType: "OCI::Core::DhcpOptions",
-			ErrorCode:    resource.OperationErrorCodeNotFound,
-		}, nil
-	}
-
 	properties := buildDhcpOptionsProperties(resp.DhcpOptions)
 
 	propBytes, err := json.Marshal(properties)

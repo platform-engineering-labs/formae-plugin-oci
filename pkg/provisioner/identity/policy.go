@@ -106,14 +106,6 @@ func (p *PolicyProvisioner) Read(ctx context.Context, request *resource.ReadRequ
 		return nil, fmt.Errorf("failed to read Policy: %w", err)
 	}
 
-	// Treat DELETING/DELETED as not found — the resource is being deleted
-	if resp.LifecycleState == identity.PolicyLifecycleStateDeleting || resp.LifecycleState == identity.PolicyLifecycleStateDeleted {
-		return &resource.ReadResult{
-			ResourceType: "OCI::Identity::Policy",
-			ErrorCode:    resource.OperationErrorCodeNotFound,
-		}, nil
-	}
-
 	properties := buildPolicyProperties(resp.Policy)
 
 	propBytes, err := json.Marshal(properties)
