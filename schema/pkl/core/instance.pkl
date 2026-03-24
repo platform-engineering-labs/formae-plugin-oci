@@ -61,9 +61,11 @@ class CreateVnicDetails {
     skipSourceDestCheck: Boolean?
 
     /// Freeform tags for the VNIC
+    @oci.FieldHint{hasProviderDefault = true}
     freeformTags: Listing<oci.FreeformTag>?
 
     /// Defined tags for the VNIC
+    @oci.FieldHint{hasProviderDefault = true}
     definedTags: Listing<oci.DefinedTag>?
 }
 
@@ -116,10 +118,10 @@ open class Instance extends formae.Resource {
     @oci.FieldHint
     metadata: Mapping<String, String>?
 
-    @oci.FieldHint
+    @oci.FieldHint{hasProviderDefault = true}
     freeformTags: Listing<oci.FreeformTag>?
 
-    @oci.FieldHint
+    @oci.FieldHint{hasProviderDefault = true}
     definedTags: Listing<oci.DefinedTag>?
 
     local parent = this

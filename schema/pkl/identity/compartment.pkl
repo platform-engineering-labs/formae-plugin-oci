@@ -40,10 +40,10 @@ open class Compartment extends formae.Resource {
     @oci.FieldHint{required = true}
     description: String
 
-    @oci.FieldHint
+    @oci.FieldHint{hasProviderDefault = true}
     freeformTags: Listing<oci.FreeformTag>?
 
-    @oci.FieldHint
+    @oci.FieldHint{hasProviderDefault = true}
     definedTags: Listing<oci.DefinedTag>?
 
     local parent = this

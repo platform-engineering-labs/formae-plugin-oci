@@ -53,10 +53,10 @@ open class Volume extends formae.Resource {
     @oci.FieldHint{createOnly = true}
     kmsKeyId: String?
 
-    @oci.FieldHint
+    @oci.FieldHint{hasProviderDefault = true}
     freeformTags: Listing<oci.FreeformTag>?
 
-    @oci.FieldHint
+    @oci.FieldHint{hasProviderDefault = true}
     definedTags: Listing<oci.DefinedTag>?
 
     local parent = this

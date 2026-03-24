@@ -44,10 +44,10 @@ open class NatGateway extends formae.Resource {
     @oci.FieldHint
     blockTraffic: Boolean?
 
-    @oci.FieldHint
+    @oci.FieldHint{hasProviderDefault = true}
     freeformTags: Listing<oci.FreeformTag>?
 
-    @oci.FieldHint
+    @oci.FieldHint{hasProviderDefault = true}
     definedTags: Listing<oci.DefinedTag>?
 
     local parent = this

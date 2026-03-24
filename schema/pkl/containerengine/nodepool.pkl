@@ -64,9 +64,11 @@ class NodeConfigDetails {
     isPvEncryptionInTransitEnabled: Boolean?
 
     /// FreeformTags for nodes
+    @oci.FieldHint{hasProviderDefault = true}
     freeformTags: Listing<oci.FreeformTag>?
 
     /// DefinedTags for nodes
+    @oci.FieldHint{hasProviderDefault = true}
     definedTags: Listing<oci.DefinedTag>?
 }
 
@@ -145,10 +147,10 @@ open class NodePool extends formae.Resource {
     @oci.FieldHint
     initialNodeLabels: Listing<NodeLabel>?
 
-    @oci.FieldHint
+    @oci.FieldHint{hasProviderDefault = true}
     freeformTags: Listing<oci.FreeformTag>?
 
-    @oci.FieldHint
+    @oci.FieldHint{hasProviderDefault = true}
     definedTags: Listing<oci.DefinedTag>?
 
     local parent = this
