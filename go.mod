@@ -8,7 +8,7 @@ require (
 	github.com/oracle/oci-go-sdk/v65 v65.81.0
 	github.com/platform-engineering-labs/formae/pkg/model v0.1.6
 	github.com/platform-engineering-labs/formae/pkg/plugin v0.1.17
-	github.com/platform-engineering-labs/formae/pkg/plugin-conformance-tests v0.1.26
+	github.com/platform-engineering-labs/formae/pkg/plugin-conformance-tests v0.1.32
 	github.com/stretchr/testify v1.11.1
 )
 
