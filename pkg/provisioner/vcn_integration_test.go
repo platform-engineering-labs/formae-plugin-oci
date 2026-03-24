@@ -154,21 +154,7 @@ func TestVCN(t *testing.T) {
 		})
 		require.NoError(t, err)
 		require.NotNil(t, deleteResult)
-		// Delete is async — returns InProgress, then poll Status until done
-		assert.Equal(t, resource.OperationStatusInProgress, deleteResult.ProgressResult.OperationStatus)
-
-		// Poll Status until delete completes
-		require.Eventually(t, func() bool {
-			statusResult, err := prov.Status(ctx, &resource.StatusRequest{
-				RequestID:    nativeID,
-				NativeID:     nativeID,
-				TargetConfig: newTestTargetConfig(),
-			})
-			if err != nil {
-				return false
-			}
-			return statusResult.ProgressResult.OperationStatus == resource.OperationStatusSuccess
-		}, 3*time.Minute, 5*time.Second, "VCN should be fully deleted within 3 minutes")
+		assert.Equal(t, resource.OperationStatusSuccess, deleteResult.ProgressResult.OperationStatus)
 
 		// Verify deleted
 		readResult, err := prov.Read(ctx, &resource.ReadRequest{

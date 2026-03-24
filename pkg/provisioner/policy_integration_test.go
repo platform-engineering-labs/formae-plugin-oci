@@ -219,27 +219,14 @@ func TestPolicy_Delete(t *testing.T) {
 		})
 	})
 
-	// Delete via provisioner — async, returns InProgress
+	// Delete via provisioner
 	deleteResult, err := prov.Delete(ctx, &resource.DeleteRequest{
 		NativeID:     nativeID,
 		TargetConfig: newTestTargetConfig(),
 	})
 	require.NoError(t, err)
 	require.NotNil(t, deleteResult)
-	assert.Equal(t, resource.OperationStatusInProgress, deleteResult.ProgressResult.OperationStatus)
-
-	// Poll Status until delete completes
-	require.Eventually(t, func() bool {
-		statusResult, err := prov.Status(ctx, &resource.StatusRequest{
-			RequestID:    nativeID,
-			NativeID:     nativeID,
-			TargetConfig: newTestTargetConfig(),
-		})
-		if err != nil {
-			return false
-		}
-		return statusResult.ProgressResult.OperationStatus == resource.OperationStatusSuccess
-	}, 3*time.Minute, 5*time.Second, "Policy should be fully deleted within 3 minutes")
+	assert.Equal(t, resource.OperationStatusSuccess, deleteResult.ProgressResult.OperationStatus)
 
 	// Verify deleted via Read
 	readResult, err := prov.Read(ctx, &resource.ReadRequest{
