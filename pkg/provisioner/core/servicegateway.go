@@ -8,7 +8,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"time"
 
 	"github.com/oracle/oci-go-sdk/v65/common"
 	"github.com/oracle/oci-go-sdk/v65/core"
@@ -215,24 +214,6 @@ func (p *ServiceGatewayProvisioner) Delete(ctx context.Context, request *resourc
 			return result, handleErr
 		}
 		return nil, fmt.Errorf("failed to delete ServiceGateway: %w", err)
-	}
-
-	// Wait for the resource to be fully terminated
-	deadline := time.Now().Add(2 * time.Minute)
-	for time.Now().Before(deadline) {
-		getResp, getErr := client.GetServiceGateway(ctx, core.GetServiceGatewayRequest{
-			ServiceGatewayId: common.String(request.NativeID),
-		})
-		if getErr != nil {
-			if serviceErr, ok := common.IsServiceError(getErr); ok && serviceErr.GetHTTPStatusCode() == 404 {
-				break // Fully deleted
-			}
-			break // Other error, assume deleted
-		}
-		if getResp.LifecycleState == core.ServiceGatewayLifecycleStateTerminated {
-			break
-		}
-		time.Sleep(5 * time.Second)
 	}
 
 	return &resource.DeleteResult{
