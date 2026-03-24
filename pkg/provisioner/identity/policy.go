@@ -207,6 +207,24 @@ func (p *PolicyProvisioner) Delete(ctx context.Context, request *resource.Delete
 		return nil, fmt.Errorf("failed to delete Policy: %w", err)
 	}
 
+	// Wait for the resource to be fully deleted
+	deadline := time.Now().Add(2 * time.Minute)
+	for time.Now().Before(deadline) {
+		getResp, getErr := svc.GetPolicy(ctx, identity.GetPolicyRequest{
+			PolicyId: common.String(request.NativeID),
+		})
+		if getErr != nil {
+			if serviceErr, ok := common.IsServiceError(getErr); ok && serviceErr.GetHTTPStatusCode() == 404 {
+				break // Fully deleted
+			}
+			break // Other error, assume deleted
+		}
+		if getResp.LifecycleState == identity.PolicyLifecycleStateDeleted {
+			break
+		}
+		time.Sleep(5 * time.Second)
+	}
+
 	return &resource.DeleteResult{
 		ProgressResult: &resource.ProgressResult{
 			Operation:       resource.OperationDelete,

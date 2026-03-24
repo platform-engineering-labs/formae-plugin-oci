@@ -8,6 +8,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/oracle/oci-go-sdk/v65/common"
 	"github.com/oracle/oci-go-sdk/v65/core"
@@ -163,6 +164,24 @@ func (p *NatGatewayProvisioner) Delete(ctx context.Context, request *resource.De
 			return result, handleErr
 		}
 		return nil, fmt.Errorf("failed to delete NatGateway: %w", err)
+	}
+
+	// Wait for the resource to be fully terminated
+	deadline := time.Now().Add(2 * time.Minute)
+	for time.Now().Before(deadline) {
+		getResp, getErr := client.GetNatGateway(ctx, core.GetNatGatewayRequest{
+			NatGatewayId: common.String(request.NativeID),
+		})
+		if getErr != nil {
+			if serviceErr, ok := common.IsServiceError(getErr); ok && serviceErr.GetHTTPStatusCode() == 404 {
+				break // Fully deleted
+			}
+			break // Other error, assume deleted
+		}
+		if getResp.LifecycleState == core.NatGatewayLifecycleStateTerminated {
+			break
+		}
+		time.Sleep(5 * time.Second)
 	}
 
 	return &resource.DeleteResult{
