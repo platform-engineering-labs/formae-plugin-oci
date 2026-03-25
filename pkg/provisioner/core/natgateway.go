@@ -205,6 +205,13 @@ func (p *NatGatewayProvisioner) Read(ctx context.Context, request *resource.Read
 		return nil, fmt.Errorf("failed to read NatGateway: %w", err)
 	}
 
+	if util.IsTerminal(string(resp.LifecycleState)) {
+		return &resource.ReadResult{
+			ResourceType: "OCI::Core::NatGateway",
+			ErrorCode:    resource.OperationErrorCodeNotFound,
+		}, nil
+	}
+
 	props := map[string]any{
 		"CompartmentId": *resp.CompartmentId,
 		"VcnId":         *resp.VcnId,

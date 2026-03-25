@@ -6,6 +6,21 @@ package util
 
 import "sort"
 
+// IsTerminal returns true if the OCI lifecycle state indicates the
+// resource is being deleted or already deleted. OCI returns 200 for resources in
+// these states, but they should be treated as NotFound by the plugin.
+//
+// Takes a string because the OCI SDK defines a separate enum type per resource
+// (VcnLifecycleStateEnum, SubnetLifecycleStateEnum, etc.) with no shared interface.
+// The string values are consistent across all resource types.
+func IsTerminal(state string) bool {
+	switch state {
+	case "TERMINATING", "TERMINATED", "DELETING", "DELETED":
+		return true
+	}
+	return false
+}
+
 // ExtractFreeformTags converts Listing<oci.FreeformTag> ([{Key, Value}]) to map[string]string for OCI API
 func ExtractFreeformTags(props map[string]any, key string) (map[string]string, bool) {
 	slice, ok := props[key].([]any)

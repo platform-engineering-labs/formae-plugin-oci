@@ -107,7 +107,7 @@ jobs:
 
     strategy:
       fail-fast: false
-      max-parallel: 1  # OCI VCN limit is 2 per region; sequential to avoid quota contention
+      max-parallel: 40
       matrix:
         resource:
           - policy

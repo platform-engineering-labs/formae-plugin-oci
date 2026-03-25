@@ -213,6 +213,14 @@ func (p *VCNProvisioner) Read(ctx context.Context, request *resource.ReadRequest
 		return nil, fmt.Errorf("failed to read VCN: %w", err)
 	}
 
+	// Treat terminal lifecycle states as NotFound
+	if util.IsTerminal(string(resp.LifecycleState)) {
+		return &resource.ReadResult{
+			ResourceType: "OCI::Core::VCN",
+			ErrorCode:    resource.OperationErrorCodeNotFound,
+		}, nil
+	}
+
 	// Build properties map
 	props := map[string]any{
 		"CompartmentId": *resp.CompartmentId,

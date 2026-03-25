@@ -198,6 +198,13 @@ func (p *DhcpOptionsProvisioner) Read(ctx context.Context, request *resource.Rea
 		return nil, fmt.Errorf("failed to read DhcpOptions: %w", err)
 	}
 
+	if util.IsTerminal(string(resp.LifecycleState)) {
+		return &resource.ReadResult{
+			ResourceType: "OCI::Core::DhcpOptions",
+			ErrorCode:    resource.OperationErrorCodeNotFound,
+		}, nil
+	}
+
 	properties := buildDhcpOptionsProperties(resp.DhcpOptions)
 
 	propBytes, err := json.Marshal(properties)
