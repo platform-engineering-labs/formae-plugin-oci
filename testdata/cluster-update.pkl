@@ -8,35 +8,28 @@ amends "@formae/forma.pkl"
 import "@formae/formae.pkl"
 
 import "@oci/oci.pkl"
-import "@oci/identity/compartment.pkl"
 import "@oci/core/vcn.pkl"
 import "@oci/core/subnet.pkl"
 import "@oci/containerengine/cluster.pkl"
+import "@oci/identity/compartment.pkl"
 
 // These values need to be set for your OCI tenancy
 local testCompartmentId = read("env:OCI_COMPARTMENT_ID")
 local testProfile = read?("env:OCI_PROFILE") ?? "DEFAULT"
 local testRunID = read("env:FORMAE_TEST_RUN_ID")
 
-local testCompartment = new compartment.Compartment {
-  label = "test-compartment"
-  compartmentId = testCompartmentId
-  name = "formae-sdk-test-\(testRunID)"
-  description = "Conformance test compartment"
-}
-
 local stackName = "plugin-sdk-test-stack"
 
 local testVcn = new vcn.VCN {
     label = "plugin-sdk-test-vcn"
-    compartmentId = testCompartment.res.id
+    compartmentId = testCompartmentId
     cidrBlock = "10.0.0.0/16"
     displayName = "formae-plugin-sdk-test-\(testRunID)"
 }
 
 local testSubnet = new subnet.Subnet {
     label = "plugin-sdk-test-subnet"
-    compartmentId = testCompartment.res.id
+    compartmentId = testCompartmentId
     vcnId = testVcn.res.id
     cidrBlock = "10.0.1.0/24"
     displayName = "formae-plugin-sdk-test-\(testRunID)"
@@ -56,13 +49,19 @@ forma {
     }
   }
 
-  testCompartment
+  new compartment.Compartment {
+    label = "plugin-sdk-test-compartment"
+    compartmentId = testCompartmentId
+    name = "formae-plugin-sdk-test-\(testRunID)"
+    description = "Compartment for conformance tests"
+  }
+
   testVcn
   testSubnet
 
   new cluster.Cluster {
     label = "plugin-sdk-test-cluster"
-    compartmentId = testCompartment.res.id
+    compartmentId = testCompartmentId
     vcnId = testVcn.res.id
     kubernetesVersion = "v1.34.2"
     // Changed name - this is an in-place update
