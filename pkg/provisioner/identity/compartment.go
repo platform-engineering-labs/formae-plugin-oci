@@ -85,8 +85,9 @@ func (p *CompartmentProvisioner) Create(ctx context.Context, request *resource.C
 	return &resource.CreateResult{
 		ProgressResult: &resource.ProgressResult{
 			Operation:       resource.OperationCreate,
-			OperationStatus: resource.OperationStatusSuccess,
+			OperationStatus: resource.OperationStatusInProgress,
 			NativeID:        *resp.Id,
+			RequestID:       *resp.Id,
 		},
 	}, nil
 }
