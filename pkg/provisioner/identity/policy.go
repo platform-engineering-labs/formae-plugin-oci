@@ -106,6 +106,14 @@ func (p *PolicyProvisioner) Read(ctx context.Context, request *resource.ReadRequ
 		return nil, fmt.Errorf("failed to read Policy: %w", err)
 	}
 
+	// Treat terminal lifecycle states as NotFound
+	if util.IsTerminal(string(resp.LifecycleState)) {
+		return &resource.ReadResult{
+			ResourceType: "OCI::Identity::Policy",
+			ErrorCode:    resource.OperationErrorCodeNotFound,
+		}, nil
+	}
+
 	properties := buildPolicyProperties(resp.Policy)
 
 	propBytes, err := json.Marshal(properties)

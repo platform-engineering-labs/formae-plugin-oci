@@ -598,6 +598,13 @@ func (p *SecurityListProvisioner) Read(ctx context.Context, request *resource.Re
 		return nil, fmt.Errorf("failed to read SecurityList: %w", err)
 	}
 
+	if util.IsTerminal(string(resp.LifecycleState)) {
+		return &resource.ReadResult{
+			ResourceType: "OCI::Core::SecurityList",
+			ErrorCode:    resource.OperationErrorCodeNotFound,
+		}, nil
+	}
+
 	props := map[string]any{
 		"CompartmentId":        *resp.CompartmentId,
 		"VcnId":                *resp.VcnId,

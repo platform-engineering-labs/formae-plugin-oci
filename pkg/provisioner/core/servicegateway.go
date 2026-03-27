@@ -256,6 +256,13 @@ func (p *ServiceGatewayProvisioner) Read(ctx context.Context, request *resource.
 		return nil, fmt.Errorf("failed to read ServiceGateway: %w", err)
 	}
 
+	if util.IsTerminal(string(resp.LifecycleState)) {
+		return &resource.ReadResult{
+			ResourceType: "OCI::Core::ServiceGateway",
+			ErrorCode:    resource.OperationErrorCodeNotFound,
+		}, nil
+	}
+
 	props := map[string]any{
 		"CompartmentId": *resp.CompartmentId,
 		"VcnId":         *resp.VcnId,

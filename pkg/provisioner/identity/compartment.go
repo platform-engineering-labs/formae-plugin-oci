@@ -8,6 +8,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/oracle/oci-go-sdk/v65/common"
 	"github.com/oracle/oci-go-sdk/v65/identity"
@@ -85,8 +86,9 @@ func (p *CompartmentProvisioner) Create(ctx context.Context, request *resource.C
 	return &resource.CreateResult{
 		ProgressResult: &resource.ProgressResult{
 			Operation:       resource.OperationCreate,
-			OperationStatus: resource.OperationStatusSuccess,
+			OperationStatus: resource.OperationStatusInProgress,
 			NativeID:        *resp.Id,
+			RequestID:       *resp.Id,
 		},
 	}, nil
 }
@@ -247,32 +249,91 @@ func (p *CompartmentProvisioner) Delete(ctx context.Context, request *resource.D
 		CompartmentId: common.String(request.NativeID),
 	}
 
-	_, err = client.DeleteCompartment(ctx, deleteReq)
+	// Use a short timeout — OCI DeleteCompartment can block for minutes,
+	// but we only need the API to accept the request. Status() polls for completion.
+	deleteCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	defer cancel()
+
+	_, err = client.DeleteCompartment(deleteCtx, deleteReq)
 	if err != nil {
+		// Context timeout is expected — the delete was likely accepted but OCI is slow.
+		// Return InProgress and let Status() poll for completion.
+		if deleteCtx.Err() == context.DeadlineExceeded {
+			return &resource.DeleteResult{
+				ProgressResult: &resource.ProgressResult{
+					Operation:       resource.OperationDelete,
+					OperationStatus: resource.OperationStatusInProgress,
+					NativeID:        request.NativeID,
+					RequestID:       request.NativeID,
+				},
+			}, nil
+		}
 		if result, handleErr := util.HandleDeleteError(err, "OCI::Identity::Compartment", request.NativeID, "OCI::Identity::Compartment"); result != nil {
 			return result, handleErr
 		}
 		return nil, fmt.Errorf("failed to delete Compartment: %w", err)
 	}
 
+	// Compartment deletion is async — return in-progress, poll lifecycle in Status()
 	return &resource.DeleteResult{
 		ProgressResult: &resource.ProgressResult{
 			Operation:       resource.OperationDelete,
-			OperationStatus: resource.OperationStatusSuccess,
+			OperationStatus: resource.OperationStatusInProgress,
 			NativeID:        request.NativeID,
+			RequestID:       request.NativeID,
 		},
 	}, nil
 }
 
 func (p *CompartmentProvisioner) Status(ctx context.Context, request *resource.StatusRequest) (*resource.StatusResult, error) {
-	// Compartment operations are synchronous, no status check needed
-	return &resource.StatusResult{
-		ProgressResult: &resource.ProgressResult{
-			Operation:       resource.OperationCheckStatus,
-			OperationStatus: resource.OperationStatusSuccess,
-			RequestID:       request.RequestID,
-		},
-	}, nil
+	client, err := p.clients.GetIdentityClient()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get Identity client: %w", err)
+	}
+
+	resp, err := client.GetCompartment(ctx, identity.GetCompartmentRequest{
+		CompartmentId: common.String(request.RequestID),
+	})
+	if err != nil {
+		if serviceErr, ok := common.IsServiceError(err); ok && serviceErr.GetHTTPStatusCode() == 404 {
+			return &resource.StatusResult{
+				ProgressResult: &resource.ProgressResult{
+					Operation:       resource.OperationCheckStatus,
+					OperationStatus: resource.OperationStatusSuccess,
+					NativeID:        request.RequestID,
+				},
+			}, nil
+		}
+		return nil, fmt.Errorf("failed to check Compartment status: %w", err)
+	}
+
+	switch resp.LifecycleState {
+	case identity.CompartmentLifecycleStateActive:
+		return &resource.StatusResult{
+			ProgressResult: &resource.ProgressResult{
+				Operation:       resource.OperationCheckStatus,
+				OperationStatus: resource.OperationStatusSuccess,
+				NativeID:        *resp.Id,
+			},
+		}, nil
+	case identity.CompartmentLifecycleStateDeleted, identity.CompartmentLifecycleStateDeleting:
+		return &resource.StatusResult{
+			ProgressResult: &resource.ProgressResult{
+				Operation:       resource.OperationCheckStatus,
+				OperationStatus: resource.OperationStatusSuccess,
+				NativeID:        *resp.Id,
+			},
+		}, nil
+	default: // CREATING
+		return &resource.StatusResult{
+			ProgressResult: &resource.ProgressResult{
+				Operation:       resource.OperationCheckStatus,
+				OperationStatus: resource.OperationStatusInProgress,
+				RequestID:       request.RequestID,
+				StatusMessage:   fmt.Sprintf("Compartment lifecycle state: %s", resp.LifecycleState),
+			},
+		}, nil
+	}
 }
 
 func (p *CompartmentProvisioner) List(ctx context.Context, request *resource.ListRequest) (*resource.ListResult, error) {
