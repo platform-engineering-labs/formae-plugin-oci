@@ -236,6 +236,7 @@ jobs:
           FORMAE_TEST_RUN_ID: ${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.resource }}
           FORMAE_TEST_FILTER: ${{ matrix.resource }}
           FORMAE_TEST_TIMEOUT: "10"
+          POSTHOG_API_KEY: ${{ secrets.POSTHOG_API_KEY }}
         run: make conformance-test
 
   # Clean up OCI resources after all matrix jobs complete
