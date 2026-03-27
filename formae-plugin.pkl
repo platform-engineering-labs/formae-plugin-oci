@@ -5,7 +5,7 @@
  */
 
 name = "oci"
-version = "0.1.0"
+version = "0.1.1"
 namespace = "OCI"
 description = "Oracle Cloud Infrastructure resource plugin for Formae"
 license = "FSL-1.1-ALv2"
