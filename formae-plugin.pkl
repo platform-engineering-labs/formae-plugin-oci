@@ -5,11 +5,11 @@
  */
 
 name = "oci"
-version = "0.1.1"
+version = "0.1.2"
 namespace = "OCI"
 description = "Oracle Cloud Infrastructure resource plugin for Formae"
 license = "FSL-1.1-ALv2"
-minFormaeVersion = "0.76.0"
+minFormaeVersion = "0.83.0"
 
 output {
   renderer = new JsonRenderer {}
