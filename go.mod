@@ -6,9 +6,9 @@ require (
 	github.com/apple/pkl-go v0.13.2
 	github.com/evanphx/json-patch/v5 v5.9.11
 	github.com/oracle/oci-go-sdk/v65 v65.110.0
-	github.com/platform-engineering-labs/formae/pkg/model v0.1.7-0.20260407003304-31afe2d7f4e7
-	github.com/platform-engineering-labs/formae/pkg/plugin v0.1.21-0.20260407003304-31afe2d7f4e7
-	github.com/platform-engineering-labs/formae/pkg/plugin-conformance-tests v0.1.42-0.20260407003304-31afe2d7f4e7
+	github.com/platform-engineering-labs/formae/pkg/model v0.1.7-0.20260407024301-5e1b6ff04665
+	github.com/platform-engineering-labs/formae/pkg/plugin v0.1.21-0.20260407024301-5e1b6ff04665
+	github.com/platform-engineering-labs/formae/pkg/plugin-conformance-tests v0.1.42-0.20260407024301-5e1b6ff04665
 	github.com/stretchr/testify v1.11.1
 )
 
