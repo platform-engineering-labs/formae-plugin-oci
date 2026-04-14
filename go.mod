@@ -6,7 +6,7 @@ require (
 	github.com/apple/pkl-go v0.13.2
 	github.com/evanphx/json-patch/v5 v5.9.11
 	github.com/oracle/oci-go-sdk/v65 v65.110.0
-	github.com/platform-engineering-labs/formae/pkg/model v0.1.6
+	github.com/platform-engineering-labs/formae/pkg/model v0.1.23
 	github.com/platform-engineering-labs/formae/pkg/plugin v0.1.21
 	github.com/platform-engineering-labs/formae/pkg/plugin-conformance-tests v0.1.40
 	github.com/stretchr/testify v1.11.1
