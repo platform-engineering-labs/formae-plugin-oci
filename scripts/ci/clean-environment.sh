@@ -9,6 +9,7 @@
 #
 # Test resources are identified by the "formae-plugin-sdk-test" prefix in their names.
 # Resources are cleaned up in dependency order (children before parents).
+# NOTE: Compartments are never deleted - tests use a static compartment.
 
 set -euo pipefail
 
@@ -60,7 +61,7 @@ delete_by_prefix() {
     done
 }
 
-# 1. Delete Policies with test prefix (before compartments)
+# 1. Delete Policies with test prefix
 echo "Cleaning Identity test policies..."
 POLICIES=$(oci iam policy list --compartment-id "$COMPARTMENT_ID" --profile "$OCI_PROFILE" \
     --query "data[?starts_with(name, '$TEST_PREFIX')].id" --output json 2>/dev/null | jq -r '.[]' 2>/dev/null || true)
@@ -206,15 +207,8 @@ for vcn in $VCNS; do
     oci network vcn delete --vcn-id "$vcn" --profile "$OCI_PROFILE" --force 2>/dev/null || true
 done
 
-# 15. Delete Compartments with test prefix (be careful!)
-echo "Cleaning test compartments..."
-COMPARTMENTS=$(oci iam compartment list --compartment-id "$COMPARTMENT_ID" --profile "$OCI_PROFILE" \
-    --query "data[?starts_with(name, '$TEST_PREFIX') && \"lifecycle-state\"=='ACTIVE'].id" --output json 2>/dev/null | jq -r '.[]' 2>/dev/null || true)
-
-for comp in $COMPARTMENTS; do
-    echo "  Deleting compartment: $comp"
-    oci iam compartment delete --compartment-id "$comp" --profile "$OCI_PROFILE" --force 2>/dev/null || true
-done
+# NOTE: Compartments are NOT cleaned up here. Tests use a static compartment
+# that must never be deleted.
 
 echo ""
 echo "=== Cleanup complete ==="

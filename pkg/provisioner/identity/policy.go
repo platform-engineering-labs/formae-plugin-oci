@@ -20,6 +20,7 @@ import (
 
 type PolicyProvisioner struct {
 	clients *client.Clients
+	svc     *identity.IdentityClient // nil until first use; injected in tests
 }
 
 var _ provisioner.Provisioner = &PolicyProvisioner{}
@@ -32,8 +33,21 @@ func NewPolicyProvisioner(clients *client.Clients) provisioner.Provisioner {
 	return &PolicyProvisioner{clients: clients}
 }
 
+// NewPolicyProvisionerWithSvc constructs a provisioner with a pre-built SDK client,
+// for use in tests that point the client at an httptest server.
+func NewPolicyProvisionerWithSvc(svc *identity.IdentityClient) *PolicyProvisioner {
+	return &PolicyProvisioner{svc: svc}
+}
+
+func (p *PolicyProvisioner) getSvc() (*identity.IdentityClient, error) {
+	if p.svc != nil {
+		return p.svc, nil
+	}
+	return p.clients.GetIdentityClient()
+}
+
 func (p *PolicyProvisioner) Create(ctx context.Context, request *resource.CreateRequest) (*resource.CreateResult, error) {
-	svc, err := p.clients.GetIdentityClient()
+	svc, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get Identity client: %w", err)
 	}
@@ -86,7 +100,7 @@ func (p *PolicyProvisioner) Create(ctx context.Context, request *resource.Create
 }
 
 func (p *PolicyProvisioner) Read(ctx context.Context, request *resource.ReadRequest) (*resource.ReadResult, error) {
-	svc, err := p.clients.GetIdentityClient()
+	svc, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get Identity client: %w", err)
 	}
@@ -128,7 +142,7 @@ func (p *PolicyProvisioner) Read(ctx context.Context, request *resource.ReadRequ
 }
 
 func (p *PolicyProvisioner) Update(ctx context.Context, request *resource.UpdateRequest) (*resource.UpdateResult, error) {
-	svc, err := p.clients.GetIdentityClient()
+	svc, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get Identity client: %w", err)
 	}
@@ -181,7 +195,7 @@ func (p *PolicyProvisioner) Update(ctx context.Context, request *resource.Update
 }
 
 func (p *PolicyProvisioner) Delete(ctx context.Context, request *resource.DeleteRequest) (*resource.DeleteResult, error) {
-	svc, err := p.clients.GetIdentityClient()
+	svc, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get Identity client: %w", err)
 	}
@@ -235,7 +249,7 @@ func (p *PolicyProvisioner) Status(ctx context.Context, request *resource.Status
 }
 
 func (p *PolicyProvisioner) List(ctx context.Context, request *resource.ListRequest) (*resource.ListResult, error) {
-	svc, err := p.clients.GetIdentityClient()
+	svc, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get Identity client: %w", err)
 	}

@@ -291,6 +291,13 @@ func (p *ClusterProvisioner) Read(ctx context.Context, request *resource.ReadReq
 		return nil, fmt.Errorf("failed to read Cluster: %w", err)
 	}
 
+	if util.IsTerminal(string(resp.LifecycleState)) {
+		return &resource.ReadResult{
+			ResourceType: "OCI::ContainerEngine::Cluster",
+			ErrorCode:    resource.OperationErrorCodeNotFound,
+		}, nil
+	}
+
 	// Build properties map
 	props := map[string]any{
 		"CompartmentId":     *resp.CompartmentId,

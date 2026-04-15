@@ -16,6 +16,12 @@ import (
 	"github.com/platform-engineering-labs/formae-plugin-oci/pkg/config"
 )
 
+// noECRetryPolicy disables the OCI SDK's eventual consistency retries.
+// Without this, the SDK retries 404 responses for up to 4 minutes after
+// any write operation, assuming eventual consistency lag. This causes
+// sync reads for deleted resources to hang instead of returning NotFound.
+var noECRetryPolicy = common.DefaultRetryPolicyWithoutEventualConsistency()
+
 // Clients manages OCI service clients with lazy initialization
 type Clients struct {
 	provider common.ConfigurationProvider
@@ -49,6 +55,7 @@ func (c *Clients) GetVirtualNetworkClient() (*core.VirtualNetworkClient, error) 
 		if err != nil {
 			return nil, err
 		}
+		client.SetCustomClientConfiguration(common.CustomClientConfiguration{RetryPolicy: &noECRetryPolicy})
 		c.virtualNetwork = &client
 	}
 	return c.virtualNetwork, nil
@@ -64,6 +71,7 @@ func (c *Clients) GetBlockstorageClient() (*core.BlockstorageClient, error) {
 		if err != nil {
 			return nil, err
 		}
+		client.SetCustomClientConfiguration(common.CustomClientConfiguration{RetryPolicy: &noECRetryPolicy})
 		c.blockstorage = &client
 	}
 	return c.blockstorage, nil
@@ -79,6 +87,7 @@ func (c *Clients) GetComputeClient() (*core.ComputeClient, error) {
 		if err != nil {
 			return nil, err
 		}
+		client.SetCustomClientConfiguration(common.CustomClientConfiguration{RetryPolicy: &noECRetryPolicy})
 		c.compute = &client
 	}
 	return c.compute, nil
@@ -94,6 +103,7 @@ func (c *Clients) GetObjectStorageClient() (*objectstorage.ObjectStorageClient, 
 		if err != nil {
 			return nil, err
 		}
+		client.SetCustomClientConfiguration(common.CustomClientConfiguration{RetryPolicy: &noECRetryPolicy})
 		c.objectStorage = &client
 	}
 	return c.objectStorage, nil
@@ -109,6 +119,7 @@ func (c *Clients) GetIdentityClient() (*identity.IdentityClient, error) {
 		if err != nil {
 			return nil, err
 		}
+		client.SetCustomClientConfiguration(common.CustomClientConfiguration{RetryPolicy: &noECRetryPolicy})
 		c.identity = &client
 	}
 	return c.identity, nil
@@ -124,6 +135,7 @@ func (c *Clients) GetContainerEngineClient() (*containerengine.ContainerEngineCl
 		if err != nil {
 			return nil, err
 		}
+		client.SetCustomClientConfiguration(common.CustomClientConfiguration{RetryPolicy: &noECRetryPolicy})
 		c.containerEngine = &client
 	}
 	return c.containerEngine, nil

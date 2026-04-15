@@ -19,6 +19,7 @@ import (
 
 type VCNProvisioner struct {
 	clients *client.Clients
+	svc     *core.VirtualNetworkClient // nil until first use; injected in tests
 }
 
 var _ provisioner.Provisioner = &VCNProvisioner{}
@@ -31,8 +32,21 @@ func NewVCNProvisioner(clients *client.Clients) provisioner.Provisioner {
 	return &VCNProvisioner{clients: clients}
 }
 
+// NewVCNProvisionerWithSvc constructs a provisioner with a pre-built SDK client,
+// for use in tests that point the client at an httptest server.
+func NewVCNProvisionerWithSvc(svc *core.VirtualNetworkClient) *VCNProvisioner {
+	return &VCNProvisioner{svc: svc}
+}
+
+func (p *VCNProvisioner) getSvc() (*core.VirtualNetworkClient, error) {
+	if p.svc != nil {
+		return p.svc, nil
+	}
+	return p.clients.GetVirtualNetworkClient()
+}
+
 func (p *VCNProvisioner) Create(ctx context.Context, request *resource.CreateRequest) (*resource.CreateResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -90,7 +104,7 @@ func (p *VCNProvisioner) Create(ctx context.Context, request *resource.CreateReq
 }
 
 func (p *VCNProvisioner) Update(ctx context.Context, request *resource.UpdateRequest) (*resource.UpdateResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -135,7 +149,7 @@ func (p *VCNProvisioner) Update(ctx context.Context, request *resource.UpdateReq
 }
 
 func (p *VCNProvisioner) Delete(ctx context.Context, request *resource.DeleteRequest) (*resource.DeleteResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -192,7 +206,7 @@ func (p *VCNProvisioner) Status(ctx context.Context, request *resource.StatusReq
 }
 
 func (p *VCNProvisioner) Read(ctx context.Context, request *resource.ReadRequest) (*resource.ReadResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -267,7 +281,7 @@ func (p *VCNProvisioner) Read(ctx context.Context, request *resource.ReadRequest
 }
 
 func (p *VCNProvisioner) List(ctx context.Context, request *resource.ListRequest) (*resource.ListResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}

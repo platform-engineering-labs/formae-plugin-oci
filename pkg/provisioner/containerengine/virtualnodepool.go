@@ -373,6 +373,13 @@ func (p *VirtualNodePoolProvisioner) Read(ctx context.Context, request *resource
 		return nil, fmt.Errorf("failed to read VirtualNodePool: %w", err)
 	}
 
+	if util.IsTerminal(string(resp.LifecycleState)) {
+		return &resource.ReadResult{
+			ResourceType: "OCI::ContainerEngine::VirtualNodePool",
+			ErrorCode:    resource.OperationErrorCodeNotFound,
+		}, nil
+	}
+
 	// Build properties map
 	props := map[string]any{
 		"CompartmentId": *resp.CompartmentId,

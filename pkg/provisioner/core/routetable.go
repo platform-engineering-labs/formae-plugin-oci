@@ -19,6 +19,7 @@ import (
 
 type RouteTableProvisioner struct {
 	clients *client.Clients
+	svc     *core.VirtualNetworkClient // nil until first use; injected in tests
 }
 
 var _ provisioner.Provisioner = &RouteTableProvisioner{}
@@ -29,6 +30,19 @@ func init() {
 
 func NewRouteTableProvisioner(clients *client.Clients) provisioner.Provisioner {
 	return &RouteTableProvisioner{clients: clients}
+}
+
+// NewRouteTableProvisionerWithSvc constructs a provisioner with a pre-built SDK client,
+// for use in tests that point the client at an httptest server.
+func NewRouteTableProvisionerWithSvc(svc *core.VirtualNetworkClient) *RouteTableProvisioner {
+	return &RouteTableProvisioner{svc: svc}
+}
+
+func (p *RouteTableProvisioner) getSvc() (*core.VirtualNetworkClient, error) {
+	if p.svc != nil {
+		return p.svc, nil
+	}
+	return p.clients.GetVirtualNetworkClient()
 }
 
 func parseRouteRules(routeRulesData any) ([]core.RouteRule, error) {
@@ -86,7 +100,7 @@ func parseRouteRules(routeRulesData any) ([]core.RouteRule, error) {
 }
 
 func (p *RouteTableProvisioner) Create(ctx context.Context, request *resource.CreateRequest) (*resource.CreateResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -140,7 +154,7 @@ func (p *RouteTableProvisioner) Create(ctx context.Context, request *resource.Cr
 }
 
 func (p *RouteTableProvisioner) Update(ctx context.Context, request *resource.UpdateRequest) (*resource.UpdateResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -195,7 +209,7 @@ func (p *RouteTableProvisioner) Update(ctx context.Context, request *resource.Up
 }
 
 func (p *RouteTableProvisioner) Delete(ctx context.Context, request *resource.DeleteRequest) (*resource.DeleteResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -250,7 +264,7 @@ func (p *RouteTableProvisioner) Status(ctx context.Context, request *resource.St
 }
 
 func (p *RouteTableProvisioner) Read(ctx context.Context, request *resource.ReadRequest) (*resource.ReadResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -326,7 +340,7 @@ func (p *RouteTableProvisioner) Read(ctx context.Context, request *resource.Read
 }
 
 func (p *RouteTableProvisioner) List(ctx context.Context, request *resource.ListRequest) (*resource.ListResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}

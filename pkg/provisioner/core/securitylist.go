@@ -19,6 +19,7 @@ import (
 
 type SecurityListProvisioner struct {
 	clients *client.Clients
+	svc     *core.VirtualNetworkClient // nil until first use; injected in tests
 }
 
 var _ provisioner.Provisioner = &SecurityListProvisioner{}
@@ -29,6 +30,19 @@ func init() {
 
 func NewSecurityListProvisioner(clients *client.Clients) provisioner.Provisioner {
 	return &SecurityListProvisioner{clients: clients}
+}
+
+// NewSecurityListProvisionerWithSvc constructs a provisioner with a pre-built SDK client,
+// for use in tests that point the client at an httptest server.
+func NewSecurityListProvisionerWithSvc(svc *core.VirtualNetworkClient) *SecurityListProvisioner {
+	return &SecurityListProvisioner{svc: svc}
+}
+
+func (p *SecurityListProvisioner) getSvc() (*core.VirtualNetworkClient, error) {
+	if p.svc != nil {
+		return p.svc, nil
+	}
+	return p.clients.GetVirtualNetworkClient()
 }
 
 // Helper to extract string with lowercase or uppercase key
@@ -402,7 +416,7 @@ func serializeEgressRules(rules []core.EgressSecurityRule) []map[string]any {
 }
 
 func (p *SecurityListProvisioner) Create(ctx context.Context, request *resource.CreateRequest) (*resource.CreateResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -461,7 +475,7 @@ func (p *SecurityListProvisioner) Create(ctx context.Context, request *resource.
 }
 
 func (p *SecurityListProvisioner) Update(ctx context.Context, request *resource.UpdateRequest) (*resource.UpdateResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -524,7 +538,7 @@ func (p *SecurityListProvisioner) Update(ctx context.Context, request *resource.
 }
 
 func (p *SecurityListProvisioner) Delete(ctx context.Context, request *resource.DeleteRequest) (*resource.DeleteResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -578,7 +592,7 @@ func (p *SecurityListProvisioner) Status(ctx context.Context, request *resource.
 }
 
 func (p *SecurityListProvisioner) Read(ctx context.Context, request *resource.ReadRequest) (*resource.ReadResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -635,7 +649,7 @@ func (p *SecurityListProvisioner) Read(ctx context.Context, request *resource.Re
 }
 
 func (p *SecurityListProvisioner) List(ctx context.Context, request *resource.ListRequest) (*resource.ListResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}

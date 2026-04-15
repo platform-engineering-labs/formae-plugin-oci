@@ -19,6 +19,7 @@ import (
 
 type SubnetProvisioner struct {
 	clients *client.Clients
+	svc     *core.VirtualNetworkClient // nil until first use; injected in tests
 }
 
 var _ provisioner.Provisioner = &SubnetProvisioner{}
@@ -31,8 +32,21 @@ func NewSubnetProvisioner(clients *client.Clients) provisioner.Provisioner {
 	return &SubnetProvisioner{clients: clients}
 }
 
+// NewSubnetProvisionerWithSvc constructs a provisioner with a pre-built SDK client,
+// for use in tests that point the client at an httptest server.
+func NewSubnetProvisionerWithSvc(svc *core.VirtualNetworkClient) *SubnetProvisioner {
+	return &SubnetProvisioner{svc: svc}
+}
+
+func (p *SubnetProvisioner) getSvc() (*core.VirtualNetworkClient, error) {
+	if p.svc != nil {
+		return p.svc, nil
+	}
+	return p.clients.GetVirtualNetworkClient()
+}
+
 func (p *SubnetProvisioner) Create(ctx context.Context, request *resource.CreateRequest) (*resource.CreateResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -104,7 +118,7 @@ func (p *SubnetProvisioner) Create(ctx context.Context, request *resource.Create
 }
 
 func (p *SubnetProvisioner) Update(ctx context.Context, request *resource.UpdateRequest) (*resource.UpdateResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -159,7 +173,7 @@ func (p *SubnetProvisioner) Update(ctx context.Context, request *resource.Update
 }
 
 func (p *SubnetProvisioner) Delete(ctx context.Context, request *resource.DeleteRequest) (*resource.DeleteResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -214,7 +228,7 @@ func (p *SubnetProvisioner) Status(ctx context.Context, request *resource.Status
 }
 
 func (p *SubnetProvisioner) Read(ctx context.Context, request *resource.ReadRequest) (*resource.ReadResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -300,7 +314,7 @@ func (p *SubnetProvisioner) Read(ctx context.Context, request *resource.ReadRequ
 }
 
 func (p *SubnetProvisioner) List(ctx context.Context, request *resource.ListRequest) (*resource.ListResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}

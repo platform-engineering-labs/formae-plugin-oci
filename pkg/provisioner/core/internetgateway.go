@@ -19,6 +19,7 @@ import (
 
 type InternetGatewayProvisioner struct {
 	clients *client.Clients
+	svc     *core.VirtualNetworkClient // nil until first use; injected in tests
 }
 
 var _ provisioner.Provisioner = &InternetGatewayProvisioner{}
@@ -31,8 +32,21 @@ func NewInternetGatewayProvisioner(clients *client.Clients) provisioner.Provisio
 	return &InternetGatewayProvisioner{clients: clients}
 }
 
+// NewInternetGatewayProvisionerWithSvc constructs a provisioner with a pre-built SDK client,
+// for use in tests that point the client at an httptest server.
+func NewInternetGatewayProvisionerWithSvc(svc *core.VirtualNetworkClient) *InternetGatewayProvisioner {
+	return &InternetGatewayProvisioner{svc: svc}
+}
+
+func (p *InternetGatewayProvisioner) getSvc() (*core.VirtualNetworkClient, error) {
+	if p.svc != nil {
+		return p.svc, nil
+	}
+	return p.clients.GetVirtualNetworkClient()
+}
+
 func (p *InternetGatewayProvisioner) Create(ctx context.Context, request *resource.CreateRequest) (*resource.CreateResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -80,7 +94,7 @@ func (p *InternetGatewayProvisioner) Create(ctx context.Context, request *resour
 }
 
 func (p *InternetGatewayProvisioner) Update(ctx context.Context, request *resource.UpdateRequest) (*resource.UpdateResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -128,7 +142,7 @@ func (p *InternetGatewayProvisioner) Update(ctx context.Context, request *resour
 }
 
 func (p *InternetGatewayProvisioner) Delete(ctx context.Context, request *resource.DeleteRequest) (*resource.DeleteResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -183,7 +197,7 @@ func (p *InternetGatewayProvisioner) Status(ctx context.Context, request *resour
 }
 
 func (p *InternetGatewayProvisioner) Read(ctx context.Context, request *resource.ReadRequest) (*resource.ReadResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -239,7 +253,7 @@ func (p *InternetGatewayProvisioner) Read(ctx context.Context, request *resource
 }
 
 func (p *InternetGatewayProvisioner) List(ctx context.Context, request *resource.ListRequest) (*resource.ListResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}

@@ -19,6 +19,7 @@ import (
 
 type NatGatewayProvisioner struct {
 	clients *client.Clients
+	svc     *core.VirtualNetworkClient // nil until first use; injected in tests
 }
 
 var _ provisioner.Provisioner = &NatGatewayProvisioner{}
@@ -31,8 +32,21 @@ func NewNatGatewayProvisioner(clients *client.Clients) provisioner.Provisioner {
 	return &NatGatewayProvisioner{clients: clients}
 }
 
+// NewNatGatewayProvisionerWithSvc constructs a provisioner with a pre-built SDK client,
+// for use in tests that point the client at an httptest server.
+func NewNatGatewayProvisionerWithSvc(svc *core.VirtualNetworkClient) *NatGatewayProvisioner {
+	return &NatGatewayProvisioner{svc: svc}
+}
+
+func (p *NatGatewayProvisioner) getSvc() (*core.VirtualNetworkClient, error) {
+	if p.svc != nil {
+		return p.svc, nil
+	}
+	return p.clients.GetVirtualNetworkClient()
+}
+
 func (p *NatGatewayProvisioner) Create(ctx context.Context, request *resource.CreateRequest) (*resource.CreateResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -82,7 +96,7 @@ func (p *NatGatewayProvisioner) Create(ctx context.Context, request *resource.Cr
 }
 
 func (p *NatGatewayProvisioner) Update(ctx context.Context, request *resource.UpdateRequest) (*resource.UpdateResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -130,7 +144,7 @@ func (p *NatGatewayProvisioner) Update(ctx context.Context, request *resource.Up
 }
 
 func (p *NatGatewayProvisioner) Delete(ctx context.Context, request *resource.DeleteRequest) (*resource.DeleteResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -185,7 +199,7 @@ func (p *NatGatewayProvisioner) Status(ctx context.Context, request *resource.St
 }
 
 func (p *NatGatewayProvisioner) Read(ctx context.Context, request *resource.ReadRequest) (*resource.ReadResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -243,7 +257,7 @@ func (p *NatGatewayProvisioner) Read(ctx context.Context, request *resource.Read
 }
 
 func (p *NatGatewayProvisioner) List(ctx context.Context, request *resource.ListRequest) (*resource.ListResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
