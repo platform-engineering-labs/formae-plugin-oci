@@ -1,5 +1,5 @@
-github.com/JeroenSoeters/actor/statemachine v0.0.0-20260319024748-85c28f9f660b h1:HBny9tCyJDRftwBjIYPO2cHJu2faBhmyfvFMeGda/cU=
-github.com/JeroenSoeters/actor/statemachine v0.0.0-20260319024748-85c28f9f660b/go.mod h1:pZkasfR9a9QIG3HbjvI5dDZpv07YQFgYXiXqCctIrmg=
+github.com/JeroenSoeters/actor/statemachine v0.0.0-20260414171442-1ef660e4a3bc h1:u7q7LSGOPFHHkekIuz88u45nCu6wOlkyJbGoSqz+UWg=
+github.com/JeroenSoeters/actor/statemachine v0.0.0-20260414171442-1ef660e4a3bc/go.mod h1:XbiEudzYCbg5YvbIMqylWXH2iWnUeKagDTfPR7uOaqg=
 github.com/JeroenSoeters/ergo v1.999.320-pel.1 h1:f+FhIqLSeK81oArXJ9QkaOhHjahyW9Ec0T50xlGVxI4=
 github.com/JeroenSoeters/ergo v1.999.320-pel.1/go.mod h1:bLQ6PoO6Mz/8gVuzvPv3xfMfo1P9w6rZV1WnMXMeMdg=
 github.com/Masterminds/semver v1.5.0 h1:H65muMkzWKEuNDnfl9d70GUjFniHKHRbFPGBuZ3QEww=
@@ -49,12 +49,12 @@ github.com/oracle/oci-go-sdk/v65 v65.112.0 h1:L4O4SXAHq5T23qxbjaC/4NHikIKGHhrPtB
 github.com/oracle/oci-go-sdk/v65 v65.112.0/go.mod h1:8ZzvzuEG/cFLFZhxg/Mg1w19KqyXBKO3c17QIc5PkGs=
 github.com/platform-engineering-labs/formae/pkg/api/model v0.1.2-0.20260414222617-bbb533eb6131 h1:2rc0JJIRUsZNhLdmoOQxhUEs5pHyfnkbXGb/MjBybFc=
 github.com/platform-engineering-labs/formae/pkg/api/model v0.1.2-0.20260414222617-bbb533eb6131/go.mod h1:0ncHFCsGA6b0w1kBm6m+QwJ823qAY2vL47GvoR0BTyU=
-github.com/platform-engineering-labs/formae/pkg/model v0.1.24-0.20260414222617-bbb533eb6131 h1:6+0dBImfHSrjkiEFmL5yUA1YM5NWluVuneIpPSYOHi4=
-github.com/platform-engineering-labs/formae/pkg/model v0.1.24-0.20260414222617-bbb533eb6131/go.mod h1:XmGJA7jNPX9cEGc8TxTiEDitBuEVJOddNakdTZ/bH4U=
-github.com/platform-engineering-labs/formae/pkg/plugin v0.1.24-0.20260414222617-bbb533eb6131 h1:VXphNlwC/VHrsWvjxFQ1Fhe29MuAtWU5P9EXUU73ryA=
-github.com/platform-engineering-labs/formae/pkg/plugin v0.1.24-0.20260414222617-bbb533eb6131/go.mod h1:RlZ7kQLDEDU6yuqT1jveD+odicnKFpv3pLQZr6S+sEw=
-github.com/platform-engineering-labs/formae/pkg/plugin-conformance-tests v0.1.43-0.20260414222617-bbb533eb6131 h1:3x/sanne+m/E6FozMxr+//FQ/Nu7VT5pTgxhTnWLNc8=
-github.com/platform-engineering-labs/formae/pkg/plugin-conformance-tests v0.1.43-0.20260414222617-bbb533eb6131/go.mod h1:PljEOiOoJXYM2qKGFhEGTmo5SxundvO6Jz/8c5xMxJQ=
+github.com/platform-engineering-labs/formae/pkg/model v0.1.23 h1:vn1Zifj9IgPew36LQXxQ0HHxf5iQT4DXulhcwf7Nys4=
+github.com/platform-engineering-labs/formae/pkg/model v0.1.23/go.mod h1:XmGJA7jNPX9cEGc8TxTiEDitBuEVJOddNakdTZ/bH4U=
+github.com/platform-engineering-labs/formae/pkg/plugin v0.1.23 h1:hkLd5wO1ikVqzg2IXi2QLDIVb6H+aL+dJD4ED5U1Dds=
+github.com/platform-engineering-labs/formae/pkg/plugin v0.1.23/go.mod h1:RlZ7kQLDEDU6yuqT1jveD+odicnKFpv3pLQZr6S+sEw=
+github.com/platform-engineering-labs/formae/pkg/plugin-conformance-tests v0.1.42 h1:EdxMbtUEt93StlvACmw4lOUrqdEVEOjZ4uhNyI5UKPE=
+github.com/platform-engineering-labs/formae/pkg/plugin-conformance-tests v0.1.42/go.mod h1:PljEOiOoJXYM2qKGFhEGTmo5SxundvO6Jz/8c5xMxJQ=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 h1:o4JXh1EVt9k/+g42oCprj/FisM4qX9L3sZB3upGN2ZU=

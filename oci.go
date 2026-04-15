@@ -16,7 +16,7 @@ import (
 	_ "github.com/platform-engineering-labs/formae-plugin-oci/pkg/provisioner/identity"
 	_ "github.com/platform-engineering-labs/formae-plugin-oci/pkg/provisioner/objectstorage"
 	"github.com/platform-engineering-labs/formae-plugin-oci/pkg/util"
-	pkgmodel "github.com/platform-engineering-labs/formae/pkg/model"
+	"github.com/platform-engineering-labs/formae/pkg/model"
 	"github.com/platform-engineering-labs/formae/pkg/plugin"
 	"github.com/platform-engineering-labs/formae/pkg/plugin/resource"
 )
@@ -30,19 +30,19 @@ type Plugin struct{}
 // Compile-time check: Plugin must satisfy ResourcePlugin interface.
 var _ plugin.ResourcePlugin = &Plugin{}
 
-func (p *Plugin) RateLimit() pkgmodel.RateLimitConfig {
-	return pkgmodel.RateLimitConfig{
-		Scope:                            pkgmodel.RateLimitScopeNamespace,
+func (p *Plugin) RateLimit() model.RateLimitConfig {
+	return model.RateLimitConfig{
+		Scope:                            model.RateLimitScopeNamespace,
 		MaxRequestsPerSecondForNamespace: 10,
 	}
 }
 
-func (p *Plugin) DiscoveryFilters() []pkgmodel.MatchFilter {
+func (p *Plugin) DiscoveryFilters() []model.MatchFilter {
 	return nil
 }
 
-func (p *Plugin) LabelConfig() pkgmodel.LabelConfig {
-	return pkgmodel.LabelConfig{}
+func (p *Plugin) LabelConfig() model.LabelConfig {
+	return model.LabelConfig{}
 }
 
 func (p *Plugin) Create(ctx context.Context, request *resource.CreateRequest) (*resource.CreateResult, error) {

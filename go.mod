@@ -6,9 +6,9 @@ require (
 	github.com/apple/pkl-go v0.13.2
 	github.com/evanphx/json-patch/v5 v5.9.11
 	github.com/oracle/oci-go-sdk/v65 v65.112.0
-	github.com/platform-engineering-labs/formae/pkg/model v0.1.24-0.20260414222617-bbb533eb6131
-	github.com/platform-engineering-labs/formae/pkg/plugin v0.1.24-0.20260414222617-bbb533eb6131
-	github.com/platform-engineering-labs/formae/pkg/plugin-conformance-tests v0.1.43-0.20260414222617-bbb533eb6131
+	github.com/platform-engineering-labs/formae/pkg/model v0.1.23
+	github.com/platform-engineering-labs/formae/pkg/plugin v0.1.23
+	github.com/platform-engineering-labs/formae/pkg/plugin-conformance-tests v0.1.42
 	github.com/stretchr/testify v1.11.1
 )
 
@@ -68,4 +68,4 @@ require (
 
 replace ergo.services/ergo => github.com/JeroenSoeters/ergo v1.999.320-pel.1
 
-replace ergo.services/actor/statemachine => github.com/JeroenSoeters/actor/statemachine v0.0.0-20260319024748-85c28f9f660b
+replace ergo.services/actor/statemachine => github.com/JeroenSoeters/actor/statemachine v0.0.0-20260414171442-1ef660e4a3bc
