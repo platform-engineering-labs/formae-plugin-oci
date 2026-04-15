@@ -19,6 +19,7 @@ import (
 
 type DhcpOptionsProvisioner struct {
 	clients *client.Clients
+	svc     *core.VirtualNetworkClient // nil until first use; injected in tests
 }
 
 var _ provisioner.Provisioner = &DhcpOptionsProvisioner{}
@@ -29,6 +30,19 @@ func init() {
 
 func NewDhcpOptionsProvisioner(clients *client.Clients) provisioner.Provisioner {
 	return &DhcpOptionsProvisioner{clients: clients}
+}
+
+// NewDhcpOptionsProvisionerWithSvc constructs a provisioner with a pre-built SDK client,
+// for use in tests that point the client at an httptest server.
+func NewDhcpOptionsProvisionerWithSvc(svc *core.VirtualNetworkClient) *DhcpOptionsProvisioner {
+	return &DhcpOptionsProvisioner{svc: svc}
+}
+
+func (p *DhcpOptionsProvisioner) getSvc() (*core.VirtualNetworkClient, error) {
+	if p.svc != nil {
+		return p.svc, nil
+	}
+	return p.clients.GetVirtualNetworkClient()
 }
 
 func parseDhcpOptions(optionsData any) ([]core.DhcpOption, error) {
@@ -122,7 +136,7 @@ func serializeDhcpOptions(options []core.DhcpOption) []map[string]any {
 }
 
 func (p *DhcpOptionsProvisioner) Create(ctx context.Context, request *resource.CreateRequest) (*resource.CreateResult, error) {
-	svc, err := p.clients.GetVirtualNetworkClient()
+	svc, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -178,7 +192,7 @@ func (p *DhcpOptionsProvisioner) Create(ctx context.Context, request *resource.C
 }
 
 func (p *DhcpOptionsProvisioner) Read(ctx context.Context, request *resource.ReadRequest) (*resource.ReadResult, error) {
-	svc, err := p.clients.GetVirtualNetworkClient()
+	svc, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -219,7 +233,7 @@ func (p *DhcpOptionsProvisioner) Read(ctx context.Context, request *resource.Rea
 }
 
 func (p *DhcpOptionsProvisioner) Update(ctx context.Context, request *resource.UpdateRequest) (*resource.UpdateResult, error) {
-	svc, err := p.clients.GetVirtualNetworkClient()
+	svc, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -274,7 +288,7 @@ func (p *DhcpOptionsProvisioner) Update(ctx context.Context, request *resource.U
 }
 
 func (p *DhcpOptionsProvisioner) Delete(ctx context.Context, request *resource.DeleteRequest) (*resource.DeleteResult, error) {
-	svc, err := p.clients.GetVirtualNetworkClient()
+	svc, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -328,7 +342,7 @@ func (p *DhcpOptionsProvisioner) Status(ctx context.Context, request *resource.S
 }
 
 func (p *DhcpOptionsProvisioner) List(ctx context.Context, request *resource.ListRequest) (*resource.ListResult, error) {
-	svc, err := p.clients.GetVirtualNetworkClient()
+	svc, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}

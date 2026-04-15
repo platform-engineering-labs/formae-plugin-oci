@@ -19,6 +19,7 @@ import (
 
 type NetworkSecurityGroupProvisioner struct {
 	clients *client.Clients
+	svc     *core.VirtualNetworkClient // nil until first use; injected in tests
 }
 
 var _ provisioner.Provisioner = &NetworkSecurityGroupProvisioner{}
@@ -31,8 +32,21 @@ func NewNetworkSecurityGroupProvisioner(clients *client.Clients) provisioner.Pro
 	return &NetworkSecurityGroupProvisioner{clients: clients}
 }
 
+// NewNetworkSecurityGroupProvisionerWithSvc constructs a provisioner with a pre-built SDK client,
+// for use in tests that point the client at an httptest server.
+func NewNetworkSecurityGroupProvisionerWithSvc(svc *core.VirtualNetworkClient) *NetworkSecurityGroupProvisioner {
+	return &NetworkSecurityGroupProvisioner{svc: svc}
+}
+
+func (p *NetworkSecurityGroupProvisioner) getSvc() (*core.VirtualNetworkClient, error) {
+	if p.svc != nil {
+		return p.svc, nil
+	}
+	return p.clients.GetVirtualNetworkClient()
+}
+
 func (p *NetworkSecurityGroupProvisioner) Create(ctx context.Context, request *resource.CreateRequest) (*resource.CreateResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -79,7 +93,7 @@ func (p *NetworkSecurityGroupProvisioner) Create(ctx context.Context, request *r
 }
 
 func (p *NetworkSecurityGroupProvisioner) Update(ctx context.Context, request *resource.UpdateRequest) (*resource.UpdateResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -126,7 +140,7 @@ func (p *NetworkSecurityGroupProvisioner) Update(ctx context.Context, request *r
 }
 
 func (p *NetworkSecurityGroupProvisioner) Delete(ctx context.Context, request *resource.DeleteRequest) (*resource.DeleteResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -180,7 +194,7 @@ func (p *NetworkSecurityGroupProvisioner) Status(ctx context.Context, request *r
 }
 
 func (p *NetworkSecurityGroupProvisioner) Read(ctx context.Context, request *resource.ReadRequest) (*resource.ReadResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -235,7 +249,7 @@ func (p *NetworkSecurityGroupProvisioner) Read(ctx context.Context, request *res
 }
 
 func (p *NetworkSecurityGroupProvisioner) List(ctx context.Context, request *resource.ListRequest) (*resource.ListResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}

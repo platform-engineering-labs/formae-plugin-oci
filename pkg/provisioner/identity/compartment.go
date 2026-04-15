@@ -20,6 +20,7 @@ import (
 
 type CompartmentProvisioner struct {
 	clients *client.Clients
+	svc     *identity.IdentityClient // nil until first use; injected in tests
 }
 
 var _ provisioner.Provisioner = &CompartmentProvisioner{}
@@ -32,8 +33,21 @@ func NewCompartmentProvisioner(clients *client.Clients) provisioner.Provisioner 
 	return &CompartmentProvisioner{clients: clients}
 }
 
+// NewCompartmentProvisionerWithSvc constructs a provisioner with a pre-built SDK client,
+// for use in tests that point the client at an httptest server.
+func NewCompartmentProvisionerWithSvc(svc *identity.IdentityClient) *CompartmentProvisioner {
+	return &CompartmentProvisioner{svc: svc}
+}
+
+func (p *CompartmentProvisioner) getSvc() (*identity.IdentityClient, error) {
+	if p.svc != nil {
+		return p.svc, nil
+	}
+	return p.clients.GetIdentityClient()
+}
+
 func (p *CompartmentProvisioner) Create(ctx context.Context, request *resource.CreateRequest) (*resource.CreateResult, error) {
-	client, err := p.clients.GetIdentityClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get Identity client: %w", err)
 	}
@@ -96,7 +110,7 @@ func (p *CompartmentProvisioner) Create(ctx context.Context, request *resource.C
 // findCompartmentByName lists child compartments under parentID and returns the OCID
 // of the active compartment matching the given name, or "" if not found.
 func (p *CompartmentProvisioner) findCompartmentByName(ctx context.Context, parentID, name string) (string, error) {
-	client, err := p.clients.GetIdentityClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return "", err
 	}
@@ -117,7 +131,7 @@ func (p *CompartmentProvisioner) findCompartmentByName(ctx context.Context, pare
 }
 
 func (p *CompartmentProvisioner) Read(ctx context.Context, request *resource.ReadRequest) (*resource.ReadResult, error) {
-	client, err := p.clients.GetIdentityClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get Identity client: %w", err)
 	}
@@ -135,6 +149,13 @@ func (p *CompartmentProvisioner) Read(ctx context.Context, request *resource.Rea
 			}, nil
 		}
 		return nil, fmt.Errorf("failed to read Compartment: %w", err)
+	}
+
+	if util.IsTerminal(string(resp.LifecycleState)) {
+		return &resource.ReadResult{
+			ResourceType: "OCI::Identity::Compartment",
+			ErrorCode:    resource.OperationErrorCodeNotFound,
+		}, nil
 	}
 
 	properties := map[string]any{
@@ -173,7 +194,7 @@ func (p *CompartmentProvisioner) Read(ctx context.Context, request *resource.Rea
 }
 
 func (p *CompartmentProvisioner) Update(ctx context.Context, request *resource.UpdateRequest) (*resource.UpdateResult, error) {
-	client, err := p.clients.GetIdentityClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get Identity client: %w", err)
 	}
@@ -222,7 +243,7 @@ func (p *CompartmentProvisioner) Update(ctx context.Context, request *resource.U
 }
 
 func (p *CompartmentProvisioner) Delete(ctx context.Context, request *resource.DeleteRequest) (*resource.DeleteResult, error) {
-	client, err := p.clients.GetIdentityClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get Identity client: %w", err)
 	}
@@ -286,7 +307,7 @@ func (p *CompartmentProvisioner) Delete(ctx context.Context, request *resource.D
 }
 
 func (p *CompartmentProvisioner) Status(ctx context.Context, request *resource.StatusRequest) (*resource.StatusResult, error) {
-	client, err := p.clients.GetIdentityClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get Identity client: %w", err)
 	}
@@ -337,7 +358,7 @@ func (p *CompartmentProvisioner) Status(ctx context.Context, request *resource.S
 }
 
 func (p *CompartmentProvisioner) List(ctx context.Context, request *resource.ListRequest) (*resource.ListResult, error) {
-	client, err := p.clients.GetIdentityClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get Identity client: %w", err)
 	}

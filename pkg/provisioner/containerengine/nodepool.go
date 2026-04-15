@@ -370,6 +370,13 @@ func (p *NodePoolProvisioner) Read(ctx context.Context, request *resource.ReadRe
 		return nil, fmt.Errorf("failed to read NodePool: %w", err)
 	}
 
+	if util.IsTerminal(string(resp.LifecycleState)) {
+		return &resource.ReadResult{
+			ResourceType: "OCI::ContainerEngine::NodePool",
+			ErrorCode:    resource.OperationErrorCodeNotFound,
+		}, nil
+	}
+
 	// Build properties map
 	props := map[string]any{
 		"CompartmentId": *resp.CompartmentId,

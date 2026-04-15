@@ -19,6 +19,7 @@ import (
 
 type BucketProvisioner struct {
 	clients *client.Clients
+	svc     *objectstorage.ObjectStorageClient // nil until first use; injected in tests
 }
 
 var _ provisioner.Provisioner = &BucketProvisioner{}
@@ -29,6 +30,19 @@ func init() {
 
 func NewBucketProvisioner(clients *client.Clients) provisioner.Provisioner {
 	return &BucketProvisioner{clients: clients}
+}
+
+// NewBucketProvisionerWithSvc constructs a provisioner with a pre-built SDK client,
+// for use in tests that point the client at an httptest server.
+func NewBucketProvisionerWithSvc(svc *objectstorage.ObjectStorageClient) *BucketProvisioner {
+	return &BucketProvisioner{svc: svc}
+}
+
+func (p *BucketProvisioner) getSvc() (*objectstorage.ObjectStorageClient, error) {
+	if p.svc != nil {
+		return p.svc, nil
+	}
+	return p.clients.GetObjectStorageClient()
 }
 
 // getNamespace fetches the Object Storage namespace for the tenancy.
@@ -45,7 +59,7 @@ func (p *BucketProvisioner) getNamespace(ctx context.Context, client *objectstor
 }
 
 func (p *BucketProvisioner) Create(ctx context.Context, request *resource.CreateRequest) (*resource.CreateResult, error) {
-	client, err := p.clients.GetObjectStorageClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get ObjectStorage client: %w", err)
 	}
@@ -107,7 +121,7 @@ func (p *BucketProvisioner) Create(ctx context.Context, request *resource.Create
 }
 
 func (p *BucketProvisioner) Update(ctx context.Context, request *resource.UpdateRequest) (*resource.UpdateResult, error) {
-	client, err := p.clients.GetObjectStorageClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get ObjectStorage client: %w", err)
 	}
@@ -172,7 +186,7 @@ func (p *BucketProvisioner) Update(ctx context.Context, request *resource.Update
 }
 
 func (p *BucketProvisioner) Delete(ctx context.Context, request *resource.DeleteRequest) (*resource.DeleteResult, error) {
-	client, err := p.clients.GetObjectStorageClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get ObjectStorage client: %w", err)
 	}
@@ -233,7 +247,7 @@ func (p *BucketProvisioner) Status(ctx context.Context, request *resource.Status
 }
 
 func (p *BucketProvisioner) Read(ctx context.Context, request *resource.ReadRequest) (*resource.ReadResult, error) {
-	client, err := p.clients.GetObjectStorageClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get ObjectStorage client: %w", err)
 	}
@@ -296,7 +310,7 @@ func (p *BucketProvisioner) Read(ctx context.Context, request *resource.ReadRequ
 }
 
 func (p *BucketProvisioner) List(ctx context.Context, request *resource.ListRequest) (*resource.ListResult, error) {
-	client, err := p.clients.GetObjectStorageClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get ObjectStorage client: %w", err)
 	}

@@ -19,6 +19,7 @@ import (
 
 type VolumeProvisioner struct {
 	clients *client.Clients
+	svc     *core.BlockstorageClient // nil until first use; injected in tests
 }
 
 var _ provisioner.Provisioner = &VolumeProvisioner{}
@@ -31,8 +32,21 @@ func NewVolumeProvisioner(clients *client.Clients) provisioner.Provisioner {
 	return &VolumeProvisioner{clients: clients}
 }
 
+// NewVolumeProvisionerWithSvc constructs a provisioner with a pre-built SDK client,
+// for use in tests that point the client at an httptest server.
+func NewVolumeProvisionerWithSvc(svc *core.BlockstorageClient) *VolumeProvisioner {
+	return &VolumeProvisioner{svc: svc}
+}
+
+func (p *VolumeProvisioner) getSvc() (*core.BlockstorageClient, error) {
+	if p.svc != nil {
+		return p.svc, nil
+	}
+	return p.clients.GetBlockstorageClient()
+}
+
 func (p *VolumeProvisioner) Create(ctx context.Context, request *resource.CreateRequest) (*resource.CreateResult, error) {
-	svc, err := p.clients.GetBlockstorageClient()
+	svc, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get Blockstorage client: %w", err)
 	}
@@ -93,7 +107,7 @@ func (p *VolumeProvisioner) Create(ctx context.Context, request *resource.Create
 }
 
 func (p *VolumeProvisioner) Read(ctx context.Context, request *resource.ReadRequest) (*resource.ReadResult, error) {
-	svc, err := p.clients.GetBlockstorageClient()
+	svc, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get Blockstorage client: %w", err)
 	}
@@ -113,6 +127,13 @@ func (p *VolumeProvisioner) Read(ctx context.Context, request *resource.ReadRequ
 		return nil, fmt.Errorf("failed to read Volume: %w", err)
 	}
 
+	if util.IsTerminal(string(resp.LifecycleState)) {
+		return &resource.ReadResult{
+			ResourceType: "OCI::Core::Volume",
+			ErrorCode:    resource.OperationErrorCodeNotFound,
+		}, nil
+	}
+
 	properties := buildVolumeProperties(resp.Volume)
 
 	propBytes, err := json.Marshal(properties)
@@ -127,7 +148,7 @@ func (p *VolumeProvisioner) Read(ctx context.Context, request *resource.ReadRequ
 }
 
 func (p *VolumeProvisioner) Update(ctx context.Context, request *resource.UpdateRequest) (*resource.UpdateResult, error) {
-	svc, err := p.clients.GetBlockstorageClient()
+	svc, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get Blockstorage client: %w", err)
 	}
@@ -181,7 +202,7 @@ func (p *VolumeProvisioner) Update(ctx context.Context, request *resource.Update
 }
 
 func (p *VolumeProvisioner) Delete(ctx context.Context, request *resource.DeleteRequest) (*resource.DeleteResult, error) {
-	svc, err := p.clients.GetBlockstorageClient()
+	svc, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get Blockstorage client: %w", err)
 	}
@@ -227,7 +248,7 @@ func (p *VolumeProvisioner) Delete(ctx context.Context, request *resource.Delete
 }
 
 func (p *VolumeProvisioner) Status(ctx context.Context, request *resource.StatusRequest) (*resource.StatusResult, error) {
-	svc, err := p.clients.GetBlockstorageClient()
+	svc, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get Blockstorage client: %w", err)
 	}
@@ -299,7 +320,7 @@ func (p *VolumeProvisioner) Status(ctx context.Context, request *resource.Status
 }
 
 func (p *VolumeProvisioner) List(ctx context.Context, request *resource.ListRequest) (*resource.ListResult, error) {
-	svc, err := p.clients.GetBlockstorageClient()
+	svc, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get Blockstorage client: %w", err)
 	}

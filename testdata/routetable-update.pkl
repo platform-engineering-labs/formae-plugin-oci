@@ -10,7 +10,6 @@ import "@formae/formae.pkl"
 import "@oci/oci.pkl"
 import "@oci/core/vcn.pkl"
 import "@oci/core/routetable.pkl"
-import "@oci/identity/compartment.pkl"
 
 // These values need to be set for your OCI tenancy
 local testCompartmentId = read("env:OCI_COMPARTMENT_ID")
@@ -38,13 +37,6 @@ forma {
       profile = testProfile
       region = "us-chicago-1"
     }
-  }
-
-  new compartment.Compartment {
-    label = "plugin-sdk-test-compartment"
-    compartmentId = testCompartmentId
-    name = "formae-plugin-sdk-test-\(testRunID)"
-    description = "Compartment for conformance tests"
   }
 
   testVcn

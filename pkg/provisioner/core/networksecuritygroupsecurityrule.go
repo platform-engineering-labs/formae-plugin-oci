@@ -30,6 +30,7 @@ func parseNativeID(nativeID string) (nsgId, ruleId string, err error) {
 
 type NetworkSecurityGroupSecurityRuleProvisioner struct {
 	clients *client.Clients
+	svc     *core.VirtualNetworkClient // nil until first use; injected in tests
 }
 
 var _ provisioner.Provisioner = &NetworkSecurityGroupSecurityRuleProvisioner{}
@@ -42,8 +43,21 @@ func NewNetworkSecurityGroupSecurityRuleProvisioner(clients *client.Clients) pro
 	return &NetworkSecurityGroupSecurityRuleProvisioner{clients: clients}
 }
 
+// NewNetworkSecurityGroupSecurityRuleProvisionerWithSvc constructs a provisioner with a pre-built SDK client,
+// for use in tests that point the client at an httptest server.
+func NewNetworkSecurityGroupSecurityRuleProvisionerWithSvc(svc *core.VirtualNetworkClient) *NetworkSecurityGroupSecurityRuleProvisioner {
+	return &NetworkSecurityGroupSecurityRuleProvisioner{svc: svc}
+}
+
+func (p *NetworkSecurityGroupSecurityRuleProvisioner) getSvc() (*core.VirtualNetworkClient, error) {
+	if p.svc != nil {
+		return p.svc, nil
+	}
+	return p.clients.GetVirtualNetworkClient()
+}
+
 func (p *NetworkSecurityGroupSecurityRuleProvisioner) Create(ctx context.Context, request *resource.CreateRequest) (*resource.CreateResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -196,7 +210,7 @@ func (p *NetworkSecurityGroupSecurityRuleProvisioner) Update(ctx context.Context
 }
 
 func (p *NetworkSecurityGroupSecurityRuleProvisioner) Delete(ctx context.Context, request *resource.DeleteRequest) (*resource.DeleteResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -282,7 +296,7 @@ func (p *NetworkSecurityGroupSecurityRuleProvisioner) Read(ctx context.Context, 
 // getSecurityRuleById fetches a security rule by listing rules in the NSG and finding the matching one.
 // Returns nil if the rule is not found.
 func (p *NetworkSecurityGroupSecurityRuleProvisioner) getSecurityRuleById(ctx context.Context, nsgId, ruleId string) (*core.SecurityRule, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
@@ -386,7 +400,7 @@ func buildSecurityRuleProperties(nsgId, ruleId string, rule *core.SecurityRule) 
 }
 
 func (p *NetworkSecurityGroupSecurityRuleProvisioner) List(ctx context.Context, request *resource.ListRequest) (*resource.ListResult, error) {
-	client, err := p.clients.GetVirtualNetworkClient()
+	client, err := p.getSvc()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get VirtualNetwork client: %w", err)
 	}
