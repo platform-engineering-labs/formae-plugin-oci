@@ -1,0 +1,104 @@
+/*
+ * © 2025 Platform Engineering Labs Inc.
+ *
+ * SPDX-License-Identifier: FSL-1.1-ALv2
+ */
+
+amends "@formae/forma.pkl"
+
+import "./vars.pkl"
+import "./infrastructure/identity.pkl"
+import "./infrastructure/network.pkl"
+import "./infrastructure/security.pkl"
+import "./infrastructure/subnets.pkl"
+import "./infrastructure/compute.pkl"
+import "./infrastructure/containers.pkl"
+import "./infrastructure/storage.pkl"
+
+local _identity = new identity.IdentityResources {
+    compartmentId = vars.props.compartmentId.value
+    projectName = vars.projectName
+}
+
+// VCN, gateways, route tables, security list, DHCP
+local _network = new network.NetworkResources {
+    compartmentId = vars.props.compartmentId.value
+    projectName = vars.projectName
+    vcnCidr = vars.vcnCidr
+    publicSubnetCidr = vars.publicSubnetCidr
+    privateSubnetCidr = vars.privateSubnetCidr
+    serviceGatewayServiceId = vars.props.serviceGatewayServiceId.value
+}
+
+// NSGs + standalone NSG rule
+local _security = new security.SecurityResources {
+    compartmentId = vars.props.compartmentId.value
+    projectName = vars.projectName
+    vcn = _network.vcn
+}
+
+local _subnets = new subnets.SubnetResources {
+    compartmentId = vars.props.compartmentId.value
+    projectName = vars.projectName
+    publicSubnetCidr = vars.publicSubnetCidr
+    privateSubnetCidr = vars.privateSubnetCidr
+    vcn = _network.vcn
+    publicRouteTable = _network.publicRouteTable
+    privateRouteTable = _network.privateRouteTable
+    securityList = _network.securityList
+}
+
+local _compute = new compute.ComputeResources {
+    compartmentId = vars.props.compartmentId.value
+    projectName = vars.projectName
+    availabilityDomain = vars.props.availabilityDomain.value
+    nodeImageId = vars.props.nodeImageId.value
+    sshPublicKey = vars.props.sshPublicKey.value
+    publicSubnet = _subnets.publicSubnet
+    webNsg = _security.webNsg
+}
+
+// OKE cluster + node pool + virtual node pool
+local _containers = new containers.ContainerResources {
+    compartmentId = vars.props.compartmentId.value
+    projectName = vars.projectName
+    k8sVersion = vars.k8sVersion
+    availabilityDomain = vars.props.availabilityDomain.value
+    nodeImageId = vars.props.nodeImageId.value
+    vcn = _network.vcn
+    publicSubnet = _subnets.publicSubnet
+    privateSubnet = _subnets.privateSubnet
+}
+
+local _storage = new storage.StorageResources {
+    compartmentId = vars.props.compartmentId.value
+    projectName = vars.projectName
+}
+
+description {
+    text = """
+    OCI Platform Example
+    - Identity:   Policy
+    - Network:    VCN, DhcpOptions, InternetGateway, NatGateway, ServiceGateway,
+                  2x RouteTable, SecurityList
+    - Security:   3x NetworkSecurityGroup, NetworkSecurityGroupSecurityRule
+    - Subnets:    Public Subnet, Private Subnet
+    - Compute:    Volume, Instance (bastion)
+    - Platform:   OKE Cluster, NodePool, VirtualNodePool
+    - Storage:    Bucket
+    """
+    confirm = true
+}
+
+forma {
+    vars.stack
+    vars.target
+
+    ..._identity.resources
+    ..._network.resources
+    ..._security.resources
+    ..._subnets.resources
+    ..._compute.resources
+    ..._containers.resources
+    ..._storage.resources
+}

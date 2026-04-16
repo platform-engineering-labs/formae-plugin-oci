@@ -1,0 +1,66 @@
+/*
+ * © 2025 Platform Engineering Labs Inc.
+ *
+ * SPDX-License-Identifier: FSL-1.1-ALv2
+ */
+
+import "@formae/formae.pkl"
+import "@oci/oci.pkl"
+
+projectName = "oci-showcase"
+ociRegion = "us-chicago-1"
+k8sVersion = "v1.34.1"
+
+// Network config
+vcnCidr = "10.0.0.0/16"
+publicSubnetCidr = "10.0.1.0/24"
+privateSubnetCidr = "10.0.2.0/24"
+
+// Compute config
+vmShape = "VM.Standard.E4.Flex"
+
+// Properties (CLI flags / env vars)
+props = new Dynamic {
+    compartmentId = new formae.Prop {
+        flag = "compartmentId"
+        default = read?("env:OCI_COMPARTMENT_ID") ?? "ocid1.compartment.oc1..aaaaaaaalrlihjwxgvrupwi47au2aqy6rk3lfhm57bdrrq2ricjoi3sp6j5q"
+    }
+
+    availabilityDomain = new formae.Prop {
+        flag = "availabilityDomain"
+        default = "Twhb:US-CHICAGO-1-AD-1"
+    }
+
+    // OKE-optimized node image for your region and K8s version
+    // Find images: oci ce node-pool-options get --node-pool-option-id all --compartment-id <compartment-id>
+    nodeImageId = new formae.Prop {
+        flag = "nodeImageId"
+        // OKE Oracle Linux 8.10 for K8s v1.34.1 in us-chicago-1 (x86_64)
+        default = "ocid1.image.oc1.us-chicago-1.aaaaaaaasyjphzjohvvrttbw66amaxx6otldb26fvvn4nsogrvzsq2t6vama"
+    }
+
+    // Service Gateway service ID for OCI services
+    // Find: oci network service list --compartment-id <compartment-id> --query "data[?contains(name, 'Services')].{Name:name, Id:id}"
+    serviceGatewayServiceId = new formae.Prop {
+        flag = "serviceGatewayServiceId"
+        default = "ocid1.service.oc1.us-chicago-1.aaaaaaaakalxenk3rcszv74eamyc6dkjq6ngikfsdpctsll4nxw2lnfqbpbq"
+    }
+
+    // SSH public key for the bastion instance
+    sshPublicKey = new formae.Prop {
+        flag = "sshPublicKey"
+        default = read?("env:SSH_PUBLIC_KEY") ?? ""
+    }
+}
+
+stack: formae.Stack = new {
+    label = projectName
+    description = "OCI Kitchen-Sink Showcase — every supported resource type"
+}
+
+target: formae.Target = new formae.Target {
+    label = "oci-target"
+    config = new oci.Config {
+        region = module.ociRegion
+    }
+}

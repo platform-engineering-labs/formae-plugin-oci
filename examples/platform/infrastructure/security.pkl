@@ -1,0 +1,78 @@
+/*
+ * © 2025 Platform Engineering Labs Inc.
+ *
+ * SPDX-License-Identifier: FSL-1.1-ALv2
+ */
+
+module platform.security
+
+import "@formae/formae.pkl"
+import "@oci/oci.pkl"
+import "@oci/core/vcn.pkl"
+import "@oci/core/networksecuritygroup.pkl"
+import "@oci/core/networksecuritygroupsecurityrule.pkl"
+
+class SecurityResources {
+    compartmentId: String
+    projectName: String
+    vcn: vcn.VCN
+
+    webNsg: networksecuritygroup.NetworkSecurityGroup = new {
+        label = "showcase-web-nsg"
+        compartmentId = outer.compartmentId
+        vcnId = vcn.res.id
+        displayName = projectName + "-web-nsg"
+        freeformTags {
+            new oci.FreeformTag { key = "Name"; value = projectName + "-web-nsg" }
+            new oci.FreeformTag { key = "Project"; value = projectName }
+            new oci.FreeformTag { key = "Tier"; value = "web" }
+        }
+    }
+
+    hidden appNsg: networksecuritygroup.NetworkSecurityGroup = new {
+        label = "showcase-app-nsg"
+        compartmentId = outer.compartmentId
+        vcnId = vcn.res.id
+        displayName = projectName + "-app-nsg"
+        freeformTags {
+            new oci.FreeformTag { key = "Name"; value = projectName + "-app-nsg" }
+            new oci.FreeformTag { key = "Project"; value = projectName }
+            new oci.FreeformTag { key = "Tier"; value = "app" }
+        }
+    }
+
+    hidden dbNsg: networksecuritygroup.NetworkSecurityGroup = new {
+        label = "showcase-db-nsg"
+        compartmentId = outer.compartmentId
+        vcnId = vcn.res.id
+        displayName = projectName + "-db-nsg"
+        freeformTags {
+            new oci.FreeformTag { key = "Name"; value = projectName + "-db-nsg" }
+            new oci.FreeformTag { key = "Project"; value = projectName }
+            new oci.FreeformTag { key = "Tier"; value = "database" }
+        }
+    }
+
+    hidden webHttpRule: networksecuritygroupsecurityrule.NetworkSecurityGroupSecurityRule = new {
+        label = "showcase-web-http-rule"
+        networkSecurityGroupId = webNsg.res.id
+        direction = "INGRESS"
+        protocol = "6"  // TCP
+        description = "Allow HTTP traffic from internet to web tier"
+        source = "0.0.0.0/0"
+        sourceType = "CIDR_BLOCK"
+        tcpOptions = new networksecuritygroupsecurityrule.TcpOptions {
+            destinationPortRange = new networksecuritygroupsecurityrule.PortRange {
+                min = 80
+                max = 80
+            }
+        }
+    }
+
+    hidden resources: Listing<formae.Resource> = new {
+        webNsg
+        appNsg
+        dbNsg
+        webHttpRule
+    }
+}

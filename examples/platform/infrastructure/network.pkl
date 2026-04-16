@@ -1,0 +1,203 @@
+/*
+ * © 2025 Platform Engineering Labs Inc.
+ *
+ * SPDX-License-Identifier: FSL-1.1-ALv2
+ */
+
+module platform.network
+
+import "@formae/formae.pkl"
+import "@oci/oci.pkl"
+import "@oci/core/vcn.pkl"
+import "@oci/core/dhcpoptions.pkl"
+import "@oci/core/internetgateway.pkl"
+import "@oci/core/natgateway.pkl"
+import "@oci/core/servicegateway.pkl"
+import "@oci/core/routetable.pkl"
+import "@oci/core/securitylist.pkl"
+
+class NetworkResources {
+    compartmentId: String
+    projectName: String
+    vcnCidr: String
+    publicSubnetCidr: String
+    privateSubnetCidr: String
+    serviceGatewayServiceId: String
+
+    vcn: vcn.VCN = new vcn.VCN {
+        label = "showcase-vcn"
+        compartmentId = outer.compartmentId
+        cidrBlock = vcnCidr
+        displayName = projectName + "-vcn"
+        dnsLabel = "showcase"
+        freeformTags {
+            new oci.FreeformTag { key = "Name"; value = projectName + "-vcn" }
+            new oci.FreeformTag { key = "Project"; value = projectName }
+        }
+    }
+
+    dhcpOptions: dhcpoptions.DhcpOptions = new dhcpoptions.DhcpOptions {
+        label = "showcase-dhcp"
+        compartmentId = outer.compartmentId
+        vcnId = vcn.res.id
+        displayName = projectName + "-dhcp"
+        options {
+            new dhcpoptions.DhcpDnsOption {
+                type = "DomainNameServer"
+                serverType = "VcnLocalPlusInternet"
+            }
+        }
+        freeformTags {
+            new oci.FreeformTag { key = "Name"; value = projectName + "-dhcp" }
+            new oci.FreeformTag { key = "Project"; value = projectName }
+        }
+    }
+
+    internetGateway: internetgateway.InternetGateway = new internetgateway.InternetGateway {
+        label = "showcase-igw"
+        compartmentId = outer.compartmentId
+        vcnId = vcn.res.id
+        isEnabled = true
+        displayName = projectName + "-igw"
+        freeformTags {
+            new oci.FreeformTag { key = "Name"; value = projectName + "-igw" }
+            new oci.FreeformTag { key = "Project"; value = projectName }
+        }
+    }
+
+    natGateway: natgateway.NatGateway = new natgateway.NatGateway {
+        label = "showcase-nat-gw"
+        compartmentId = outer.compartmentId
+        vcnId = vcn.res.id
+        displayName = projectName + "-nat-gw"
+        blockTraffic = false
+        freeformTags {
+            new oci.FreeformTag { key = "Name"; value = projectName + "-nat-gw" }
+            new oci.FreeformTag { key = "Project"; value = projectName }
+        }
+    }
+
+    serviceGateway: servicegateway.ServiceGateway = new servicegateway.ServiceGateway {
+        label = "showcase-svc-gw"
+        compartmentId = outer.compartmentId
+        vcnId = vcn.res.id
+        displayName = projectName + "-svc-gw"
+        services {
+            new servicegateway.ServiceGatewayService {
+                serviceId = serviceGatewayServiceId
+            }
+        }
+        freeformTags {
+            new oci.FreeformTag { key = "Name"; value = projectName + "-svc-gw" }
+            new oci.FreeformTag { key = "Project"; value = projectName }
+        }
+    }
+
+    publicRouteTable: routetable.RouteTable = new routetable.RouteTable {
+        label = "showcase-public-rt"
+        compartmentId = outer.compartmentId
+        vcnId = vcn.res.id
+        displayName = projectName + "-public-rt"
+        routeRules {
+            new routetable.RouteRule {
+                description = "traffic to/from internet"
+                destination = "0.0.0.0/0"
+                destinationType = "CIDR_BLOCK"
+                networkEntityId = internetGateway.res.id
+            }
+        }
+        freeformTags {
+            new oci.FreeformTag { key = "Name"; value = projectName + "-public-rt" }
+            new oci.FreeformTag { key = "Project"; value = projectName }
+        }
+    }
+
+    privateRouteTable: routetable.RouteTable = new routetable.RouteTable {
+        label = "showcase-private-rt"
+        compartmentId = outer.compartmentId
+        vcnId = vcn.res.id
+        displayName = projectName + "-private-rt"
+        routeRules {
+            new routetable.RouteRule {
+                description = "traffic to the internet via NAT"
+                destination = "0.0.0.0/0"
+                destinationType = "CIDR_BLOCK"
+                networkEntityId = natGateway.res.id
+            }
+            new routetable.RouteRule {
+                description = "traffic to OCI services"
+                destination = "all-ord-services-in-oracle-services-network"
+                destinationType = "SERVICE_CIDR_BLOCK"
+                networkEntityId = serviceGateway.res.id
+            }
+        }
+        freeformTags {
+            new oci.FreeformTag { key = "Name"; value = projectName + "-private-rt" }
+            new oci.FreeformTag { key = "Project"; value = projectName }
+        }
+    }
+
+    securityList: securitylist.SecurityList = new securitylist.SecurityList {
+        label = "showcase-security-list"
+        compartmentId = outer.compartmentId
+        vcnId = vcn.res.id
+        displayName = projectName + "-security-list"
+
+        ingressSecurityRules {
+            // Allow all traffic within the VCN
+            new securitylist.IngressSecurityRule {
+                description = "Allow all traffic within VCN"
+                protocol = "all"
+                source = vcnCidr
+                sourceType = "CIDR_BLOCK"
+            }
+            // SSH from anywhere (demo only)
+            new securitylist.IngressSecurityRule {
+                description = "SSH access"
+                protocol = "6"
+                source = "0.0.0.0/0"
+                sourceType = "CIDR_BLOCK"
+                tcpOptions = new securitylist.TcpOptions {
+                    destinationPortRange = new securitylist.PortRange { min = 22; max = 22 }
+                }
+            }
+            // ICMP path discovery
+            new securitylist.IngressSecurityRule {
+                description = "ICMP path discovery"
+                protocol = "1"
+                source = "0.0.0.0/0"
+                sourceType = "CIDR_BLOCK"
+                icmpOptions = new securitylist.IcmpOptions {
+                    type = 3
+                    code = 4
+                }
+            }
+        }
+
+        egressSecurityRules {
+            // Allow all outbound
+            new securitylist.EgressSecurityRule {
+                description = "Allow all outbound traffic"
+                protocol = "all"
+                destination = "0.0.0.0/0"
+                destinationType = "CIDR_BLOCK"
+            }
+        }
+
+        freeformTags {
+            new oci.FreeformTag { key = "Name"; value = projectName + "-security-list" }
+            new oci.FreeformTag { key = "Project"; value = projectName }
+        }
+    }
+
+    hidden resources: Listing<formae.Resource> = new {
+        vcn
+        dhcpOptions
+        internetGateway
+        natGateway
+        serviceGateway
+        publicRouteTable
+        privateRouteTable
+        securityList
+    }
+}

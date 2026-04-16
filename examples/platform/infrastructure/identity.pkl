@@ -1,0 +1,34 @@
+/*
+ * © 2025 Platform Engineering Labs Inc.
+ *
+ * SPDX-License-Identifier: FSL-1.1-ALv2
+ */
+
+module platform.identity
+
+import "@formae/formae.pkl"
+import "@oci/oci.pkl"
+import "@oci/identity/policy.pkl"
+
+class IdentityResources {
+    compartmentId: String
+    projectName: String
+
+    auditPolicy: policy.Policy = new policy.Policy {
+        label = "showcase-audit-policy"
+        compartmentId = outer.compartmentId
+        name = projectName + "-audit-policy"
+        description = "Read-only audit policy for " + projectName
+        statements {
+            "Allow any-user to read all-resources in compartment id " + outer.compartmentId
+        }
+        freeformTags {
+            new oci.FreeformTag { key = "Name"; value = projectName + "-audit-policy" }
+            new oci.FreeformTag { key = "Project"; value = projectName }
+        }
+    }
+
+    hidden resources: Listing<formae.Resource> = new {
+        auditPolicy
+    }
+}

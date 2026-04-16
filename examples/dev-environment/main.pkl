@@ -1,0 +1,185 @@
+/*
+ * © 2025 Platform Engineering Labs Inc.
+ *
+ * SPDX-License-Identifier: FSL-1.1-ALv2
+ */
+
+amends "@formae/forma.pkl"
+
+import "./vars.pkl"
+import "@oci/oci.pkl"
+import "@oci/core/vcn.pkl"
+import "@oci/core/internetgateway.pkl"
+import "@oci/core/routetable.pkl"
+import "@oci/core/securitylist.pkl"
+import "@oci/core/subnet.pkl"
+import "@oci/core/instance.pkl"
+import "@oci/objectstorage/bucket.pkl"
+
+local _vcn = new vcn.VCN {
+    label = "dev-vcn"
+    compartmentId = vars.compartmentId.value
+    cidrBlock = vars.vcnCidr
+    displayName = vars.projectName + "-vcn"
+    dnsLabel = "devenv"
+    freeformTags {
+        new oci.FreeformTag { key = "Project"; value = vars.projectName }
+    }
+}
+
+local _igw = new internetgateway.InternetGateway {
+    label = "dev-igw"
+    compartmentId = vars.compartmentId.value
+    vcnId = _vcn.res.id
+    isEnabled = true
+    displayName = vars.projectName + "-igw"
+    freeformTags {
+        new oci.FreeformTag { key = "Project"; value = vars.projectName }
+    }
+}
+
+local _routeTable = new routetable.RouteTable {
+    label = "dev-public-rt"
+    compartmentId = vars.compartmentId.value
+    vcnId = _vcn.res.id
+    displayName = vars.projectName + "-public-rt"
+    routeRules {
+        new routetable.RouteRule {
+            description = "traffic to/from internet"
+            destination = "0.0.0.0/0"
+            destinationType = "CIDR_BLOCK"
+            networkEntityId = _igw.res.id
+        }
+    }
+    freeformTags {
+        new oci.FreeformTag { key = "Project"; value = vars.projectName }
+    }
+}
+
+local _securityList = new securitylist.SecurityList {
+    label = "dev-sl"
+    compartmentId = vars.compartmentId.value
+    vcnId = _vcn.res.id
+    displayName = vars.projectName + "-sl"
+    ingressSecurityRules {
+        // SSH access
+        new securitylist.IngressSecurityRule {
+            description = "SSH from anywhere"
+            protocol = "6"
+            source = "0.0.0.0/0"
+            sourceType = "CIDR_BLOCK"
+            isStateless = false
+            tcpOptions = new securitylist.TcpOptions {
+                destinationPortRange = new securitylist.PortRange { min = 22; max = 22 }
+            }
+        }
+        // HTTP access
+        new securitylist.IngressSecurityRule {
+            description = "HTTP from anywhere"
+            protocol = "6"
+            source = "0.0.0.0/0"
+            sourceType = "CIDR_BLOCK"
+            isStateless = false
+            tcpOptions = new securitylist.TcpOptions {
+                destinationPortRange = new securitylist.PortRange { min = 80; max = 80 }
+            }
+        }
+    }
+    egressSecurityRules {
+        new securitylist.EgressSecurityRule {
+            description = "allow all outbound traffic"
+            protocol = "all"
+            destination = "0.0.0.0/0"
+            destinationType = "CIDR_BLOCK"
+            isStateless = false
+        }
+    }
+    freeformTags {
+        new oci.FreeformTag { key = "Project"; value = vars.projectName }
+    }
+}
+
+local _subnet = new subnet.Subnet {
+    label = "dev-public-subnet"
+    compartmentId = vars.compartmentId.value
+    vcnId = _vcn.res.id
+    cidrBlock = vars.publicSubnetCidr
+    displayName = vars.projectName + "-public-subnet"
+    dnsLabel = "devpublic"
+    prohibitPublicIpOnVnic = false
+    prohibitInternetIngress = false
+    routeTableId = _routeTable.res.id
+    securityListIds {
+        _securityList.res.id
+    }
+    freeformTags {
+        new oci.FreeformTag { key = "Project"; value = vars.projectName }
+    }
+}
+
+local _instance = new instance.Instance {
+    label = "dev-box"
+    compartmentId = vars.compartmentId.value
+    availabilityDomain = vars.availabilityDomain.value
+    shape = "VM.Standard.E4.Flex"
+    displayName = vars.projectName + "-box"
+    shapeConfig = new instance.ShapeConfig {
+        ocpus = 1.0
+        memoryInGBs = 6.0
+    }
+    sourceDetails = new instance.SourceDetails {
+        sourceType = "image"
+        imageId = vars.imageId.value
+    }
+    createVnicDetails = new instance.CreateVnicDetails {
+        subnetId = _subnet.res.id
+        assignPublicIp = true
+        displayName = vars.projectName + "-vnic"
+    }
+    metadata {
+        ["ssh_authorized_keys"] = vars.sshPublicKey
+    }
+    freeformTags {
+        new oci.FreeformTag { key = "Project"; value = vars.projectName }
+    }
+}
+
+local _bucket = new bucket.Bucket {
+    label = "dev-scratch-bucket"
+    compartmentId = vars.compartmentId.value
+    name = vars.projectName + "-scratch"
+    storageTier = "Standard"
+    publicAccessType = "NoPublicAccess"
+    freeformTags {
+        new oci.FreeformTag { key = "Project"; value = vars.projectName }
+    }
+}
+
+description {
+    text = """
+    Dev Environment — VM + Scratch Bucket
+
+    This example creates:
+    - VCN with a public subnet
+    - Internet Gateway + Route Table for outbound access
+    - Security List allowing SSH (22) and HTTP (80) inbound
+    - VM.Standard.E4.Flex instance (1 OCPU, 6 GB RAM) with a public IP
+    - Object Storage bucket for data/scratch
+
+    The instance is accessible via SSH using the public key you provide.
+    """
+    confirm = true
+}
+
+forma {
+    vars.stack
+    vars.target
+
+    _vcn
+    _igw
+    _routeTable
+    _securityList
+    _subnet
+    _instance
+    _bucket
+}

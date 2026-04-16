@@ -1,0 +1,68 @@
+/*
+ * © 2025 Platform Engineering Labs Inc.
+ *
+ * SPDX-License-Identifier: FSL-1.1-ALv2
+ */
+
+module platform.subnets
+
+import "@formae/formae.pkl"
+import "@oci/oci.pkl"
+import "@oci/core/vcn.pkl"
+import "@oci/core/subnet.pkl"
+import "@oci/core/routetable.pkl"
+import "@oci/core/securitylist.pkl"
+
+class SubnetResources {
+    compartmentId: String
+    projectName: String
+    publicSubnetCidr: String
+    privateSubnetCidr: String
+    vcn: vcn.VCN
+    publicRouteTable: routetable.RouteTable
+    privateRouteTable: routetable.RouteTable
+    securityList: securitylist.SecurityList
+
+    publicSubnet: subnet.Subnet = new subnet.Subnet {
+        label = "showcase-public-subnet"
+        compartmentId = outer.compartmentId
+        vcnId = vcn.res.id
+        cidrBlock = publicSubnetCidr
+        displayName = projectName + "-public-subnet"
+        dnsLabel = "pub"
+        prohibitPublicIpOnVnic = false
+        prohibitInternetIngress = false
+        routeTableId = publicRouteTable.res.id
+        securityListIds {
+            securityList.res.id
+        }
+        freeformTags {
+            new oci.FreeformTag { key = "Name"; value = projectName + "-public-subnet" }
+            new oci.FreeformTag { key = "Project"; value = projectName }
+        }
+    }
+
+    privateSubnet: subnet.Subnet = new subnet.Subnet {
+        label = "showcase-private-subnet"
+        compartmentId = outer.compartmentId
+        vcnId = vcn.res.id
+        cidrBlock = privateSubnetCidr
+        displayName = projectName + "-private-subnet"
+        dnsLabel = "priv"
+        prohibitPublicIpOnVnic = true
+        prohibitInternetIngress = true
+        routeTableId = privateRouteTable.res.id
+        securityListIds {
+            securityList.res.id
+        }
+        freeformTags {
+            new oci.FreeformTag { key = "Name"; value = projectName + "-private-subnet" }
+            new oci.FreeformTag { key = "Project"; value = projectName }
+        }
+    }
+
+    hidden resources: Listing<formae.Resource> = new {
+        publicSubnet
+        privateSubnet
+    }
+}
