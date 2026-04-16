@@ -1,0 +1,32 @@
+/*
+ * © 2025 Platform Engineering Labs Inc.
+ *
+ * SPDX-License-Identifier: FSL-1.1-ALv2
+ */
+
+module platform.storage
+
+import "@formae/formae.pkl"
+import "@oci/oci.pkl"
+import "@oci/objectstorage/bucket.pkl"
+
+class StorageResources {
+    compartmentId: String
+    projectName: String
+
+    hidden dataBucket: bucket.Bucket = new bucket.Bucket {
+        label = "showcase-bucket"
+        compartmentId = outer.compartmentId
+        name = projectName + "-data-bucket"
+        storageTier = "Standard"
+        publicAccessType = "NoPublicAccess"
+        freeformTags {
+            new oci.FreeformTag { key = "Name"; value = projectName + "-data-bucket" }
+            new oci.FreeformTag { key = "Project"; value = projectName }
+        }
+    }
+
+    hidden resources: Listing<formae.Resource> = new {
+        dataBucket
+    }
+}

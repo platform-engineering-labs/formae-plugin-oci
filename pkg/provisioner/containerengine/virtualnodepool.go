@@ -48,19 +48,20 @@ func (p *VirtualNodePoolProvisioner) Create(ctx context.Context, request *resour
 		DisplayName:   common.String(props["DisplayName"].(string)),
 	}
 
-	// Parse PlacementConfigurations (required)
+	// Parse PlacementConfigurations (required). Nested object fields use
+	// camelCase in the PKL-serialized properties.
 	if placementConfigs, ok := props["PlacementConfigurations"].([]any); ok {
 		configs := make([]containerengine.PlacementConfiguration, 0, len(placementConfigs))
 		for _, pc := range placementConfigs {
 			if pcMap, ok := pc.(map[string]any); ok {
 				placementConfig := containerengine.PlacementConfiguration{}
-				if ad, ok := util.ExtractString(pcMap, "AvailabilityDomain"); ok {
+				if ad, ok := util.ExtractString(pcMap, "availabilityDomain"); ok {
 					placementConfig.AvailabilityDomain = common.String(ad)
 				}
-				if subnetId, ok := util.ExtractString(pcMap, "SubnetId"); ok {
+				if subnetId, ok := util.ExtractString(pcMap, "subnetId"); ok {
 					placementConfig.SubnetId = common.String(subnetId)
 				}
-				if faultDomains, ok := util.ExtractStringSlice(pcMap, "FaultDomains"); ok {
+				if faultDomains, ok := util.ExtractStringSlice(pcMap, "faultDomains"); ok {
 					placementConfig.FaultDomain = faultDomains
 				}
 				configs = append(configs, placementConfig)
@@ -69,16 +70,16 @@ func (p *VirtualNodePoolProvisioner) Create(ctx context.Context, request *resour
 		createDetails.PlacementConfigurations = configs
 	}
 
-	// Parse PodConfiguration (required)
+	// Parse PodConfiguration (required). Nested object fields use camelCase.
 	if podConfig, ok := props["PodConfiguration"].(map[string]any); ok {
 		config := &containerengine.PodConfiguration{}
-		if subnetId, ok := util.ExtractString(podConfig, "SubnetId"); ok {
+		if subnetId, ok := util.ExtractString(podConfig, "subnetId"); ok {
 			config.SubnetId = common.String(subnetId)
 		}
-		if shape, ok := util.ExtractString(podConfig, "Shape"); ok {
+		if shape, ok := util.ExtractString(podConfig, "shape"); ok {
 			config.Shape = common.String(shape)
 		}
-		if nsgIds, ok := util.ExtractStringSlice(podConfig, "NsgIds"); ok {
+		if nsgIds, ok := util.ExtractStringSlice(podConfig, "nsgIds"); ok {
 			config.NsgIds = nsgIds
 		}
 		createDetails.PodConfiguration = config

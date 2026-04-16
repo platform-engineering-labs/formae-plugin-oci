@@ -1,0 +1,79 @@
+/*
+ * © 2025 Platform Engineering Labs Inc.
+ *
+ * SPDX-License-Identifier: FSL-1.1-ALv2
+ */
+
+module platform.compute
+
+import "@formae/formae.pkl"
+import "@oci/oci.pkl"
+import "@oci/core/volume.pkl"
+import "@oci/core/instance.pkl"
+import "@oci/core/subnet.pkl"
+import "@oci/core/networksecuritygroup.pkl"
+
+class ComputeResources {
+    compartmentId: String
+    projectName: String
+    availabilityDomain: String
+    nodeImageId: String
+    sshPublicKey: String
+    publicSubnet: subnet.Subnet
+    webNsg: networksecuritygroup.NetworkSecurityGroup
+
+    hidden dataVolume: volume.Volume = new volume.Volume {
+        label = "showcase-data-volume"
+        compartmentId = outer.compartmentId
+        availabilityDomain = outer.availabilityDomain
+        displayName = projectName + "-data-volume"
+        sizeInGBs = 50
+        freeformTags {
+            new oci.FreeformTag { key = "Name"; value = projectName + "-data-volume" }
+            new oci.FreeformTag { key = "Project"; value = projectName }
+        }
+    }
+
+    hidden bastion: instance.Instance = new instance.Instance {
+        label = "showcase-bastion"
+        compartmentId = outer.compartmentId
+        availabilityDomain = outer.availabilityDomain
+        shape = "VM.Standard.E4.Flex"
+        displayName = projectName + "-bastion"
+
+        shapeConfig = new instance.ShapeConfig {
+            ocpus = 1.0
+            memoryInGBs = 6.0
+        }
+
+        sourceDetails = new instance.SourceDetails {
+            sourceType = "image"
+            imageId = nodeImageId
+            bootVolumeSizeInGBs = 50
+        }
+
+        createVnicDetails = new instance.CreateVnicDetails {
+            subnetId = publicSubnet.res.id
+            displayName = projectName + "-bastion-vnic"
+            assignPublicIp = true
+            nsgIds {
+                webNsg.res.id
+            }
+        }
+
+        metadata {
+            ["ssh_authorized_keys"] = sshPublicKey
+        }
+
+        freeformTags {
+            new oci.FreeformTag { key = "Name"; value = projectName + "-bastion" }
+            new oci.FreeformTag { key = "Project"; value = projectName }
+            new oci.FreeformTag { key = "Role"; value = "bastion" }
+        }
+    }
+
+    hidden resources: Listing<formae.Resource> = new {
+        dataVolume
+        bastion
+    }
+}
