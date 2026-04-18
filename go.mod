@@ -3,7 +3,6 @@ module github.com/platform-engineering-labs/formae-plugin-oci
 go 1.26.0
 
 require (
-	github.com/apple/pkl-go v0.13.2
 	github.com/evanphx/json-patch/v5 v5.9.11
 	github.com/oracle/oci-go-sdk/v65 v65.112.0
 	github.com/platform-engineering-labs/formae/pkg/model v0.1.23
@@ -15,6 +14,7 @@ require (
 require (
 	ergo.services/actor/statemachine v0.0.0-20251202053101-c0aa08b403e5 // indirect
 	ergo.services/ergo v1.999.320 // indirect
+	github.com/apple/pkl-go v0.13.2 // indirect
 	github.com/asdine/storm v2.1.2+incompatible // indirect
 	github.com/aws/aws-sdk-go-v2 v1.41.4 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.7 // indirect

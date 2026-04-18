@@ -9,7 +9,6 @@ import (
 	"encoding/json"
 
 	"github.com/oracle/oci-go-sdk/v65/common"
-	pkgmodel "github.com/platform-engineering-labs/formae/pkg/model"
 )
 
 type Config struct {
@@ -36,18 +35,6 @@ func (c *Config) ToConfigProvider(ctx context.Context) (common.ConfigurationProv
 	}
 
 	return common.ConfigurationProviderFromFileWithProfile(configPath, c.Profile, "")
-}
-
-// FromTarget extracts Config from a Target's raw config
-// Deprecated: Use FromTargetConfig instead
-func FromTarget(target *pkgmodel.Target) *Config {
-	if target == nil || target.Config == nil {
-		return &Config{}
-	}
-	config := &Config{}
-	_ = json.Unmarshal(target.Config, config)
-
-	return config
 }
 
 // FromTargetConfig extracts Config from raw JSON config
