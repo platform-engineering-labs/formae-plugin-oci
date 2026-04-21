@@ -291,7 +291,7 @@ func serializeIngressRules(rules []core.IngressSecurityRule) []map[string]any {
 		if rule.SourceType != "" {
 			ruleMap["sourceType"] = string(rule.SourceType)
 		}
-		if rule.IsStateless != nil {
+		if rule.IsStateless != nil && *rule.IsStateless {
 			ruleMap["isStateless"] = *rule.IsStateless
 		}
 		if rule.Description != nil {
@@ -359,7 +359,7 @@ func serializeEgressRules(rules []core.EgressSecurityRule) []map[string]any {
 		if rule.DestinationType != "" {
 			ruleMap["destinationType"] = string(rule.DestinationType)
 		}
-		if rule.IsStateless != nil {
+		if rule.IsStateless != nil && *rule.IsStateless {
 			ruleMap["isStateless"] = *rule.IsStateless
 		}
 		if rule.Description != nil {

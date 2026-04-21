@@ -55,6 +55,7 @@ class NodeConfigDetails {
     size: Int?
 
     /// Placement configurations - where to place the nodes
+    @oci.FieldHint{hasProviderDefault = true}
     placementConfigs: Listing<NodePoolPlacementConfig>?
 
     /// NSG OCIDs for the nodes
@@ -114,6 +115,13 @@ open class NodePool extends formae.Resource {
     @oci.FieldHint{required = true}
     clusterId: String|formae.Resolvable
 
+    /// The OCID of the subnet where node VNICs are placed. Not required by the
+    /// OCI API (subnet is specified in nodeConfigDetails.placementConfigs), but
+    /// declaring it with a Resolvable reference creates an implicit dependency
+    /// so formae destroys the node pool before the subnet.
+    @oci.FieldHint
+    subnetId: (String|formae.Resolvable)?
+
     /// The name of the node pool
     @oci.FieldHint{required = true}
     name: String
@@ -144,7 +152,7 @@ open class NodePool extends formae.Resource {
     sshPublicKey: String?
 
     /// Initial labels for nodes
-    @oci.FieldHint
+    @oci.FieldHint{hasProviderDefault = true}
     initialNodeLabels: Listing<NodeLabel>?
 
     @oci.FieldHint{hasProviderDefault = true}

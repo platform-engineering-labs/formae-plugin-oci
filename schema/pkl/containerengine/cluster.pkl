@@ -26,6 +26,18 @@ open class ClusterResolvable extends formae.Resolvable {
     hidden vcnId: ClusterResolvable = (this) {
         property = "VcnId"
     }
+    hidden endpoint: ClusterResolvable = (this) {
+        property = "Endpoints.PublicEndpoint"
+    }
+    hidden publicEndpoint: ClusterResolvable = (this) {
+        property = "Endpoints.PublicEndpoint"
+    }
+    hidden privateEndpoint: ClusterResolvable = (this) {
+        property = "Endpoints.PrivateEndpoint"
+    }
+    hidden certificateAuthority: ClusterResolvable = (this) {
+        property = "CertificateAuthority"
+    }
 }
 
 /// Cluster type - BASIC_CLUSTER or ENHANCED_CLUSTER
@@ -143,6 +155,13 @@ open class Cluster extends formae.Resource {
 
     @oci.FieldHint{hasProviderDefault = true}
     definedTags: Listing<oci.DefinedTag>?
+
+    // Read-only output fields (populated by Read, not user-supplied)
+    @oci.FieldHint{hasProviderDefault = true}
+    Endpoints: Mapping<String, String>?
+
+    @oci.FieldHint{hasProviderDefault = true}
+    CertificateAuthority: String?
 
     local parent = this
 

@@ -26,7 +26,7 @@ nodePoolSize = 2
 props = new Dynamic {
     compartmentId = new formae.Prop {
         flag = "compartmentId"
-        default = "ocid1.tenancy.oc1..aaaaaaaakxm3lo5ntsbsmx3n6epvrntxsmjg6eypafyi2ldngr6bsclpcdta"
+        default = "ocid1.compartment.oc1..aaaaaaaalrlihjwxgvrupwi47au2aqy6rk3lfhm57bdrrq2ricjoi3sp6j5q"
     }
 
     availabilityDomain = new formae.Prop {

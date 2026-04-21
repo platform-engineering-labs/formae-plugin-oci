@@ -8,6 +8,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 
 	"github.com/oracle/oci-go-sdk/v65/common"
 	"github.com/oracle/oci-go-sdk/v65/containerengine"
@@ -15,6 +16,7 @@ import (
 	"github.com/platform-engineering-labs/formae-plugin-oci/pkg/provisioner"
 	"github.com/platform-engineering-labs/formae-plugin-oci/pkg/util"
 	"github.com/platform-engineering-labs/formae/pkg/plugin/resource"
+	"gopkg.in/yaml.v3"
 )
 
 type ClusterProvisioner struct {
@@ -390,6 +392,11 @@ func (p *ClusterProvisioner) Read(ctx context.Context, request *resource.ReadReq
 		props["DefinedTags"] = util.DefinedTagsToList(resp.DefinedTags)
 	}
 
+	// Fetch CA certificate from kubeconfig
+	if ca, err := fetchCACert(ctx, client, request.NativeID); err == nil && ca != "" {
+		props["CertificateAuthority"] = ca
+	}
+
 	propBytes, err := json.Marshal(props)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal Cluster properties: %w", err)
@@ -436,4 +443,40 @@ func (p *ClusterProvisioner) List(ctx context.Context, request *resource.ListReq
 	return &resource.ListResult{
 		NativeIDs: nativeIDs,
 	}, nil
+}
+
+// kubeconfig is a minimal representation for extracting the CA certificate.
+type kubeconfig struct {
+	Clusters []struct {
+		Cluster struct {
+			CertificateAuthorityData string `yaml:"certificate-authority-data"`
+		} `yaml:"cluster"`
+	} `yaml:"clusters"`
+}
+
+// fetchCACert retrieves the cluster's CA certificate via the CreateKubeconfig API.
+func fetchCACert(ctx context.Context, ce *containerengine.ContainerEngineClient, clusterID string) (string, error) {
+	resp, err := ce.CreateKubeconfig(ctx, containerengine.CreateKubeconfigRequest{
+		ClusterId: common.String(clusterID),
+	})
+	if err != nil {
+		return "", fmt.Errorf("failed to create kubeconfig: %w", err)
+	}
+	defer func() { _ = resp.Content.Close() }()
+
+	body, err := io.ReadAll(resp.Content)
+	if err != nil {
+		return "", fmt.Errorf("failed to read kubeconfig content: %w", err)
+	}
+
+	var kc kubeconfig
+	if err := yaml.Unmarshal(body, &kc); err != nil {
+		return "", fmt.Errorf("failed to parse kubeconfig YAML: %w", err)
+	}
+
+	if len(kc.Clusters) > 0 && kc.Clusters[0].Cluster.CertificateAuthorityData != "" {
+		return kc.Clusters[0].Cluster.CertificateAuthorityData, nil
+	}
+
+	return "", nil
 }
