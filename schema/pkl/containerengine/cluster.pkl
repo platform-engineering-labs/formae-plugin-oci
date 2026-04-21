@@ -156,6 +156,13 @@ open class Cluster extends formae.Resource {
     @oci.FieldHint{hasProviderDefault = true}
     definedTags: Listing<oci.DefinedTag>?
 
+    // Read-only output fields (populated by Read, not user-supplied)
+    @oci.FieldHint{hasProviderDefault = true}
+    Endpoints: Mapping<String, String>?
+
+    @oci.FieldHint{hasProviderDefault = true}
+    CertificateAuthority: String?
+
     local parent = this
 
     hidden res: ClusterResolvable = new {
