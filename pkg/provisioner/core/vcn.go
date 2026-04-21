@@ -244,9 +244,10 @@ func (p *VCNProvisioner) Read(ctx context.Context, request *resource.ReadRequest
 	if resp.CidrBlock != nil {
 		props["CidrBlock"] = *resp.CidrBlock
 	}
-	if resp.CidrBlocks != nil {
-		props["CidrBlocks"] = resp.CidrBlocks
-	}
+	// CidrBlocks is server-computed from CidrBlock — omit to avoid false diffs
+	// if resp.CidrBlocks != nil {
+	// 	props["CidrBlocks"] = resp.CidrBlocks
+	// }
 	if resp.DisplayName != nil {
 		props["DisplayName"] = *resp.DisplayName
 	}

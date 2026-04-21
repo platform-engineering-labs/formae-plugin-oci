@@ -53,7 +53,7 @@ open class VCN extends formae.Resource {
     @oci.FieldHint
     cidrBlock: String?
 
-    @oci.FieldHint
+    @oci.FieldHint{hasProviderDefault = true}
     cidrBlocks: Listing<String>?
 
     @oci.FieldHint

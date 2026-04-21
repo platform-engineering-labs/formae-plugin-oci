@@ -27,7 +27,7 @@ open class ClusterResolvable extends formae.Resolvable {
         property = "VcnId"
     }
     hidden endpoint: ClusterResolvable = (this) {
-        property = "Endpoints.Kubernetes"
+        property = "Endpoints.PublicEndpoint"
     }
     hidden publicEndpoint: ClusterResolvable = (this) {
         property = "Endpoints.PublicEndpoint"

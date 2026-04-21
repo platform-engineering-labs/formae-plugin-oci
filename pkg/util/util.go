@@ -86,13 +86,18 @@ func FreeformTagsToList(tags map[string]string) []map[string]string {
 	return result
 }
 
-// DefinedTagsToList converts OCI's map[string]map[string]any to Listing<oci.DefinedTag> format for responses
+// DefinedTagsToList converts OCI's map[string]map[string]any to Listing<oci.DefinedTag> format for responses.
+// Oracle-Tags (auto-generated CreatedBy/CreatedOn) are excluded since they are server-computed
+// and would cause false diffs when the forma doesn't declare them.
 func DefinedTagsToList(tags map[string]map[string]any) []map[string]any {
 	if len(tags) == 0 {
 		return nil
 	}
 	namespaces := make([]string, 0, len(tags))
 	for ns := range tags {
+		if ns == "Oracle-Tags" {
+			continue
+		}
 		namespaces = append(namespaces, ns)
 	}
 	sort.Strings(namespaces)
