@@ -17,6 +17,9 @@ open class InternetGatewayResolvable extends formae.Resolvable {
     hidden id: InternetGatewayResolvable = (this) {
         property = "Id"
     }
+    hidden CompartmentId: InternetGatewayResolvable = (this) {
+        property = "CompartmentId"
+    }
 }
 
 @oci.ResourceHint {

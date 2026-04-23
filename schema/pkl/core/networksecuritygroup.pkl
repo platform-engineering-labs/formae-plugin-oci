@@ -17,6 +17,9 @@ open class NetworkSecurityGroupResolvable extends formae.Resolvable {
     hidden id: NetworkSecurityGroupResolvable = (this) {
         property = "Id"
     }
+    hidden CompartmentId: NetworkSecurityGroupResolvable = (this) {
+        property = "CompartmentId"
+    }
 }
 
 @oci.ResourceHint {

@@ -23,6 +23,12 @@ open class VcnResolvable extends formae.Resolvable {
     hidden cidrBlock: VcnResolvable = (this) {
         property = "CidrBlock"
     }
+    hidden displayName: VcnResolvable = (this) {
+        property = "DisplayName"
+    }
+    hidden dnsLabel: VcnResolvable = (this) {
+        property = "DnsLabel"
+    }
     hidden defaultDhcpOptionsId: VcnResolvable = (this) {
         property = "DefaultDhcpOptionsId"
     }

@@ -484,6 +484,18 @@ func buildInstanceProperties(inst core.Instance) map[string]any {
 	if inst.LifecycleState != "" {
 		properties["LifecycleState"] = string(inst.LifecycleState)
 	}
+	if inst.Region != nil {
+		properties["Region"] = *inst.Region
+	}
+	if inst.FaultDomain != nil {
+		properties["FaultDomain"] = *inst.FaultDomain
+	}
+	if inst.TimeCreated != nil {
+		properties["TimeCreated"] = inst.TimeCreated.Format("2006-01-02T15:04:05.000Z")
+	}
+	if inst.ImageId != nil {
+		properties["ImageId"] = *inst.ImageId
+	}
 
 	if inst.SourceDetails != nil {
 		switch v := inst.SourceDetails.(type) {

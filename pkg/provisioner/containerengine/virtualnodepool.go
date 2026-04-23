@@ -185,13 +185,13 @@ func (p *VirtualNodePoolProvisioner) Update(ctx context.Context, request *resour
 		for _, pc := range placementConfigs {
 			if pcMap, ok := pc.(map[string]any); ok {
 				placementConfig := containerengine.PlacementConfiguration{}
-				if ad, ok := util.ExtractString(pcMap, "AvailabilityDomain"); ok {
+				if ad, ok := util.ExtractString(pcMap, "availabilityDomain"); ok {
 					placementConfig.AvailabilityDomain = common.String(ad)
 				}
-				if subnetId, ok := util.ExtractString(pcMap, "SubnetId"); ok {
+				if subnetId, ok := util.ExtractString(pcMap, "subnetId"); ok {
 					placementConfig.SubnetId = common.String(subnetId)
 				}
-				if faultDomains, ok := util.ExtractStringSlice(pcMap, "FaultDomains"); ok {
+				if faultDomains, ok := util.ExtractStringSlice(pcMap, "faultDomains"); ok {
 					placementConfig.FaultDomain = faultDomains
 				}
 				configs = append(configs, placementConfig)
@@ -203,13 +203,13 @@ func (p *VirtualNodePoolProvisioner) Update(ctx context.Context, request *resour
 	// Parse PodConfiguration for update
 	if podConfig, ok := props["PodConfiguration"].(map[string]any); ok {
 		config := &containerengine.PodConfiguration{}
-		if subnetId, ok := util.ExtractString(podConfig, "SubnetId"); ok {
+		if subnetId, ok := util.ExtractString(podConfig, "subnetId"); ok {
 			config.SubnetId = common.String(subnetId)
 		}
-		if shape, ok := util.ExtractString(podConfig, "Shape"); ok {
+		if shape, ok := util.ExtractString(podConfig, "shape"); ok {
 			config.Shape = common.String(shape)
 		}
-		if nsgIds, ok := util.ExtractStringSlice(podConfig, "NsgIds"); ok {
+		if nsgIds, ok := util.ExtractStringSlice(podConfig, "nsgIds"); ok {
 			config.NsgIds = nsgIds
 		}
 		updateDetails.PodConfiguration = config
@@ -229,14 +229,14 @@ func (p *VirtualNodePoolProvisioner) Update(ctx context.Context, request *resour
 		for _, label := range initialLabels {
 			if labelMap, ok := label.(map[string]any); ok {
 				kv := containerengine.InitialVirtualNodeLabel{}
-				if key, ok := util.ExtractString(labelMap, "Key"); ok {
+				if key, ok := util.ExtractString(labelMap, "key"); ok {
 					kv.Key = common.String(key)
-				} else if key, ok := util.ExtractString(labelMap, "key"); ok {
+				} else if key, ok := util.ExtractString(labelMap, "Key"); ok {
 					kv.Key = common.String(key)
 				}
-				if value, ok := util.ExtractString(labelMap, "Value"); ok {
+				if value, ok := util.ExtractString(labelMap, "value"); ok {
 					kv.Value = common.String(value)
-				} else if value, ok := util.ExtractString(labelMap, "value"); ok {
+				} else if value, ok := util.ExtractString(labelMap, "Value"); ok {
 					kv.Value = common.String(value)
 				}
 				labels = append(labels, kv)
@@ -251,13 +251,13 @@ func (p *VirtualNodePoolProvisioner) Update(ctx context.Context, request *resour
 		for _, taint := range taints {
 			if taintMap, ok := taint.(map[string]any); ok {
 				t := containerengine.Taint{}
-				if key, ok := util.ExtractString(taintMap, "Key"); ok {
+				if key, ok := util.ExtractString(taintMap, "key"); ok {
 					t.Key = common.String(key)
 				}
-				if value, ok := util.ExtractString(taintMap, "Value"); ok {
+				if value, ok := util.ExtractString(taintMap, "value"); ok {
 					t.Value = common.String(value)
 				}
-				if effect, ok := util.ExtractString(taintMap, "Effect"); ok {
+				if effect, ok := util.ExtractString(taintMap, "effect"); ok {
 					t.Effect = common.String(effect)
 				}
 				taintList = append(taintList, t)
@@ -389,6 +389,10 @@ func (p *VirtualNodePoolProvisioner) Read(ctx context.Context, request *resource
 		"DisplayName":   *resp.DisplayName,
 	}
 
+	if resp.KubernetesVersion != nil {
+		props["KubernetesVersion"] = *resp.KubernetesVersion
+	}
+
 	if resp.LifecycleState != "" {
 		props["LifecycleState"] = string(resp.LifecycleState)
 	}
@@ -407,13 +411,13 @@ func (p *VirtualNodePoolProvisioner) Read(ctx context.Context, request *resource
 		for _, pc := range resp.PlacementConfigurations {
 			pcMap := map[string]any{}
 			if pc.AvailabilityDomain != nil {
-				pcMap["AvailabilityDomain"] = *pc.AvailabilityDomain
+				pcMap["availabilityDomain"] = *pc.AvailabilityDomain
 			}
 			if pc.SubnetId != nil {
-				pcMap["SubnetId"] = *pc.SubnetId
+				pcMap["subnetId"] = *pc.SubnetId
 			}
 			if len(pc.FaultDomain) > 0 {
-				pcMap["FaultDomains"] = pc.FaultDomain
+				pcMap["faultDomains"] = pc.FaultDomain
 			}
 			placementConfigs = append(placementConfigs, pcMap)
 		}
@@ -424,13 +428,13 @@ func (p *VirtualNodePoolProvisioner) Read(ctx context.Context, request *resource
 	if resp.PodConfiguration != nil {
 		podConfig := map[string]any{}
 		if resp.PodConfiguration.SubnetId != nil {
-			podConfig["SubnetId"] = *resp.PodConfiguration.SubnetId
+			podConfig["subnetId"] = *resp.PodConfiguration.SubnetId
 		}
 		if resp.PodConfiguration.Shape != nil {
-			podConfig["Shape"] = *resp.PodConfiguration.Shape
+			podConfig["shape"] = *resp.PodConfiguration.Shape
 		}
 		if resp.PodConfiguration.NsgIds != nil {
-			podConfig["NsgIds"] = resp.PodConfiguration.NsgIds
+			podConfig["nsgIds"] = resp.PodConfiguration.NsgIds
 		}
 		props["PodConfiguration"] = podConfig
 	}
@@ -441,10 +445,10 @@ func (p *VirtualNodePoolProvisioner) Read(ctx context.Context, request *resource
 		for _, label := range resp.InitialVirtualNodeLabels {
 			labelMap := map[string]any{}
 			if label.Key != nil {
-				labelMap["Key"] = *label.Key
+				labelMap["key"] = *label.Key
 			}
 			if label.Value != nil {
-				labelMap["Value"] = *label.Value
+				labelMap["value"] = *label.Value
 			}
 			labels = append(labels, labelMap)
 		}
@@ -457,13 +461,13 @@ func (p *VirtualNodePoolProvisioner) Read(ctx context.Context, request *resource
 		for _, taint := range resp.Taints {
 			taintMap := map[string]any{}
 			if taint.Key != nil {
-				taintMap["Key"] = *taint.Key
+				taintMap["key"] = *taint.Key
 			}
 			if taint.Value != nil {
-				taintMap["Value"] = *taint.Value
+				taintMap["value"] = *taint.Value
 			}
 			if taint.Effect != nil {
-				taintMap["Effect"] = *taint.Effect
+				taintMap["effect"] = *taint.Effect
 			}
 			taints = append(taints, taintMap)
 		}

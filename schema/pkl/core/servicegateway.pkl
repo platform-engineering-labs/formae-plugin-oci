@@ -22,6 +22,9 @@ open class ServiceGatewayResolvable extends formae.Resolvable {
     hidden id: ServiceGatewayResolvable = (this) {
         property = "Id"
     }
+    hidden CompartmentId: ServiceGatewayResolvable = (this) {
+        property = "CompartmentId"
+    }
 }
 
 @oci.ResourceHint {

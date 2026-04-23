@@ -291,6 +291,12 @@ func (p *BucketProvisioner) Read(ctx context.Context, request *resource.ReadRequ
 	if resp.Versioning != "" {
 		props["Versioning"] = string(resp.Versioning)
 	}
+	if resp.CreatedBy != nil {
+		props["CreatedBy"] = *resp.CreatedBy
+	}
+	if resp.TimeCreated != nil {
+		props["TimeCreated"] = resp.TimeCreated.Format("2006-01-02T15:04:05.000Z")
+	}
 	if resp.FreeformTags != nil {
 		props["FreeformTags"] = util.FreeformTagsToList(resp.FreeformTags)
 	}

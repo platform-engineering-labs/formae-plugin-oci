@@ -20,6 +20,15 @@ open class BucketResolvable extends formae.Resolvable {
     hidden namespace: BucketResolvable = (this) {
         property = "Namespace"
     }
+    hidden compartmentId: BucketResolvable = (this) {
+        property = "CompartmentId"
+    }
+    hidden timeCreated: BucketResolvable = (this) {
+        property = "TimeCreated"
+    }
+    hidden createdBy: BucketResolvable = (this) {
+        property = "CreatedBy"
+    }
 }
 
 @oci.ResourceHint {

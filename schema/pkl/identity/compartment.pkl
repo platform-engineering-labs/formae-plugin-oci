@@ -20,6 +20,15 @@ open class CompartmentResolvable extends formae.Resolvable {
     hidden name: CompartmentResolvable = (this) {
         property = "Name"
     }
+    hidden description: CompartmentResolvable = (this) {
+        property = "Description"
+    }
+    hidden lifecycleState: CompartmentResolvable = (this) {
+        property = "LifecycleState"
+    }
+    hidden timeCreated: CompartmentResolvable = (this) {
+        property = "TimeCreated"
+    }
 }
 
 @oci.ResourceHint {

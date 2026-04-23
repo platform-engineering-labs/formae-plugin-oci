@@ -199,10 +199,10 @@ func (p *NodePoolProvisioner) Update(ctx context.Context, request *resource.Upda
 	// Parse NodeShapeConfig for flexible shapes
 	if nodeShapeConfig, ok := props["NodeShapeConfig"].(map[string]any); ok {
 		config := &containerengine.UpdateNodeShapeConfigDetails{}
-		if ocpus, ok := nodeShapeConfig["Ocpus"].(float64); ok {
+		if ocpus, ok := nodeShapeConfig["ocpus"].(float64); ok {
 			config.Ocpus = common.Float32(float32(ocpus))
 		}
-		if memoryInGBs, ok := nodeShapeConfig["MemoryInGBs"].(float64); ok {
+		if memoryInGBs, ok := nodeShapeConfig["memoryInGBs"].(float64); ok {
 			config.MemoryInGBs = common.Float32(float32(memoryInGBs))
 		}
 		updateDetails.NodeShapeConfig = config
@@ -212,26 +212,26 @@ func (p *NodePoolProvisioner) Update(ctx context.Context, request *resource.Upda
 	if nodeConfigDetails, ok := props["NodeConfigDetails"].(map[string]any); ok {
 		config := &containerengine.UpdateNodePoolNodeConfigDetails{}
 
-		if size, ok := nodeConfigDetails["Size"].(float64); ok {
+		if size, ok := nodeConfigDetails["size"].(float64); ok {
 			config.Size = common.Int(int(size))
 		}
-		if nsgIds, ok := util.ExtractStringSlice(nodeConfigDetails, "NsgIds"); ok {
+		if nsgIds, ok := util.ExtractStringSlice(nodeConfigDetails, "nsgIds"); ok {
 			config.NsgIds = nsgIds
 		}
-		if isPvEncryptionInTransitEnabled, ok := util.ExtractBool(nodeConfigDetails, "IsPvEncryptionInTransitEnabled"); ok {
+		if isPvEncryptionInTransitEnabled, ok := util.ExtractBool(nodeConfigDetails, "isPvEncryptionInTransitEnabled"); ok {
 			config.IsPvEncryptionInTransitEnabled = common.Bool(isPvEncryptionInTransitEnabled)
 		}
 
 		// Parse PlacementConfigs for update
-		if placementConfigs, ok := nodeConfigDetails["PlacementConfigs"].([]any); ok {
+		if placementConfigs, ok := nodeConfigDetails["placementConfigs"].([]any); ok {
 			configs := make([]containerengine.NodePoolPlacementConfigDetails, 0, len(placementConfigs))
 			for _, pc := range placementConfigs {
 				if pcMap, ok := pc.(map[string]any); ok {
 					placementConfig := containerengine.NodePoolPlacementConfigDetails{}
-					if ad, ok := util.ExtractString(pcMap, "AvailabilityDomain"); ok {
+					if ad, ok := util.ExtractString(pcMap, "availabilityDomain"); ok {
 						placementConfig.AvailabilityDomain = common.String(ad)
 					}
-					if subnetId, ok := util.ExtractString(pcMap, "SubnetId"); ok {
+					if subnetId, ok := util.ExtractString(pcMap, "subnetId"); ok {
 						placementConfig.SubnetId = common.String(subnetId)
 					}
 					configs = append(configs, placementConfig)
@@ -249,10 +249,10 @@ func (p *NodePoolProvisioner) Update(ctx context.Context, request *resource.Upda
 		for _, label := range initialNodeLabels {
 			if labelMap, ok := label.(map[string]any); ok {
 				kv := containerengine.KeyValue{}
-				if key, ok := util.ExtractString(labelMap, "Key"); ok {
+				if key, ok := util.ExtractString(labelMap, "key"); ok {
 					kv.Key = common.String(key)
 				}
-				if value, ok := util.ExtractString(labelMap, "Value"); ok {
+				if value, ok := util.ExtractString(labelMap, "value"); ok {
 					kv.Value = common.String(value)
 				}
 				labels = append(labels, kv)
@@ -397,13 +397,29 @@ func (p *NodePoolProvisioner) Read(ctx context.Context, request *resource.ReadRe
 	if resp.NodeShapeConfig != nil {
 		shapeConfig := map[string]any{}
 		if resp.NodeShapeConfig.Ocpus != nil {
-			shapeConfig["Ocpus"] = *resp.NodeShapeConfig.Ocpus
+			shapeConfig["ocpus"] = *resp.NodeShapeConfig.Ocpus
 		}
 		if resp.NodeShapeConfig.MemoryInGBs != nil {
-			shapeConfig["MemoryInGBs"] = *resp.NodeShapeConfig.MemoryInGBs
+			shapeConfig["memoryInGBs"] = *resp.NodeShapeConfig.MemoryInGBs
 		}
 		if len(shapeConfig) > 0 {
 			props["NodeShapeConfig"] = shapeConfig
+		}
+	}
+
+	// NodeSourceDetails (polymorphic - currently only IMAGE type)
+	if resp.NodeSourceDetails != nil {
+		if imageDetails, ok := resp.NodeSourceDetails.(containerengine.NodeSourceViaImageDetails); ok {
+			sourceDetails := map[string]any{}
+			if imageDetails.ImageId != nil {
+				sourceDetails["imageId"] = *imageDetails.ImageId
+			}
+			if imageDetails.BootVolumeSizeInGBs != nil {
+				sourceDetails["bootVolumeSizeInGBs"] = *imageDetails.BootVolumeSizeInGBs
+			}
+			if len(sourceDetails) > 0 {
+				props["NodeSourceDetails"] = sourceDetails
+			}
 		}
 	}
 
@@ -411,13 +427,13 @@ func (p *NodePoolProvisioner) Read(ctx context.Context, request *resource.ReadRe
 	if resp.NodeConfigDetails != nil {
 		nodeConfig := map[string]any{}
 		if resp.NodeConfigDetails.Size != nil {
-			nodeConfig["Size"] = *resp.NodeConfigDetails.Size
+			nodeConfig["size"] = *resp.NodeConfigDetails.Size
 		}
 		if resp.NodeConfigDetails.NsgIds != nil {
-			nodeConfig["NsgIds"] = resp.NodeConfigDetails.NsgIds
+			nodeConfig["nsgIds"] = resp.NodeConfigDetails.NsgIds
 		}
 		if resp.NodeConfigDetails.IsPvEncryptionInTransitEnabled != nil {
-			nodeConfig["IsPvEncryptionInTransitEnabled"] = *resp.NodeConfigDetails.IsPvEncryptionInTransitEnabled
+			nodeConfig["isPvEncryptionInTransitEnabled"] = *resp.NodeConfigDetails.IsPvEncryptionInTransitEnabled
 		}
 
 		// PlacementConfigs
@@ -426,20 +442,27 @@ func (p *NodePoolProvisioner) Read(ctx context.Context, request *resource.ReadRe
 			for _, pc := range resp.NodeConfigDetails.PlacementConfigs {
 				pcMap := map[string]any{}
 				if pc.AvailabilityDomain != nil {
-					pcMap["AvailabilityDomain"] = *pc.AvailabilityDomain
+					pcMap["availabilityDomain"] = *pc.AvailabilityDomain
 				}
 				if pc.SubnetId != nil {
-					pcMap["SubnetId"] = *pc.SubnetId
+					pcMap["subnetId"] = *pc.SubnetId
 				}
 				if pc.CapacityReservationId != nil {
-					pcMap["CapacityReservationId"] = *pc.CapacityReservationId
+					pcMap["capacityReservationId"] = *pc.CapacityReservationId
 				}
 				if len(pc.FaultDomains) > 0 {
-					pcMap["FaultDomains"] = pc.FaultDomains
+					pcMap["faultDomains"] = pc.FaultDomains
 				}
 				placementConfigs = append(placementConfigs, pcMap)
 			}
-			nodeConfig["PlacementConfigs"] = placementConfigs
+			nodeConfig["placementConfigs"] = placementConfigs
+		}
+
+		if resp.NodeConfigDetails.FreeformTags != nil {
+			nodeConfig["freeformTags"] = util.FreeformTagsToList(resp.NodeConfigDetails.FreeformTags)
+		}
+		if resp.NodeConfigDetails.DefinedTags != nil {
+			nodeConfig["definedTags"] = util.DefinedTagsToList(resp.NodeConfigDetails.DefinedTags)
 		}
 
 		props["NodeConfigDetails"] = nodeConfig
@@ -451,10 +474,10 @@ func (p *NodePoolProvisioner) Read(ctx context.Context, request *resource.ReadRe
 		for _, label := range resp.InitialNodeLabels {
 			labelMap := map[string]any{}
 			if label.Key != nil {
-				labelMap["Key"] = *label.Key
+				labelMap["key"] = *label.Key
 			}
 			if label.Value != nil {
-				labelMap["Value"] = *label.Value
+				labelMap["value"] = *label.Value
 			}
 			labels = append(labels, labelMap)
 		}
