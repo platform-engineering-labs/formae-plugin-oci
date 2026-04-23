@@ -17,6 +17,9 @@ open class DhcpOptionsResolvable extends formae.Resolvable {
     hidden id: DhcpOptionsResolvable = (this) {
         property = "Id"
     }
+    hidden CompartmentId: DhcpOptionsResolvable = (this) {
+        property = "CompartmentId"
+    }
 }
 
 /// DHCP DNS option - configures how DNS is handled in the VCN

@@ -31,6 +31,9 @@ open class RouteTableResolvable extends formae.Resolvable {
     hidden id: RouteTableResolvable = (this) {
         property = "Id"
     }
+    hidden CompartmentId: RouteTableResolvable = (this) {
+        property = "CompartmentId"
+    }
 }
 
 @oci.ResourceHint {

@@ -17,6 +17,15 @@ open class NatGatewayResolvable extends formae.Resolvable {
     hidden id: NatGatewayResolvable = (this) {
         property = "Id"
     }
+    hidden CompartmentId: NatGatewayResolvable = (this) {
+        property = "CompartmentId"
+    }
+    hidden natIp: NatGatewayResolvable = (this) {
+        property = "NatIp"
+    }
+    hidden publicIpId: NatGatewayResolvable = (this) {
+        property = "PublicIpId"
+    }
 }
 
 @oci.ResourceHint {

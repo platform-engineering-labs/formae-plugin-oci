@@ -269,17 +269,28 @@ func (p *ServiceGatewayProvisioner) Read(ctx context.Context, request *resource.
 		"Id":            *resp.Id,
 	}
 
+	if resp.BlockTraffic != nil {
+		props["BlockTraffic"] = *resp.BlockTraffic
+	}
+
 	// Convert services to array of maps
 	servicesArray := make([]map[string]string, 0, len(resp.Services))
 	for _, svc := range resp.Services {
-		servicesArray = append(servicesArray, map[string]string{
+		entry := map[string]string{
 			"serviceId": *svc.ServiceId,
-		})
+		}
+		if svc.ServiceName != nil {
+			entry["serviceName"] = *svc.ServiceName
+		}
+		servicesArray = append(servicesArray, entry)
 	}
 	props["Services"] = servicesArray
 
 	if resp.DisplayName != nil {
 		props["DisplayName"] = *resp.DisplayName
+	}
+	if resp.RouteTableId != nil {
+		props["RouteTableId"] = *resp.RouteTableId
 	}
 	if resp.FreeformTags != nil {
 		props["FreeformTags"] = util.FreeformTagsToList(resp.FreeformTags)

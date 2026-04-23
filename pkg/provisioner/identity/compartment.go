@@ -175,6 +175,12 @@ func (p *CompartmentProvisioner) Read(ctx context.Context, request *resource.Rea
 	if resp.Description != nil {
 		properties["Description"] = *resp.Description
 	}
+	if resp.LifecycleState != "" {
+		properties["LifecycleState"] = string(resp.LifecycleState)
+	}
+	if resp.TimeCreated != nil {
+		properties["TimeCreated"] = resp.TimeCreated.Format("2006-01-02T15:04:05.000Z")
+	}
 	if resp.FreeformTags != nil {
 		properties["FreeformTags"] = util.FreeformTagsToList(resp.FreeformTags)
 	}

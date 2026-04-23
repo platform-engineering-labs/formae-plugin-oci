@@ -17,6 +17,33 @@ open class InstanceResolvable extends formae.Resolvable {
     hidden id: InstanceResolvable = (this) {
         property = "Id"
     }
+    hidden compartmentId: InstanceResolvable = (this) {
+        property = "CompartmentId"
+    }
+    hidden availabilityDomain: InstanceResolvable = (this) {
+        property = "AvailabilityDomain"
+    }
+    hidden displayName: InstanceResolvable = (this) {
+        property = "DisplayName"
+    }
+    hidden shape: InstanceResolvable = (this) {
+        property = "Shape"
+    }
+    hidden region: InstanceResolvable = (this) {
+        property = "Region"
+    }
+    hidden faultDomain: InstanceResolvable = (this) {
+        property = "FaultDomain"
+    }
+    hidden lifecycleState: InstanceResolvable = (this) {
+        property = "LifecycleState"
+    }
+    hidden timeCreated: InstanceResolvable = (this) {
+        property = "TimeCreated"
+    }
+    hidden imageId: InstanceResolvable = (this) {
+        property = "ImageId"
+    }
 }
 
 /// Source details for launching an instance (image or boot volume)

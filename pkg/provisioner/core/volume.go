@@ -378,6 +378,12 @@ func buildVolumeProperties(vol core.Volume) map[string]any {
 	if vol.KmsKeyId != nil {
 		properties["KmsKeyId"] = *vol.KmsKeyId
 	}
+	if vol.LifecycleState != "" {
+		properties["LifecycleState"] = string(vol.LifecycleState)
+	}
+	if vol.TimeCreated != nil {
+		properties["TimeCreated"] = vol.TimeCreated.Format("2006-01-02T15:04:05.000Z")
+	}
 	if vol.FreeformTags != nil {
 		properties["FreeformTags"] = util.FreeformTagsToList(vol.FreeformTags)
 	}

@@ -17,6 +17,9 @@ open class SecurityListResolvable extends formae.Resolvable {
     hidden id: SecurityListResolvable = (this) {
         property = "Id"
     }
+    hidden CompartmentId: SecurityListResolvable = (this) {
+        property = "CompartmentId"
+    }
 }
 
 /// Port range for TCP/UDP options

@@ -180,9 +180,9 @@ func (p *ClusterProvisioner) Update(ctx context.Context, request *resource.Updat
 	if options, ok := props["Options"].(map[string]any); ok {
 		clusterOptions := &containerengine.UpdateClusterOptionsDetails{}
 
-		if admissionControllerOptions, ok := options["AdmissionControllerOptions"].(map[string]any); ok {
+		if admissionControllerOptions, ok := options["admissionControllerOptions"].(map[string]any); ok {
 			admissionOptions := &containerengine.AdmissionControllerOptions{}
-			if isPodSecurityPolicyEnabled, ok := util.ExtractBool(admissionControllerOptions, "IsPodSecurityPolicyEnabled"); ok {
+			if isPodSecurityPolicyEnabled, ok := util.ExtractBool(admissionControllerOptions, "isPodSecurityPolicyEnabled"); ok {
 				admissionOptions.IsPodSecurityPolicyEnabled = common.Bool(isPodSecurityPolicyEnabled)
 			}
 			clusterOptions.AdmissionControllerOptions = admissionOptions
@@ -312,7 +312,7 @@ func (p *ClusterProvisioner) Read(ctx context.Context, request *resource.ReadReq
 		props["Name"] = *resp.Name
 	}
 	if resp.Type != "" {
-		props["Type"] = string(resp.Type)
+		props["ClusterType"] = string(resp.Type)
 	}
 	if resp.LifecycleState != "" {
 		props["LifecycleState"] = string(resp.LifecycleState)
@@ -378,6 +378,15 @@ func (p *ClusterProvisioner) Read(ctx context.Context, request *resource.ReadReq
 			}
 			if len(addOns) > 0 {
 				options["addOns"] = addOns
+			}
+		}
+		if resp.Options.AdmissionControllerOptions != nil {
+			admissionOpts := map[string]any{}
+			if resp.Options.AdmissionControllerOptions.IsPodSecurityPolicyEnabled != nil {
+				admissionOpts["isPodSecurityPolicyEnabled"] = *resp.Options.AdmissionControllerOptions.IsPodSecurityPolicyEnabled
+			}
+			if len(admissionOpts) > 0 {
+				options["admissionControllerOptions"] = admissionOpts
 			}
 		}
 		if len(options) > 0 {

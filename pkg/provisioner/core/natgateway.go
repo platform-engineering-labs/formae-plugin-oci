@@ -232,11 +232,20 @@ func (p *NatGatewayProvisioner) Read(ctx context.Context, request *resource.Read
 		"Id":            *resp.Id,
 	}
 
+	if resp.NatIp != nil {
+		props["NatIp"] = *resp.NatIp
+	}
 	if resp.DisplayName != nil {
 		props["DisplayName"] = *resp.DisplayName
 	}
 	if resp.BlockTraffic != nil {
 		props["BlockTraffic"] = *resp.BlockTraffic
+	}
+	if resp.PublicIpId != nil {
+		props["PublicIpId"] = *resp.PublicIpId
+	}
+	if resp.RouteTableId != nil {
+		props["RouteTableId"] = *resp.RouteTableId
 	}
 	if resp.FreeformTags != nil {
 		props["FreeformTags"] = util.FreeformTagsToList(resp.FreeformTags)

@@ -17,6 +17,24 @@ open class VolumeResolvable extends formae.Resolvable {
     hidden id: VolumeResolvable = (this) {
         property = "Id"
     }
+    hidden compartmentId: VolumeResolvable = (this) {
+        property = "CompartmentId"
+    }
+    hidden availabilityDomain: VolumeResolvable = (this) {
+        property = "AvailabilityDomain"
+    }
+    hidden displayName: VolumeResolvable = (this) {
+        property = "DisplayName"
+    }
+    hidden sizeInGBs: VolumeResolvable = (this) {
+        property = "SizeInGBs"
+    }
+    hidden lifecycleState: VolumeResolvable = (this) {
+        property = "LifecycleState"
+    }
+    hidden timeCreated: VolumeResolvable = (this) {
+        property = "TimeCreated"
+    }
 }
 
 @oci.ResourceHint {

@@ -17,8 +17,14 @@ open class SubnetResolvable extends formae.Resolvable {
     hidden id: SubnetResolvable = (this) {
         property = "Id"
     }
+    hidden CompartmentId: SubnetResolvable = (this) {
+        property = "CompartmentId"
+    }
     hidden cidrBlock: SubnetResolvable = (this) {
         property = "CidrBlock"
+    }
+    hidden availabilityDomain: SubnetResolvable = (this) {
+        property = "AvailabilityDomain"
     }
     hidden virtualRouterIp: SubnetResolvable = (this) {
         property = "VirtualRouterIp"
