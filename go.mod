@@ -4,7 +4,7 @@ go 1.26.0
 
 require (
 	github.com/evanphx/json-patch/v5 v5.9.11
-	github.com/oracle/oci-go-sdk/v65 v65.112.0
+	github.com/oracle/oci-go-sdk/v65 v65.113.0
 	github.com/platform-engineering-labs/formae/pkg/model v0.1.23
 	github.com/platform-engineering-labs/formae/pkg/plugin v0.2.2-0.20260425033718-2ccb40eaf779
 	github.com/platform-engineering-labs/formae/pkg/plugin-conformance-tests v0.2.2
