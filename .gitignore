@@ -29,6 +29,9 @@ dist/
 *.pkl-expected.pcf
 PklProject.deps.json
 
+# Generated at build time
+schema/pkl/VERSION
+
 # Claude Code
 CLAUDE.md
 .claude/
