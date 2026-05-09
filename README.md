@@ -28,12 +28,6 @@ Formae plugin for managing Oracle Cloud Infrastructure resources.
 | `OCI::ContainerEngine::VirtualNodePool` | OKE virtual node pools |
 | `OCI::ObjectStorage::Bucket` | Object storage buckets |
 
-## Installation
-
-```bash
-make install
-```
-
 ## Configuration
 
 Configure an OCI target in your Forma file:
@@ -63,25 +57,6 @@ See [examples/](examples/) for usage patterns:
 - `oke/` - OKE Kubernetes cluster
 
 **Note:** Update `vars.pkl` with your compartment ID and region before running.
-
-## Development
-
-```bash
-make build          # Build plugin
-make test           # Run tests
-make install        # Install locally
-make install-dev    # Install as v0.0.0 (for debug builds)
-make gen-pkl        # Resolve PKL dependencies
-```
-
-## Conformance Tests
-
-Run against real OCI resources:
-
-```bash
-make setup-credentials                           # Verify OCI login
-make conformance-test   # Run full suite
-```
 
 ## License
 
