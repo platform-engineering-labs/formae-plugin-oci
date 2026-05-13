@@ -35,5 +35,5 @@ schema/pkl/VERSION
 # Claude Code
 CLAUDE.md
 .claude/
-oci
+bin/oci
 .handoffs/
