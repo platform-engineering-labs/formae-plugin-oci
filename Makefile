@@ -22,7 +22,7 @@ BINARY := $(PLUGIN_NAME)
 PLUGIN_BASE_DIR := $(HOME)/.pel/formae/plugins
 INSTALL_DIR := $(PLUGIN_BASE_DIR)/$(PLUGIN_NAME)/v$(PLUGIN_VERSION)
 
-.PHONY: all build test test-unit test-integration lint lint-reuse add-license schema-version verify-schema clean install install-dev gen-pkl help setup-credentials clean-environment conformance-test conformance-test-crud conformance-test-discovery
+.PHONY: all build test test-unit test-integration lint lint-reuse add-license schema-version verify-schema clean install install-dev gen-pkl help setup-credentials clean-environment conformance-test conformance-test-crud conformance-test-discovery conformance-test-crud-run conformance-test-discovery-run
 
 all: build
 
@@ -125,28 +125,37 @@ clean-environment:
 	@./scripts/ci/clean-environment.sh
 
 ## conformance-test: Run all conformance tests (CRUD + discovery)
-## Usage: make conformance-test [VERSION=0.80.0] [TEST=bucket]
-## Downloads the specified formae version (or latest) and runs conformance tests.
+## Usage: make conformance-test [TEST=bucket] [PARALLEL=1] [TIMEOUT=60]
 ## Calls clean-environment before and after tests.
 ##
 ## Parameters:
-##   VERSION - Formae version to test against (default: latest)
-##   TEST    - Filter tests by name pattern (e.g., TEST=bucket)
-conformance-test: conformance-test-crud conformance-test-discovery
+##   TEST     - Filter tests by name pattern (e.g., TEST=bucket)
+##   PARALLEL - Concurrent tests inside the SDK (default: 1 = sequential)
+##   TIMEOUT  - Test timeout in minutes (default: 60)
+##
+## The conformance SDK installs the latest released formae via orbital
+## unless FORMAE_BINARY is set (e.g. by nightly which builds from source).
+conformance-test: install
+	@echo "Pre-test cleanup..."
+	@./scripts/ci/clean-environment.sh || true
+	@echo ""
+	@$(MAKE) conformance-test-crud-run conformance-test-discovery-run TEST=$(TEST) PARALLEL=$(PARALLEL) TIMEOUT=$(TIMEOUT); \
+	TEST_EXIT=$$?; \
+	echo ""; \
+	echo "Post-test cleanup..."; \
+	./scripts/ci/clean-environment.sh || true; \
+	exit $$TEST_EXIT
 
-## conformance-test-crud: Run only CRUD lifecycle tests
-## Usage: make conformance-test-crud [VERSION=0.80.0] [TEST=bucket]
+## conformance-test-crud: Run CRUD tests with cleanup (convenience for local dev)
 ## Note: Environment cleanup is skipped when FORMAE_TEST_FILTER is set (e.g. matrix CI)
-## to avoid parallel jobs deleting each other's resources. Use clean-environment target
-## or a separate CI cleanup job instead.
+## to avoid parallel jobs deleting each other's resources.
 conformance-test-crud: install
 	@if [ -z "$(FORMAE_TEST_FILTER)" ] && [ -z "$(TEST)" ]; then \
 		echo "Pre-test cleanup..."; \
 		./scripts/ci/clean-environment.sh || true; \
 		echo ""; \
 	fi
-	@echo "Running CRUD conformance tests..."
-	@FORMAE_TEST_FILTER="$(if $(TEST),$(TEST),$(FORMAE_TEST_FILTER))" FORMAE_TEST_TYPE=crud ./scripts/run-conformance-tests.sh $(VERSION); \
+	@$(MAKE) conformance-test-crud-run TEST=$(TEST) PARALLEL=$(PARALLEL) TIMEOUT=$(TIMEOUT); \
 	TEST_EXIT=$$?; \
 	if [ -z "$(FORMAE_TEST_FILTER)" ] && [ -z "$(TEST)" ]; then \
 		echo ""; \
@@ -155,8 +164,7 @@ conformance-test-crud: install
 	fi; \
 	exit $$TEST_EXIT
 
-## conformance-test-discovery: Run only discovery tests
-## Usage: make conformance-test-discovery [VERSION=0.80.0] [TEST=bucket]
+## conformance-test-discovery: Run discovery tests with cleanup (convenience for local dev)
 ## NOTE: natgateway, servicegateway, instance, cluster, nodepool, and virtualnodepool
 ## are excluded by default due to service limits in us-chicago-1.
 DISCOVERY_DEFAULT_FILTER := policy,vcn,volume,bucket,networksecuritygroup,internetgateway,routetable,securitylist,subnet,dhcpoptions,nsg_securityrule
@@ -166,8 +174,7 @@ conformance-test-discovery: install
 		./scripts/ci/clean-environment.sh || true; \
 		echo ""; \
 	fi
-	@echo "Running discovery conformance tests..."
-	@FORMAE_TEST_FILTER="$(if $(TEST),$(TEST),$(if $(FORMAE_TEST_FILTER),$(FORMAE_TEST_FILTER),$(DISCOVERY_DEFAULT_FILTER)))" FORMAE_TEST_TYPE=discovery ./scripts/run-conformance-tests.sh $(VERSION); \
+	@$(MAKE) conformance-test-discovery-run TEST=$(TEST) PARALLEL=$(PARALLEL) TIMEOUT=$(TIMEOUT); \
 	TEST_EXIT=$$?; \
 	if [ -z "$(FORMAE_TEST_FILTER)" ] && [ -z "$(TEST)" ]; then \
 		echo ""; \
@@ -175,3 +182,20 @@ conformance-test-discovery: install
 		./scripts/ci/clean-environment.sh || true; \
 	fi; \
 	exit $$TEST_EXIT
+
+## conformance-test-crud-run: Run only CRUD lifecycle tests (no cleanup)
+## Used by CI matrix jobs where cleanup is managed separately.
+## Honours $(TEST) (make var) and falls back to $(FORMAE_TEST_FILTER) (env)
+## so that CI workflows that only set the env var keep working.
+conformance-test-crud-run:
+	@echo "Running CRUD conformance tests..."
+	@FORMAE_TEST_FILTER="$(if $(TEST),$(TEST),$(FORMAE_TEST_FILTER))" FORMAE_TEST_TYPE=crud FORMAE_TEST_PARALLEL="$(PARALLEL)" \
+		$(GO) test -tags=conformance -v -timeout $(or $(TIMEOUT),60)m ./...
+
+## conformance-test-discovery-run: Run only discovery tests (no cleanup)
+## Used by CI matrix jobs where cleanup is managed separately.
+## Honours $(TEST), then $(FORMAE_TEST_FILTER), then DISCOVERY_DEFAULT_FILTER.
+conformance-test-discovery-run:
+	@echo "Running discovery conformance tests..."
+	@FORMAE_TEST_FILTER="$(if $(TEST),$(TEST),$(if $(FORMAE_TEST_FILTER),$(FORMAE_TEST_FILTER),$(DISCOVERY_DEFAULT_FILTER)))" FORMAE_TEST_TYPE=discovery FORMAE_TEST_PARALLEL="$(PARALLEL)" \
+		$(GO) test -tags=conformance -v -timeout $(or $(TIMEOUT),60)m ./...
