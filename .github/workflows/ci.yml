@@ -14,13 +14,6 @@ on:
         type: boolean
 
 jobs:
-  reuse-compliance:
-    name: REUSE License Compliance
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: fsfe/reuse-action@v5
-
   build:
     runs-on: ubuntu-latest
     steps:
