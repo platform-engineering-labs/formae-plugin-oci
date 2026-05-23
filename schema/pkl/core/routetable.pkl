@@ -12,7 +12,7 @@ import "../oci.pkl"
 const type = "OCI::Core::RouteTable"
 
 open class RouteRule {
-    @oci.FieldHint
+    @oci.FieldHint{edgeKind = "attachesTo"}
     networkEntityId: (String|formae.Resolvable)?
 
     @oci.FieldHint

@@ -59,6 +59,7 @@ class NodeConfigDetails {
     placementConfigs: Listing<NodePoolPlacementConfig>?
 
     /// NSG OCIDs for the nodes
+    @oci.FieldHint{edgeKind = "attachesTo"}
     nsgIds: Listing<String|formae.Resolvable>?
 
     /// Whether PV encryption in transit is enabled

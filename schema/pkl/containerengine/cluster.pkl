@@ -55,6 +55,7 @@ class ClusterEndpointConfig {
     isPublicIpEnabled: Boolean?
 
     /// List of NSG OCIDs for the API endpoint
+    @oci.FieldHint{edgeKind = "attachesTo"}
     nsgIds: Listing<String|formae.Resolvable>?
 }
 
