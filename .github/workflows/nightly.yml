@@ -244,6 +244,9 @@ jobs:
           OCI_COMPARTMENT_ID: ${{ secrets.OCI_COMPARTMENT_ID }}
         run: ./scripts/ci/wait-for-vcn-quota.sh
 
+      - name: Resolve testdata Pkl dependencies
+        run: pkl project resolve testdata
+
       - name: Run conformance tests against main (${{ matrix.resource }})
         env:
           OCI_COMPARTMENT_ID: ${{ secrets.OCI_COMPARTMENT_ID }}
