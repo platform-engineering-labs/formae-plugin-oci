@@ -55,7 +55,7 @@ require (
 	github.com/masterminds/semver v1.5.0 // indirect
 	github.com/miekg/dns v1.1.72 // indirect
 	github.com/naegelejd/go-acl v0.0.0-20260323030528-42e4d61407df // indirect
-	github.com/platform-engineering-labs/formae/pkg/api/model v0.1.2-0.20260414222617-bbb533eb6131 // indirect
+	github.com/platform-engineering-labs/formae/pkg/api/model v0.1.1 // indirect
 	github.com/platform-engineering-labs/orbital v0.1.36 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
