@@ -108,11 +108,11 @@ class NodeLabel {
 open class NodePool extends formae.Resource {
 
     /// The OCID of the compartment in which the node pool exists
-    @oci.FieldHint{required = true}
+    @oci.FieldHint{required = true createOnly = true}
     compartmentId: String|formae.Resolvable
 
     /// The OCID of the cluster to which this node pool is attached
-    @oci.FieldHint{required = true}
+    @oci.FieldHint{required = true createOnly = true}
     clusterId: String|formae.Resolvable
 
     /// The OCID of the subnet where node VNICs are placed. Not required by the

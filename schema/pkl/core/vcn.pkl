@@ -56,7 +56,7 @@ open class VCN extends formae.Resource {
     @oci.FieldHint{required = true}
     compartmentId: String|formae.Resolvable
 
-    @oci.FieldHint
+    @oci.FieldHint{createOnly = true}
     cidrBlock: String?
 
     @oci.FieldHint{hasProviderDefault = true}
@@ -65,7 +65,7 @@ open class VCN extends formae.Resource {
     @oci.FieldHint
     displayName: String?
 
-    @oci.FieldHint
+    @oci.FieldHint{createOnly = true}
     dnsLabel: String?
 
     @oci.FieldHint

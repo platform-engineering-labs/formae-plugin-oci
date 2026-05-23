@@ -56,7 +56,7 @@ open class Bucket extends formae.Resource {
     @oci.FieldHint
     publicAccessType: String?
 
-    @oci.FieldHint
+    @oci.FieldHint{createOnly = true}
     storageTier: String?
 
     @oci.FieldHint

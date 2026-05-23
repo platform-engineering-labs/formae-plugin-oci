@@ -56,19 +56,19 @@ open class Subnet extends formae.Resource {
     @oci.FieldHint{required = true}
     cidrBlock: String
 
-    @oci.FieldHint
+    @oci.FieldHint{createOnly = true}
     availabilityDomain: String?
 
     @oci.FieldHint
     displayName: String?
 
-    @oci.FieldHint
+    @oci.FieldHint{createOnly = true}
     dnsLabel: String?
 
-    @oci.FieldHint
+    @oci.FieldHint{createOnly = true}
     prohibitPublicIpOnVnic: Boolean?
 
-    @oci.FieldHint
+    @oci.FieldHint{createOnly = true}
     prohibitInternetIngress: Boolean?
 
     @oci.FieldHint
