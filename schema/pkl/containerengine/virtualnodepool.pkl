@@ -78,11 +78,11 @@ class Taint {
 open class VirtualNodePool extends formae.Resource {
 
     /// The OCID of the compartment
-    @oci.FieldHint{required = true}
+    @oci.FieldHint{required = true createOnly = true}
     compartmentId: String|formae.Resolvable
 
     /// The OCID of the cluster
-    @oci.FieldHint{required = true}
+    @oci.FieldHint{required = true createOnly = true}
     clusterId: String|formae.Resolvable
 
     /// The display name of the virtual node pool

@@ -123,11 +123,11 @@ class FlannelOverlayPodNetworkOptionDetails {
 open class Cluster extends formae.Resource {
 
     /// The OCID of the compartment in which to create the cluster
-    @oci.FieldHint{required = true}
+    @oci.FieldHint{required = true createOnly = true}
     compartmentId: String|formae.Resolvable
 
     /// The OCID of the VCN to use for the cluster
-    @oci.FieldHint{required = true}
+    @oci.FieldHint{required = true createOnly = true}
     vcnId: String|formae.Resolvable
 
     /// The version of Kubernetes to install into the cluster masters
