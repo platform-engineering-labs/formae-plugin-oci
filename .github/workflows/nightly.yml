@@ -244,6 +244,18 @@ jobs:
           OCI_COMPARTMENT_ID: ${{ secrets.OCI_COMPARTMENT_ID }}
         run: ./scripts/ci/wait-for-vcn-quota.sh
 
+      - name: Generate schema/pkl/VERSION
+        # testdata/PklProject imports schema/pkl/PklProject which reads VERSION.
+        # The build job creates this file but it's not in the uploaded artifact,
+        # so regenerate it here from the manifest.
+        run: |
+          VERSION=$(pkl eval -x version formae-plugin.pkl)
+          mkdir -p schema/pkl
+          echo "$VERSION" > schema/pkl/VERSION
+
+      - name: Resolve testdata Pkl dependencies
+        run: pkl project resolve testdata
+
       - name: Run conformance tests against main (${{ matrix.resource }})
         env:
           OCI_COMPARTMENT_ID: ${{ secrets.OCI_COMPARTMENT_ID }}
