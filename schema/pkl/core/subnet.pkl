@@ -71,10 +71,10 @@ open class Subnet extends formae.Resource {
     @oci.FieldHint{createOnly = true}
     prohibitInternetIngress: Boolean?
 
-    @oci.FieldHint
+    @oci.FieldHint{edgeKind = "attachesTo"}
     routeTableId: (String|formae.Resolvable)?
 
-    @oci.FieldHint
+    @oci.FieldHint{edgeKind = "attachesTo"}
     securityListIds: Listing<String|formae.Resolvable>?
 
     @oci.FieldHint

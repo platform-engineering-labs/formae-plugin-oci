@@ -79,6 +79,7 @@ class CreateVnicDetails {
     hostnameLabel: String?
 
     /// List of NSG OCIDs
+    @oci.FieldHint{edgeKind = "attachesTo"}
     nsgIds: Listing<String|formae.Resolvable>?
 
     /// Private IP address

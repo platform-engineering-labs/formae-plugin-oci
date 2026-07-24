@@ -46,6 +46,7 @@ class PodConfiguration {
     subnetId: String|formae.Resolvable
 
     /// NSG OCIDs for pods
+    @oci.FieldHint{edgeKind = "attachesTo"}
     nsgIds: Listing<String|formae.Resolvable>?
 
     /// Pod shape (e.g., "Pod.Standard.E4.Flex")
@@ -102,7 +103,7 @@ open class VirtualNodePool extends formae.Resource {
     size: Int?
 
     /// NSG OCIDs for virtual nodes
-    @oci.FieldHint
+    @oci.FieldHint{edgeKind = "attachesTo"}
     nsgIds: Listing<String|formae.Resolvable>?
 
     /// Initial labels for virtual nodes (using formae.Tag for key/value pairs)
