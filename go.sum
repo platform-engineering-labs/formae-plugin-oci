@@ -109,8 +109,8 @@ github.com/oracle/oci-go-sdk/v65 v65.112.0 h1:L4O4SXAHq5T23qxbjaC/4NHikIKGHhrPtB
 github.com/oracle/oci-go-sdk/v65 v65.112.0/go.mod h1:8ZzvzuEG/cFLFZhxg/Mg1w19KqyXBKO3c17QIc5PkGs=
 github.com/platform-engineering-labs/formae/pkg/api/model v0.1.1 h1:ZMTgKwSomy2cVcl/+NivSqopbWeHbmYeQ+BxoYq8bVY=
 github.com/platform-engineering-labs/formae/pkg/api/model v0.1.1/go.mod h1:0ncHFCsGA6b0w1kBm6m+QwJ823qAY2vL47GvoR0BTyU=
-github.com/platform-engineering-labs/formae/pkg/model v0.1.23 h1:vn1Zifj9IgPew36LQXxQ0HHxf5iQT4DXulhcwf7Nys4=
-github.com/platform-engineering-labs/formae/pkg/model v0.1.23/go.mod h1:XmGJA7jNPX9cEGc8TxTiEDitBuEVJOddNakdTZ/bH4U=
+github.com/platform-engineering-labs/formae/pkg/model v0.1.25 h1:y6F4MCR8deBnBmlwldFew1lIwreXNtZitgBlFT60E/w=
+github.com/platform-engineering-labs/formae/pkg/model v0.1.25/go.mod h1:1dmsFwoaJZkHevBsAIZr068CWzG7de1VNz7PFWvM3Z8=
 github.com/platform-engineering-labs/formae/pkg/plugin v0.4.0 h1:NbSOq5YmeLPpFXDxqvmQ3iBfkLL7qSANPgaTbzD126o=
 github.com/platform-engineering-labs/formae/pkg/plugin v0.4.0/go.mod h1:ZFXMfeZljHVDWQTSeJ4dj2EG3iTjdrxQjm7DpvOYUXk=
 github.com/platform-engineering-labs/formae/pkg/plugin-conformance-tests v0.2.4 h1:7Ww45TQ3sNNQVwMiEMPKles+HCXZLJRSVjgMJZMj0sQ=
