@@ -6,7 +6,7 @@ require (
 	github.com/evanphx/json-patch/v5 v5.9.11
 	github.com/oracle/oci-go-sdk/v65 v65.112.0
 	github.com/platform-engineering-labs/formae/pkg/model v0.1.23
-	github.com/platform-engineering-labs/formae/pkg/plugin v0.4.0
+	github.com/platform-engineering-labs/formae/pkg/plugin v0.4.1
 	github.com/platform-engineering-labs/formae/pkg/plugin-conformance-tests v0.2.4
 	github.com/stretchr/testify v1.11.1
 	gopkg.in/yaml.v3 v3.0.1
